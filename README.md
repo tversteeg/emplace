@@ -7,20 +7,20 @@ Command-line tool to mirror installed software on multiple machines.
 
 1. Install the *emplace* binary:
 
-#### Rust
-
-```sh
-cargo install emplace
-```
+   #### Rust
+   
+   ```sh
+   cargo install emplace
+   ```
 
 2. Add the init script to your shell's config file:
 
-#### Bash
-
-Add the following tot he end of `~/.bashrc`:
-
-```sh
-# ~/.bashrc
-
-eval "$(emplace init bash)"
-```
+   #### Bash
+   
+   Add the following tot he end of `~/.bashrc`:
+   
+   ```sh
+   # ~/.bashrc
+   
+   eval "$(emplace init bash)"
+   ```
