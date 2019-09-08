@@ -1,0 +1,24 @@
+[package]
+name = "emplace"
+version = "0.1.0"
+authors = ["Thomas Versteeg <thomasversteeg@gmx.com>"]
+edition = "2018"
+repository = "https://github.com/tversteeg/emplace"
+readme = "README.md"
+license = "AGPL-3"
+keywords = ["shell", "cli", "mirror"]
+categories = ["command-line-utilities"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[badges]
+is-it-maintained-issue-resolution = { repository = "tversteeg/emplace" }
+is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
+
+[dependencies]
+ansi_term = "0.12"
+clap = "2"
+dialoguer = "0.4"
+git2 = "0.10"
+regex = "1"
+toml = "0.5"
+lazy_static = "1"
