@@ -49,16 +49,26 @@ fn main() {
         ("catch", Some(sub_m)) => {
             let line = sub_m.value_of("line").expect("Line is missing");
             let catches = catch::catch(line).expect("Could not parse line");
-            if catches.len() > 0 {
-                if dialoguer::Confirmation::new()
-                    .with_text("Do you want mirror this command?")
-                        .interact()
-                        .unwrap()
-                {
-                    println!("Y");
-                } else {
-                    println!("N");
-                }
+
+            // Nothing found, just return
+            if catches.len() == 0 {
+                return;
+            }
+
+            // Print the info
+            match catches.len() {
+                1 => println!("Mirror this command?"),
+                n => println!("Mirror these {} commands?", n)
+            }
+            for catch in catches.iter() {
+                println!("- {}", catch);
+            }
+
+            // Ask it needs to be mirrored
+            if !dialoguer::Confirmation::new()
+                .interact()
+                .expect("Could not create dialogue") {
+                return
             }
         },
         (&_, _) => { }

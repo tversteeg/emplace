@@ -18,7 +18,7 @@ is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
 ansi_term = "0.12"
 clap = "2"
 dialoguer = "0.4"
-directories = "2"
+dirs = "2"
 git2 = "0.10"
 lazy_static = "1"
 regex = "1"

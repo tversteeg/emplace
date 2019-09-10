@@ -22,6 +22,13 @@ impl Default for Config {
 }
 
 impl Config {
+    pub fn from_default_file() -> Result<Self, Box<dyn Error>> {
+        let mut dir = dirs::config_dir().expect("Could not find config dir");
+        dir.push("emplace.toml");
+
+        Config::from_path(&dir)
+    }
+
     pub fn from_path<P: AsRef<Path>>(file_path: &P) -> Result<Self, Box<dyn Error>> {
         // Open the file
         let mut file = File::open(file_path)?;
