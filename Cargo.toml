@@ -6,7 +6,7 @@ description = "Command-line tool to mirror installed software on multiple machin
 edition = "2018"
 repository = "https://github.com/tversteeg/emplace"
 readme = "README.md"
-license = "AGPL-3"
+license = "AGPL-3.0-or-later"
 keywords = ["shell", "cli", "mirror"]
 categories = ["command-line-utilities"]
 
