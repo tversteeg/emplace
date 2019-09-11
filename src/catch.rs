@@ -70,7 +70,7 @@ impl fmt::Display for Package {
 
 fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref CARGO_RE: Regex = Regex::new(r"cargo\S*\s+install\s+(?P<name>\w+)+").unwrap();
+        static ref CARGO_RE: Regex = Regex::new(r"cargo\s+install\s+(?P<name>\w+)+").unwrap();
     }
 
     let mut packages = vec![];
