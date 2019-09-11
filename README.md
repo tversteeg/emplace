@@ -1,7 +1,7 @@
 # emplace
 Command-line tool to mirror installed software on multiple machines.
 
-[![](https://travis-ci.org/tversteeg/emplace.svg?branch=master)](https://travis-ci.org/tversteeg/emplace) 
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftversteeg%2Femplace%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tversteeg/emplace/goto)
 [![](https://img.shields.io/crates/d/emplace.svg)](#downloads)
 [![](https://img.shields.io/crates/v/emplace.svg)](https://crates.io/crates/emplace)
 [![](https://img.shields.io/github/commits-since/tversteeg/emplace/latest.svg)]()
