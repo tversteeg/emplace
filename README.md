@@ -22,7 +22,7 @@ Command-line tool to mirror installed software on multiple machines.
 
    #### Bash
    
-   Add the following tot he end of `~/.bashrc`:
+   Add the following to the end of `~/.bashrc`:
    
    ```sh
    # ~/.bashrc
