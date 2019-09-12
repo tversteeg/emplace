@@ -54,17 +54,19 @@ fn main() {
             let line = sub_m.value_of("line").expect("Line is missing");
             let catches = catch::catch(line).expect("Could not parse line");
 
+            let len = catches.0.len();
+
             // Nothing found, just return
-            if catches.len() == 0 {
+            if len == 0 {
                 return;
             }
 
             // Print the info
-            match catches.len() {
+            match len {
                 1 => println!("Mirror this command?"),
                 n => println!("Mirror these {} commands?", n)
             }
-            for catch in catches.iter() {
+            for catch in catches.0.iter() {
                 println!("- {}", catch);
             }
 
@@ -83,6 +85,8 @@ fn main() {
             };
 
             let repo = Repo::new(config).expect("Could not initialize git repository");
+
+            repo.mirror(catches).expect("Could not mirror commands");
         },
         (&_, _) => { }
     }

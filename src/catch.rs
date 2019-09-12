@@ -1,3 +1,4 @@
+use serde::{Serialize, Deserialize};
 use regex::Regex;
 use std::{
     fmt,
@@ -5,6 +6,7 @@ use std::{
     string::String,
 };
 
+#[derive(Debug, Serialize, Deserialize)]
 pub enum PackageSource {
     /// Rust cargo.
     Cargo,
@@ -46,31 +48,49 @@ impl fmt::Display for PackageSource {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Package {
     /// The package manager's name.
-    pub package_source: PackageSource,
+    pub source: PackageSource,
     /// A list of packages that are going to be installed.
-    pub install_name: String,
+    pub name: String,
 }
 
 impl Package {
-    pub fn new(package_source: PackageSource, install_name: String) -> Self {
+    pub fn new(source: PackageSource, name: String) -> Self {
         Self {
-            package_source,
-            install_name,
+            source,
+            name,
         }
     }
 }
 
 impl fmt::Display for Package {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} ({})", self.install_name, self.package_source)
+        write!(f, "{} ({})", self.name, self.source)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Packages(pub Vec<Package>);
+
+impl Packages {
+    pub fn merge(&mut self, other: &mut Packages) {
+        self.0.append(&mut other.0);
+    }
+
+    pub fn commit_message(&self) -> String {
+        match self.0.len() {
+            0 => panic!("Can't create a commit message for empty changes"),
+            1 => format!("Added a new package ({})", self.0[0]),
+            n => format!("Added {} new packages", n),
+        }
     }
 }
 
 fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref CARGO_RE: Regex = Regex::new(r"cargo\s+install\s+(?P<name>\w+)+").unwrap();
+        static ref CARGO_RE: Regex = Regex::new(r"cargo\s+install\s+(?P<name>\S+)+").unwrap();
     }
 
     let mut packages = vec![];
@@ -84,7 +104,7 @@ fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 
 fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref APT_RE: Regex = Regex::new(r"apt\S*\s+install\s+(?P<name>\w+)+").unwrap();
+        static ref APT_RE: Regex = Regex::new(r"apt\S*\s+install\s+(?P<name>\S+)+").unwrap();
     }
 
     let mut packages = vec![];
@@ -98,7 +118,7 @@ fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 
 fn match_choco(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref CHOCO_RE: Regex = Regex::new(r"choco\S*\s+install\s+(?P<name>\w+)+").unwrap();
+        static ref CHOCO_RE: Regex = Regex::new(r"choco\S*\s+install\s+(?P<name>\S+)+").unwrap();
     }
 
     let mut packages = vec![];
@@ -110,7 +130,7 @@ fn match_choco(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     Ok(packages)
 }
 
-pub fn catch(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     let mut packages = vec![];
 
     // Parse Cargo
@@ -122,5 +142,5 @@ pub fn catch(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     // Parse Chocolatey
     packages.append(&mut match_choco(line)?);
 
-    Ok(packages)
+    Ok(Packages(packages))
 }

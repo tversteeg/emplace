@@ -5,39 +5,46 @@ use std::{
     error::Error,
     string::String,
     io::Read,
-    default::Default,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RepoConfig {
-    pub url: Option<String>,
-    pub branch: Option<String>,
+    pub url: String,
+    pub username: String,
+    #[serde(default = "RepoConfig::default_branch")]
+    pub branch: String,
+    #[serde(default = "RepoConfig::default_file")]
+    pub file: String,
 }
 
-impl Default for RepoConfig {
-    fn default() -> Self {
+impl RepoConfig {
+    fn new(url: String, username: String) -> Self {
         Self {
-            url: None,
-            branch: Some("master".to_string()),
+            url,
+            username,
+            branch: RepoConfig::default_branch(),
+            file: RepoConfig::default_file(),
         }
+    }
+
+    fn default_branch() -> String {
+        "master".to_owned()
+    }
+
+    fn default_file() -> String {
+        ".emplace".to_owned()
+    }
+
+    pub fn path(&self) -> PathBuf {
+        PathBuf::from(self.file.clone())
     }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    pub mirror_directory: Option<String>,
+    #[serde(default = "Config::default_mirror_dir_string")]
+    pub mirror_directory: String,
     pub repo: RepoConfig
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            mirror_directory: Some(Config::default_mirror_dir()
-                .to_str().expect("Could not get directory")
-                .to_string()),
-            repo: RepoConfig::default()
-        }
-    }
 }
 
 impl Config {
@@ -47,12 +54,13 @@ impl Config {
             .with_prompt("The URL of the git repository you (want to) store the mirrors in")
             .interact()?;
 
+        let username = dialoguer::Input::<String>::new()
+            .with_prompt("The username of the account you want to push with")
+            .interact()?;
+
         let config = Config {
-            repo: RepoConfig {
-                url: Some(repo_url),
-                ..Default::default()
-            },
-            ..Default::default()
+            mirror_directory: Config::default_mirror_dir_string(),
+            repo: RepoConfig::new(repo_url, username)
         };
 
         // Save the config
@@ -94,6 +102,13 @@ impl Config {
         Ok(())
     }
 
+    pub fn full_file_path(&self) -> PathBuf {
+        let mut base = PathBuf::from(self.mirror_directory.clone());
+        base.push(self.repo.path());
+
+        base
+    }
+
     fn default_path() -> PathBuf {
         dirs::config_dir().expect("Could not find config dir")
             .join("emplace.toml")
@@ -102,5 +117,11 @@ impl Config {
     fn default_mirror_dir() -> PathBuf {
         dirs::data_local_dir().expect("Could not find local data dir")
             .join("emplace")
+    }
+
+    fn default_mirror_dir_string() -> String {
+         Config::default_mirror_dir()
+            .to_str().expect("Could not get directory")
+            .to_string()
     }
 }
