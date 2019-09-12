@@ -9,18 +9,33 @@ use std::{
 };
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct RepoConfig {
+    pub url: Option<String>,
+    pub branch: Option<String>,
+}
+
+impl Default for RepoConfig {
+    fn default() -> Self {
+        Self {
+            url: None,
+            branch: Some("master".to_string()),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    pub repo_url: Option<String>,
     pub mirror_directory: Option<String>,
+    pub repo: RepoConfig
 }
 
 impl Default for Config {
     fn default() -> Self {
-        Config {
-            repo_url: None,
+        Self {
             mirror_directory: Some(Config::default_mirror_dir()
                 .to_str().expect("Could not get directory")
                 .to_string()),
+            repo: RepoConfig::default()
         }
     }
 }
@@ -33,7 +48,10 @@ impl Config {
             .interact()?;
 
         let config = Config {
-            repo_url: Some(repo_url),
+            repo: RepoConfig {
+                url: Some(repo_url),
+                ..Default::default()
+            },
             ..Default::default()
         };
 
