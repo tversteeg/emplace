@@ -1,7 +1,7 @@
 use git2::Repository;
 use std::{
     fs::{self, File},
-    path::Path,
+    path::{Path, PathBuf},
     error::Error,
     io::Read,
 };
@@ -11,17 +11,16 @@ use crate::catch::Packages;
 
 pub struct Repo {
     config: Config,
-    repo: Repository
+    repo: Repository,
 }
 
 impl Repo {
     pub fn new(config: Config) -> Result<Self, Box<dyn Error>> {
-        let mirror_directory = config.mirror_directory.clone();
+        let repo_directory = config.repo_directory.clone();
         let repo_url = config.repo.url.clone();
         let repo_branch = config.repo.branch.clone();
-        let username = config.repo.username.clone();
 
-        let path = Path::new(&mirror_directory);
+        let path = Path::new(&repo_directory);
         let path_str = path.to_str().expect("Could not get directory").to_string();
 
         let is_new = !path.join(".git").exists();
@@ -36,17 +35,24 @@ impl Repo {
             },
             true => {
                 println!("Cloning repo \"{}\" to \"{}\"", repo_url, path_str);
-                let mut callbacks = git2::RemoteCallbacks::new();
-                callbacks.credentials(|_, _, _| {
-                    git2::Cred::ssh_key_from_agent(&*username)
+
+                let mut checkout = git2::build::CheckoutBuilder::new();
+                checkout.progress(|path, cur, total| {
+                    match path {
+                        Some(path) => println!("Checkout ({}):\t{}/{}", path.display(), cur, total),
+                        None => println!("Checkout:\t{}/{}", cur, total),
+                    }
                 });
 
                 let mut fetch_options = git2::FetchOptions::new();
-                fetch_options.remote_callbacks(callbacks);
+                let public_key = config.repo.public_key_path();
+                let private_key = config.repo.private_key_path();
+                fetch_options.remote_callbacks(Repo::remote_callbacks(repo_url.clone(), public_key, private_key)?);
 
                 git2::build::RepoBuilder::new()
                     .branch(&*repo_branch)
                     .fetch_options(fetch_options)
+                    .with_checkout(checkout)
                     .clone(&*repo_url, path)?
             }
         };
@@ -75,7 +81,10 @@ impl Repo {
         commit(&self.repo, &self.config.repo.path(), &*commit_msg)?;
 
         println!("Pushing..");
-        push(&self.repo, &*self.config.repo.branch, &*self.config.repo.url)?;
+        let public_key = self.config.repo.public_key_path();
+        let private_key = self.config.repo.private_key_path();
+        let remote_callbacks = Repo::remote_callbacks(self.config.repo.url.clone(), public_key, private_key)?;
+        push(&self.repo, &*self.config.repo.branch, &*self.config.repo.url, remote_callbacks)?;
 
         Ok(())
     }
@@ -94,6 +103,47 @@ impl Repo {
         commands.merge(&mut old);
 
         Ok(())
+    }
+
+    pub fn remote_callbacks<'cb>(repo_url: String, public_key: PathBuf, private_key: PathBuf) -> Result<git2::RemoteCallbacks<'cb>, Box<dyn Error>> {
+        let mut callbacks = git2::RemoteCallbacks::new();
+        if repo_url.starts_with("https") {
+            // Repo is a HTTPS repo, use the credential helper
+            callbacks.credentials(move |url, username_from_url, allowed_types| {
+                if allowed_types.contains(git2::CredentialType::USERNAME) {
+                    return Err(git2::Error::from_str("Try usernames later"));
+                }
+                if allowed_types.contains(git2::CredentialType::USER_PASS_PLAINTEXT) {
+                    println!("Detected plain-text, using credential manager");
+                    return git2::Cred::credential_helper(&git2::Config::open_default()?, url, username_from_url);
+                }
+                if allowed_types.contains(git2::CredentialType::SSH_KEY) || allowed_types.contains(git2::CredentialType::SSH_CUSTOM) {
+                    println!("Detected SSH key, using agent");
+                    return git2::Cred::ssh_key_from_agent(&username_from_url.expect("A username in the URL is required for SSH and Git to work"));
+                }
+                if allowed_types.contains(git2::CredentialType::DEFAULT) {
+                    return git2::Cred::default();
+                }
+                Err(git2::Error::from_str("no authentication available"))
+            });
+        } else {
+            // Repo is a SSH repo, so we need to use the keys
+            callbacks.credentials(move |_user, username_from_url, _allowed_types| {
+                git2::Cred::ssh_key(
+                    username_from_url.unwrap_or("git"),
+                    Some(public_key.as_ref()),
+                    private_key.as_ref(),
+                    None
+                )
+            });
+        }
+
+        callbacks.transfer_progress(|stats| {
+            println!("Objects:\t{}/{}", stats.indexed_objects(), stats.total_objects());
+            true
+        });
+
+        Ok(callbacks)
     }
 }
 
@@ -154,22 +204,15 @@ fn commit(repo: &Repository, file: &Path, msg: &str) -> Result<git2::Oid, git2::
     repo.commit(Some("HEAD"), &signature, &signature, &*msg, &tree, &[&parent_commit])
 }
 
-fn push(repo: &Repository, branch: &str, url: &str) -> Result<(), git2::Error> {
-    let mut remote = match repo.find_remote("origin") {
-        Ok(r) => r,
-        Err(_) => repo.remote("origin", url)?,
-    };
-    match remote.connect(git2::Direction::Push) {
-        Err(error) => {
-            println!("Error when connecting to repo: {}", error);
-            return Ok(())
-        },
-        _ => ()
-    }
-    match remote.push(&[&*format!("refs/heads/{b}:refs/heads/{b}", b=branch)], None) {
+fn push(repo: &Repository, branch: &str, url: &str, remote_callbacks: git2::RemoteCallbacks) -> Result<(), git2::Error> {
+    let mut remote = repo.find_remote("origin")?;
+
+    let mut opts = git2::PushOptions::new();
+    opts.remote_callbacks(remote_callbacks);
+    match remote.push(&[&*format!("refs/heads/{b}", b=branch)], Some(&mut opts)) {
         Ok(_) => Ok(()),
         Err(error) => {
-            println!("Error when pushing repo: {}", error);
+            println!("Error while pushing repo: {}", error);
             Ok(())
         }
     }
