@@ -36,30 +36,21 @@ impl Repo {
             true => {
                 println!("Cloning repo \"{}\" to \"{}\"", repo_url, path_str);
 
-                let mut checkout = git2::build::CheckoutBuilder::new();
-                checkout.progress(|path, cur, total| {
-                    match path {
-                        Some(path) => println!("Checkout ({}):\t{}/{}", path.display(), cur, total),
-                        None => println!("Checkout:\t{}/{}", cur, total),
-                    }
-                });
-
                 let mut fetch_options = git2::FetchOptions::new();
                 let public_key = config.repo.public_key_path();
                 let private_key = config.repo.private_key_path();
-                fetch_options.remote_callbacks(Repo::remote_callbacks(repo_url.clone(), public_key, private_key)?);
+                fetch_options.remote_callbacks(Repo::remote_callbacks(public_key, private_key)?);
 
                 git2::build::RepoBuilder::new()
                     .branch(&*repo_branch)
                     .fetch_options(fetch_options)
-                    .with_checkout(checkout)
                     .clone(&*repo_url, path)?
             }
         };
 
         Ok(Repo {
             config,
-            repo,
+            repo
         })
     }
 
@@ -83,8 +74,8 @@ impl Repo {
         println!("Pushing..");
         let public_key = self.config.repo.public_key_path();
         let private_key = self.config.repo.private_key_path();
-        let remote_callbacks = Repo::remote_callbacks(self.config.repo.url.clone(), public_key, private_key)?;
-        push(&self.repo, &*self.config.repo.branch, &*self.config.repo.url, remote_callbacks)?;
+        let remote_callbacks = Repo::remote_callbacks(public_key, private_key)?;
+        push(&self.repo, &*self.config.repo.branch, remote_callbacks)?;
 
         Ok(())
     }
@@ -105,42 +96,55 @@ impl Repo {
         Ok(())
     }
 
-    pub fn remote_callbacks<'cb>(repo_url: String, public_key: PathBuf, private_key: PathBuf) -> Result<git2::RemoteCallbacks<'cb>, Box<dyn Error>> {
-        let mut callbacks = git2::RemoteCallbacks::new();
-        if repo_url.starts_with("https") {
-            // Repo is a HTTPS repo, use the credential helper
-            callbacks.credentials(move |url, username_from_url, allowed_types| {
-                if allowed_types.contains(git2::CredentialType::USERNAME) {
-                    return Err(git2::Error::from_str("Try usernames later"));
-                }
-                if allowed_types.contains(git2::CredentialType::USER_PASS_PLAINTEXT) {
-                    println!("Detected plain-text, using credential manager");
-                    return git2::Cred::credential_helper(&git2::Config::open_default()?, url, username_from_url);
-                }
-                if allowed_types.contains(git2::CredentialType::SSH_KEY) || allowed_types.contains(git2::CredentialType::SSH_CUSTOM) {
-                    println!("Detected SSH key, using agent");
-                    return git2::Cred::ssh_key_from_agent(&username_from_url.expect("A username in the URL is required for SSH and Git to work"));
-                }
-                if allowed_types.contains(git2::CredentialType::DEFAULT) {
-                    return git2::Cred::default();
-                }
-                Err(git2::Error::from_str("no authentication available"))
-            });
-        } else {
-            // Repo is a SSH repo, so we need to use the keys
-            callbacks.credentials(move |_user, username_from_url, _allowed_types| {
-                git2::Cred::ssh_key(
-                    username_from_url.unwrap_or("git"),
-                    Some(public_key.as_ref()),
-                    private_key.as_ref(),
-                    None
-                )
-            });
+    pub fn remote_callbacks<'cb>(public_key: PathBuf, private_key: PathBuf) -> Result<git2::RemoteCallbacks<'cb>, Box<dyn Error>> {
+        lazy_static! {
+            static ref USERNAME: String = dialoguer::Input::<String>::new()
+                .with_prompt(&*format!("Username for for git repository"))
+                .interact().expect("Could not get username for git repository");
+            static ref PASSWORD: String = dialoguer::PasswordInput::new()
+                .with_prompt(&*format!("Password for git repository"))
+                .interact().expect("Could not get password for git repository");
         }
 
-        callbacks.transfer_progress(|stats| {
-            println!("Objects:\t{}/{}", stats.indexed_objects(), stats.total_objects());
-            true
+        let config = git2::Config::open_default()?;
+        let mut tried_ssh_agent = false;
+        let mut tried_ssh_key = false;
+        let mut callbacks = git2::RemoteCallbacks::new();
+        callbacks.credentials(move |url, username_from_url, allowed_types| {
+            if allowed_types.contains(git2::CredentialType::USERNAME) {
+                return Err(git2::Error::from_str("Try usernames later"));
+            }
+            if allowed_types.contains(git2::CredentialType::USER_PASS_PLAINTEXT) {
+                println!("Detected plain-text url, trying credential helper");
+                return match git2::Cred::credential_helper(&config, url, username_from_url) {
+                    Ok(result) => Ok(result),
+                    Err(err) => {
+                        println!("Trying credential helper failed ({}), prompting for username and password", err);
+                        git2::Cred::userpass_plaintext(&*USERNAME, &*PASSWORD)
+                    }
+                };
+            }
+            if allowed_types.contains(git2::CredentialType::SSH_KEY) && !tried_ssh_key {
+                if !tried_ssh_agent {
+                    println!("Detected SSH url, trying SSH agent");
+                    tried_ssh_agent = true;
+                    return git2::Cred::ssh_key_from_agent(&username_from_url.expect("A username in the URL is required for SSH and Git to work"));
+                } else {
+                    println!("Trying SSH agent failed, trying SSH keys");
+                    tried_ssh_key = true;
+                    return git2::Cred::ssh_key(
+                        username_from_url.unwrap_or("git"),
+                        Some(public_key.as_ref()),
+                        private_key.as_ref(),
+                        None
+                    )
+                }
+            }
+            if allowed_types.contains(git2::CredentialType::DEFAULT) {
+                println!("Using default credentials");
+                return git2::Cred::default();
+            }
+            Err(git2::Error::from_str("no authentication available"))
         });
 
         Ok(callbacks)
@@ -204,7 +208,7 @@ fn commit(repo: &Repository, file: &Path, msg: &str) -> Result<git2::Oid, git2::
     repo.commit(Some("HEAD"), &signature, &signature, &*msg, &tree, &[&parent_commit])
 }
 
-fn push(repo: &Repository, branch: &str, url: &str, remote_callbacks: git2::RemoteCallbacks) -> Result<(), git2::Error> {
+fn push(repo: &Repository, branch: &str, remote_callbacks: git2::RemoteCallbacks) -> Result<(), git2::Error> {
     let mut remote = repo.find_remote("origin")?;
 
     let mut opts = git2::PushOptions::new();
