@@ -157,8 +157,9 @@ fn pull(repo: &Repository, branch: &str, remote_callbacks: git2::RemoteCallbacks
 
     // Do a fetch
     println!("Fetching");
-    let mut remote = repo.find_remote("origin")?;
-    remote.fetch(&[branch], Some(&mut opts), Some(&*format!("Retrieve {} branch from remote", branch)))?;
+    let remote_name = "origin";
+    let mut remote = repo.find_remote(remote_name).or_else(|_| repo.remote_anonymous("origin"))?;
+    remote.fetch(&[&*format!("refs/remote/{}", branch)], Some(&mut opts), Some(&*format!("Retrieve {} branch from remote", branch)))?;
 
     // Get the FETCH_HEAD commit
     let fetch_head = repo.find_reference("FETCH_HEAD")?;
@@ -216,7 +217,7 @@ fn push(repo: &Repository, branch: &str, remote_callbacks: git2::RemoteCallbacks
 
     let mut opts = git2::PushOptions::new();
     opts.remote_callbacks(remote_callbacks);
-    match remote.push(&[&*format!("refs/heads/{b}", b=branch)], Some(&mut opts)) {
+    match remote.push(&[&*format!("refs/heads/{b}:refs/heads/{b}", b=branch)], Some(&mut opts)) {
         Ok(_) => Ok(()),
         Err(error) => {
             println!("Error while pushing repo: {}", error);
