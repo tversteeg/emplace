@@ -1,7 +1,7 @@
 use git2::Repository;
 use std::{
     fs::{self, File},
-    path::{Path, PathBuf},
+    path::Path,
     error::Error,
     io::Read,
 };
@@ -27,9 +27,9 @@ impl Repo {
         let repo = match is_new {
             false => {
                 println!("Opening existing repo: \"{}\"", path_str);
-                let repo = Repository::open(path)?;
+                let repo = Repository::discover(path)?;
 
-                pull(&repo, &*repo_branch)?;
+                pull(&repo, &*repo_branch, Repo::remote_callbacks(&config, repo.config()?)?)?;
 
                 repo
             },
@@ -37,9 +37,7 @@ impl Repo {
                 println!("Cloning repo \"{}\" to \"{}\"", repo_url, path_str);
 
                 let mut fetch_options = git2::FetchOptions::new();
-                let public_key = config.repo.public_key_path();
-                let private_key = config.repo.private_key_path();
-                fetch_options.remote_callbacks(Repo::remote_callbacks(public_key, private_key)?);
+                fetch_options.remote_callbacks(Repo::remote_callbacks(&config, git2::Config::open_default()?)?);
 
                 git2::build::RepoBuilder::new()
                     .branch(&*repo_branch)
@@ -71,10 +69,8 @@ impl Repo {
         println!("Commiting with message \"{}\"..", commit_msg);
         commit(&self.repo, &self.config.repo.path(), &*commit_msg)?;
 
-        println!("Pushing..");
-        let public_key = self.config.repo.public_key_path();
-        let private_key = self.config.repo.private_key_path();
-        let remote_callbacks = Repo::remote_callbacks(public_key, private_key)?;
+        println!("Pushing to remote");
+        let remote_callbacks = Repo::remote_callbacks(&self.config, self.repo.config()?)?;
         push(&self.repo, &*self.config.repo.branch, remote_callbacks)?;
 
         Ok(())
@@ -96,7 +92,7 @@ impl Repo {
         Ok(())
     }
 
-    pub fn remote_callbacks<'cb>(public_key: PathBuf, private_key: PathBuf) -> Result<git2::RemoteCallbacks<'cb>, Box<dyn Error>> {
+    pub fn remote_callbacks<'cb>(config: &Config, git_config: git2::Config) -> Result<git2::RemoteCallbacks<'cb>, Box<dyn Error>> {
         lazy_static! {
             static ref USERNAME: String = dialoguer::Input::<String>::new()
                 .with_prompt(&*format!("Username for for git repository"))
@@ -106,17 +102,19 @@ impl Repo {
                 .interact().expect("Could not get password for git repository");
         }
 
-        let config = git2::Config::open_default()?;
+        let public_key = config.repo.public_key_path();
+        let private_key = config.repo.private_key_path();
+
         let mut tried_ssh_agent = false;
         let mut tried_ssh_key = false;
         let mut callbacks = git2::RemoteCallbacks::new();
         callbacks.credentials(move |url, username_from_url, allowed_types| {
             if allowed_types.contains(git2::CredentialType::USERNAME) {
-                return Err(git2::Error::from_str("Try usernames later"));
+                unimplemented!();
             }
             if allowed_types.contains(git2::CredentialType::USER_PASS_PLAINTEXT) {
                 println!("Detected plain-text url, trying credential helper");
-                return match git2::Cred::credential_helper(&config, url, username_from_url) {
+                return match git2::Cred::credential_helper(&git_config, url, username_from_url) {
                     Ok(result) => Ok(result),
                     Err(err) => {
                         println!("Trying credential helper failed ({}), prompting for username and password", err);
@@ -128,7 +126,7 @@ impl Repo {
                 if !tried_ssh_agent {
                     println!("Detected SSH url, trying SSH agent");
                     tried_ssh_agent = true;
-                    return git2::Cred::ssh_key_from_agent(&username_from_url.expect("A username in the URL is required for SSH and Git to work"));
+                    return git2::Cred::ssh_key_from_agent(&username_from_url.unwrap_or("git"));
                 } else {
                     println!("Trying SSH agent failed, trying SSH keys");
                     tried_ssh_key = true;
@@ -151,18 +149,23 @@ impl Repo {
     }
 }
 
-fn pull(repo: &Repository, branch: &str) -> Result<(), git2::Error> {
-    println!("Pulling origin/{}..", branch);
+fn pull(repo: &Repository, branch: &str, remote_callbacks: git2::RemoteCallbacks) -> Result<(), git2::Error> {
+    println!("Pulling origin/{}", branch);
+
+    let mut opts = git2::FetchOptions::new();
+    opts.remote_callbacks(remote_callbacks);
 
     // Do a fetch
+    println!("Fetching");
     let mut remote = repo.find_remote("origin")?;
-    remote.fetch(&[branch], None, None)?;
+    remote.fetch(&[branch], Some(&mut opts), Some(&*format!("Retrieve {} branch from remote", branch)))?;
 
     // Get the FETCH_HEAD commit
     let fetch_head = repo.find_reference("FETCH_HEAD")?;
     let fetch_commit = repo.reference_to_annotated_commit(&fetch_head)?;
 
     // Do a merge
+    println!("Merging");
     let analysis = repo.merge_analysis(&[&fetch_commit])?;
     if analysis.0.is_fast_forward() {
         let refname = format!("refs/heads/{}", branch);
