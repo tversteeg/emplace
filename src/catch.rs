@@ -6,7 +6,7 @@ use std::{
     string::String,
 };
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, EnumIter)]
 pub enum PackageSource {
     /// Rust cargo.
     Cargo,
