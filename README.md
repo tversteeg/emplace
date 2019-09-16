@@ -5,7 +5,6 @@ Command-line tool to mirror installed software on multiple machines.
 [![Build status](https://ci.appveyor.com/api/projects/status/1aykje7hu7b88k8e?svg=true)](https://ci.appveyor.com/project/tversteeg/emplace)
 [![](https://img.shields.io/crates/d/emplace.svg)](#downloads)
 [![](https://img.shields.io/crates/v/emplace.svg)](https://crates.io/crates/emplace)
-[![](https://img.shields.io/github/commits-since/tversteeg/emplace/latest.svg)]()
 
 ## Installation
 
