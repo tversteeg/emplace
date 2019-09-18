@@ -16,7 +16,7 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
     let checks: String = PackageSource::iter()
         .map(|s| check_str.replace("## EMPLACE ##", s.command()))
         .collect::<Vec<String>>()
-        .join("\n");
+        .join(" || ");
 
     let setup_script = match shell_name {
         "bash" => BASH_INIT,
@@ -38,7 +38,7 @@ emplace_preexec_invoke_exec () {
 
     local hist=`history 1`
     # optimization to check quickly for strings
-## EMPLACE_CHECKS ##
+    ## EMPLACE_CHECKS ## || return;
 
     local this_command=`HISTTIMEFORMAT= history 1 | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
     ## EMPLACE ## catch "$this_command"
@@ -46,4 +46,4 @@ emplace_preexec_invoke_exec () {
 trap 'emplace_preexec_invoke_exec' DEBUG
 "##;
 
-const BASH_CHECK: &str = "    [[ $hist == *\"## EMPLACE ##\"* ]] || return;";
+const BASH_CHECK: &str = "[[ $hist == *\"## EMPLACE ##\"* ]]";
