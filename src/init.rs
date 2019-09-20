@@ -32,9 +32,9 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
 }
 
 const BASH_INIT: &str = r##"
-emplace_preexec_invoke_exec () {
-    [ -n "$COMP_LINE" ] && return # do nothing if completing
-    [ "$BASH_COMMAND" = "$PROMPT_COMMAND" ] && return # don't cause a preexec for $PROMPT_COMMAND
+emplace_postexec_invoke_exec () {
+    # quit when the previous command failed
+    [ -z "$!" ] && exit
 
     local hist=`history 1`
     # optimization to check quickly for strings
@@ -43,7 +43,7 @@ emplace_preexec_invoke_exec () {
     local this_command=`HISTTIMEFORMAT= history 1 | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
     ## EMPLACE ## catch "$this_command"
 }
-trap 'emplace_preexec_invoke_exec' DEBUG
+PROMPT_COMMAND="emplace_postexec_invoke_exec"
 "##;
 
 const BASH_CHECK: &str = "[[ $hist == *\"## EMPLACE ##\"* ]]";
