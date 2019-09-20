@@ -43,7 +43,7 @@ emplace_postexec_invoke_exec () {
     local this_command=`HISTTIMEFORMAT= history 1 | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
     ## EMPLACE ## catch "$this_command"
 }
-PROMPT_COMMAND="emplace_postexec_invoke_exec"
+PROMPT_COMMAND="$PROMPT_COMMAND;emplace_postexec_invoke_exec"
 "##;
 
 const BASH_CHECK: &str = "[[ $hist == *\"## EMPLACE ##\"* ]]";
