@@ -45,6 +45,10 @@ fn main() {
                 .required(true)
             )
         )
+        .subcommand(
+            SubCommand::with_name("install")
+            .about("Install the packages that have been mirrored from other machines")
+        )
         .get_matches();
 
     match matches.subcommand() {
@@ -89,6 +93,9 @@ fn main() {
             let repo = Repo::new(config).expect("Could not initialize git repository");
 
             repo.mirror(catches).expect("Could not mirror commands");
+        },
+        ("install", Some(_)) => {
+
         },
         (&_, _) => { }
     }
