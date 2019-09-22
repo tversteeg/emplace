@@ -10,8 +10,8 @@ extern crate failure;
 mod init;
 mod config;
 mod catch;
-mod authentication;
 mod repo;
+mod git;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 
