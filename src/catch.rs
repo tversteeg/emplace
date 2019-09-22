@@ -3,6 +3,21 @@ use std::error::Error;
 
 use crate::package::{Package, Packages, PackageSource};
 
+pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
+    let mut packages = vec![];
+
+    // Parse Cargo
+    packages.append(&mut match_cargo(line)?);
+
+    // Parse APT
+    packages.append(&mut match_apt(line)?);
+
+    // Parse Chocolatey
+    packages.append(&mut match_choco(line)?);
+
+    Ok(Packages(packages))
+}
+
 fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref CARGO_RE: Regex = Regex::new(r"cargo\s+install\s+(?P<name>\S+)+").unwrap();
@@ -43,19 +58,4 @@ fn match_choco(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     }
 
     Ok(packages)
-}
-
-pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
-    let mut packages = vec![];
-
-    // Parse Cargo
-    packages.append(&mut match_cargo(line)?);
-
-    // Parse APT
-    packages.append(&mut match_apt(line)?);
-
-    // Parse Chocolatey
-    packages.append(&mut match_choco(line)?);
-
-    Ok(Packages(packages))
 }

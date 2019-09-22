@@ -13,6 +13,7 @@ mod config;
 mod catch;
 mod repo;
 mod git;
+mod install;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 
@@ -107,6 +108,8 @@ fn main() {
 
             let repo = Repo::new(config).expect("Could not initialize git repository");
 
+            let packages = repo.read().expect("Could not get packages from repository");
+            crate::install::install(packages).expect("Could not install new changes");
         },
         (&_, _) => { }
     }

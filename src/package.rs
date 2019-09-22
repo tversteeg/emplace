@@ -2,6 +2,7 @@ use serde::{Serialize, Deserialize};
 use std::{
     fmt,
     string::String,
+    slice::Iter
 };
 
 #[derive(Debug, Serialize, Deserialize, EnumIter)]
@@ -23,27 +24,27 @@ impl PackageSource {
         }
     }
 
-    pub fn install_command(&self) -> &str {
-        match self {
-            PackageSource::Cargo => "cargo install",
-            PackageSource::Apt => "apt install",
-            PackageSource::Chocolatey => "choco install",
-        }
-    }
-
-    pub fn is_installed_command(&self) -> &str {
-        match self {
-            PackageSource::Cargo => "cargo install",
-            PackageSource::Apt => "dpkg -s",
-            PackageSource::Chocolatey => "choco install",
-        }
-    }
-
     pub fn full_name(&self) -> &str {
         match self {
             PackageSource::Cargo => "Cargo Rust",
             PackageSource::Apt => "Advanced Package Tool",
             PackageSource::Chocolatey => "Chocolatey",
+        }
+    }
+
+    pub fn install_command(&self) -> Vec<&str> {
+        match self {
+            PackageSource::Cargo => vec!["cargo", "install"],
+            PackageSource::Apt => vec!["apt", "install"],
+            PackageSource::Chocolatey => vec!["choco", "install"],
+        }
+    }
+
+    pub fn is_installed_command(&self) -> Vec<&str> {
+        match self {
+            PackageSource::Cargo => vec!["cargo", "install"],
+            PackageSource::Apt => vec!["dpkg", "-s"],
+            PackageSource::Chocolatey => vec!["choco", "install"],
         }
     }
 }
@@ -69,6 +70,20 @@ impl Package {
             name,
         }
     }
+
+    pub fn install_command(&self) -> Vec<&str> {
+        let mut commands = self.source.install_command();
+        commands.push(&*self.name);
+
+        commands
+    }
+
+    pub fn is_installed_command(&self) -> Vec<&str> {
+        let mut commands = self.source.is_installed_command();
+        commands.push(&*self.name);
+
+        commands
+    }
 }
 
 impl fmt::Display for Package {
@@ -81,6 +96,10 @@ impl fmt::Display for Package {
 pub struct Packages(pub Vec<Package>);
 
 impl Packages {
+    pub fn iter(&self) -> Iter<Package> {
+        self.0.iter()
+    }
+
     pub fn merge(&mut self, other: &mut Packages) {
         self.0.append(&mut other.0);
     }
