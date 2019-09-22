@@ -90,8 +90,8 @@ impl Packages {
     pub fn commit_message(&self) -> String {
         match self.0.len() {
             0 => panic!("Can't create a commit message for empty changes"),
-            1 => format!("Added a new package ({})", self.0[0]),
-            n => format!("Added {} new packages", n),
+            1 => format!("Emplace - Added new package \"{}\"", self.0[0]),
+            n => format!("Emplace - Added {} new packages", n),
         }
     }
 }
