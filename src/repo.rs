@@ -6,7 +6,7 @@ use std::{
 };
 
 use crate::config::Config;
-use crate::catch::Packages;
+use crate::package::Packages;
 use crate::git;
 
 pub struct Repo {
@@ -41,6 +41,18 @@ impl Repo {
         })
     }
 
+    pub fn read(&self) -> Result<Packages, Box<dyn Error>> {
+        // Open the file
+        let mut file = File::open(&self.config.full_file_path())?;
+
+        // Read the contents
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)?;
+
+        // Deserialize the file into the struct
+        Ok(serde_json::from_str(&*contents)?)
+    }
+
     pub fn mirror(&self, mut commands: Packages) -> Result<(), Box<dyn Error>> {
         // Get the message first before the old stuff is added
         let commit_msg = commands.commit_message();
@@ -48,7 +60,10 @@ impl Repo {
         let full_path = self.config.full_file_path();
         if full_path.exists() {
             // A file already exists, merge the existing one with the current one
-            self.merge_file(&mut commands)?;
+            let mut old: Packages = self.read()?;
+
+            // Merge it with the new one
+            commands.merge(&mut old);
         }
 
         // There's no file yet, just serialize everything and write it to a new file
@@ -61,22 +76,6 @@ impl Repo {
 
         println!("Pushing to remote");
         git::push(&self.path, false)?;
-
-        Ok(())
-    }
-
-    pub fn merge_file(&self, commands: &mut Packages) -> Result<(), Box<dyn Error>> {
-        // Open the file
-        let mut file = File::open(&self.config.full_file_path())?;
-
-        // Read the contents
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
-
-        // Deserialize the file into the struct
-        let mut old: Packages = serde_json::from_str(&*contents)?;
-        // Merge it with the new one
-        commands.merge(&mut old);
 
         Ok(())
     }

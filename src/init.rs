@@ -3,7 +3,7 @@ use std:: {
     env,
     error:: Error
 };
-use crate::catch::PackageSource;
+use crate::package::PackageSource;
 
 pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
     let exe_path = env::current_exe()?.into_os_string().into_string().expect("Could not convert path to string");

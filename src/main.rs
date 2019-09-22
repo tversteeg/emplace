@@ -7,6 +7,7 @@ extern crate strum_macros;
 #[macro_use]
 extern crate failure;
 
+mod package;
 mod init;
 mod config;
 mod catch;
@@ -98,6 +99,13 @@ fn main() {
             repo.mirror(catches).expect("Could not mirror commands");
         },
         ("install", Some(_)) => {
+            // Get the config
+            let config = match Config::from_default_file().expect("Retrieving config went wrong") {
+                Some(config) => config,
+                None => Config::new().expect("Initializing new config failed")
+            };
+
+            let repo = Repo::new(config).expect("Could not initialize git repository");
 
         },
         (&_, _) => { }
