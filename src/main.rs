@@ -4,10 +4,13 @@ extern crate clap;
 extern crate lazy_static;
 #[macro_use]
 extern crate strum_macros;
+#[macro_use]
+extern crate failure;
 
 mod init;
 mod config;
 mod catch;
+mod authentication;
 mod repo;
 
 use clap::{App, AppSettings, Arg, SubCommand};

@@ -33,6 +33,14 @@ impl PackageSource {
         }
     }
 
+    pub fn is_installed_command(&self) -> &str {
+        match self {
+            PackageSource::Cargo => "cargo install",
+            PackageSource::Apt => "dpkg -s",
+            PackageSource::Chocolatey => "choco install",
+        }
+    }
+
     pub fn full_name(&self) -> &str {
         match self {
             PackageSource::Cargo => "Cargo Rust",

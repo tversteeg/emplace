@@ -14,18 +14,12 @@ pub struct RepoConfig {
     pub branch: String,
     #[serde(default = "RepoConfig::default_file")]
     pub file: String,
-    #[serde(default = "RepoConfig::default_private_key")]
-    pub ssh_private_key: String,
-    #[serde(default = "RepoConfig::default_public_key")]
-    pub ssh_public_key: String,
 }
 
 impl RepoConfig {
     fn new(url: String) -> Self {
         Self {
             url,
-            ssh_private_key: RepoConfig::default_private_key(),
-            ssh_public_key: RepoConfig::default_public_key(),
             branch: RepoConfig::default_branch(),
             file: RepoConfig::default_file(),
         }
@@ -39,30 +33,8 @@ impl RepoConfig {
         ".emplace".to_owned()
     }
 
-    fn default_private_key() -> String {
-         dirs::home_dir().expect("Could not get home directory")
-             .join(".ss/id_rsa")
-            .to_str().expect("Could not get directory")
-            .to_string()
-    }
-
-    fn default_public_key() -> String {
-         dirs::home_dir().expect("Could not get home directory")
-             .join(".ssh/id_rsa.pub")
-            .to_str().expect("Could not get directory")
-            .to_string()
-    }
-
     pub fn path(&self) -> PathBuf {
         PathBuf::from(self.file.clone())
-    }
-
-    pub fn private_key_path(&self) -> PathBuf {
-        PathBuf::from(self.ssh_private_key.clone())
-    }
-
-    pub fn public_key_path(&self) -> PathBuf {
-        PathBuf::from(self.ssh_public_key.clone())
     }
 }
 
