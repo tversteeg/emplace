@@ -52,7 +52,7 @@ impl Repo {
         }
 
         // There's no file yet, just serialize everything and write it to a new file
-        let toml_string = serde_json::to_string(&commands)?;
+        let toml_string = serde_json::to_string_pretty(&commands)?;
         fs::write(&full_path, toml_string)?;
 
         println!("Commiting with message \"{}\"..", commit_msg);
