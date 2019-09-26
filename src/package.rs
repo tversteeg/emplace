@@ -16,14 +16,6 @@ pub enum PackageSource {
 }
 
 impl PackageSource {
-    pub fn command(&self) -> &str {
-        match self {
-            PackageSource::Cargo => "cargo",
-            PackageSource::Apt => "apt",
-            PackageSource::Chocolatey => "choco",
-        }
-    }
-
     pub fn full_name(&self) -> &str {
         match self {
             PackageSource::Cargo => "Cargo Rust",
@@ -32,19 +24,56 @@ impl PackageSource {
         }
     }
 
+#[cfg(other)]
+    pub fn command(&self) -> &str {
+        match self {
+            PackageSource::Cargo => "cargo",
+            PackageSource::Apt => "apt",
+            _ => ""
+        }
+    }
+#[cfg(target_os = "windows")]
+    pub fn command(&self) -> &str {
+        match self {
+            PackageSource::Cargo => "cargo",
+            PackageSource::Chocolatey => "choco",
+            _ => ""
+        }
+    }
+
+#[cfg(other)]
     pub fn install_command(&self) -> Vec<&str> {
         match self {
             PackageSource::Cargo => vec!["cargo", "install"],
             PackageSource::Apt => vec!["apt", "install"],
-            PackageSource::Chocolatey => vec!["choco", "install"],
+            _ => vec![]
+        }
+    }
+#[cfg(target_os = "windows")]
+    pub fn install_command(&self) -> Vec<&str> {
+        match self {
+            PackageSource::Cargo => vec!["cargo", "install"],
+            PackageSource::Chocolatey => vec!["choco", "install", "-y"],
+            _ => vec![]
         }
     }
 
+#[cfg(other)]
     pub fn is_installed_command(&self) -> Vec<&str> {
         match self {
-            PackageSource::Cargo => vec!["cargo", "install"],
+            PackageSource::Cargo => vec!["sh", "-c", "cargo install --list | grep -q"],
             PackageSource::Apt => vec!["dpkg", "-s"],
-            PackageSource::Chocolatey => vec!["choco", "install"],
+            _ => vec![]
+        }
+    }
+#[cfg(target_os = "windows")]
+    pub fn is_installed_command(&self) -> Vec<&str> {
+        match self {
+            PackageSource::Cargo => vec!["cmd", "/k",
+                "cargo --list | findstr"],
+            PackageSource::Chocolatey => vec!["cmd", "/k",
+                "choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color"],
+            _ => vec![]
         }
     }
 }
@@ -69,6 +98,10 @@ impl Package {
             source,
             name,
         }
+    }
+
+    pub fn command(&self) -> &str {
+        self.source.command()
     }
 
     pub fn install_command(&self) -> Vec<&str> {

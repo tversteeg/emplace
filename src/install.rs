@@ -5,6 +5,10 @@ use std::{
 
 use crate::package::{Package, Packages};
 
+fn can_call(command: &str) -> bool {
+    Command::new(command).spawn().is_ok()
+}
+
 fn call(command: Vec<&str>, dry_run: bool) -> Result<bool, Box<dyn Error>> {
     if dry_run {
         println!("{}", command.join(" "));
@@ -29,6 +33,8 @@ fn call(command: Vec<&str>, dry_run: bool) -> Result<bool, Box<dyn Error>> {
 pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
     println!("Checking which packages haven't been installed yet..");
     let packages_to_install: Vec<&Package> = packages.iter()
+        // Only keep packages where we have the package manager of
+        .filter(|package| can_call(package.command()))
         // Only keep packages that can actually be installed
         .filter(|package| call(package.is_installed_command(), false).expect("Could not perform command"))
         // Make it a vector again
@@ -40,6 +46,12 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         // Make it a vector again
         .collect::<_>();
     let package_names: Vec<&str> = package_names.iter().map(|name| name.as_str()).collect::<_>();
+
+    // If there's nothing to install just return
+    if package_names.is_empty() {
+        println!("Nothing to install");
+        return Ok(());
+    }
 
     let selections = dialoguer::Checkboxes::new()
         .with_prompt("Select the packages you want to install")
