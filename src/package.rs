@@ -24,7 +24,7 @@ impl PackageSource {
         }
     }
 
-#[cfg(other)]
+#[cfg(not(target_os = "windows"))]
     pub fn command(&self) -> &str {
         match self {
             PackageSource::Cargo => "cargo",
@@ -41,7 +41,7 @@ impl PackageSource {
         }
     }
 
-#[cfg(other)]
+#[cfg(not(target_os = "windows"))]
     pub fn install_command(&self) -> Vec<&str> {
         match self {
             PackageSource::Cargo => vec!["cargo", "install"],
@@ -58,7 +58,7 @@ impl PackageSource {
         }
     }
 
-#[cfg(other)]
+#[cfg(not(target_os = "windows"))]
     pub fn is_installed_command(&self) -> Vec<&str> {
         match self {
             PackageSource::Cargo => vec!["sh", "-c", "cargo install --list | grep -q"],
