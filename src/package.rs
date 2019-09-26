@@ -61,7 +61,7 @@ impl PackageSource {
 #[cfg(not(target_os = "windows"))]
     pub fn is_installed_command(&self) -> Vec<&str> {
         match self {
-            PackageSource::Cargo => vec!["sh", "-c", "cargo install --list | grep -q"],
+            PackageSource::Cargo => vec!["sh", "-c", "\"cargo --list | grep -q\""],
             PackageSource::Apt => vec!["dpkg", "-s"],
             _ => vec![]
         }

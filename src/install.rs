@@ -1,12 +1,16 @@
 use std::{
     error::Error,
-    process::Command
+    process::{Command, Stdio},
 };
 
 use crate::package::{Package, Packages};
 
 fn can_call(command: &str) -> bool {
-    Command::new(command).spawn().is_ok()
+    Command::new(command)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .is_ok()
 }
 
 fn call(command: Vec<&str>, dry_run: bool) -> Result<bool, Box<dyn Error>> {
@@ -36,7 +40,7 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         // Only keep packages where we have the package manager of
         .filter(|package| can_call(package.command()))
         // Only keep packages that can actually be installed
-        .filter(|package| call(package.is_installed_command(), false).expect("Could not perform command"))
+        .filter(|package| !call(package.is_installed_command(), false).expect("Could not perform command"))
         // Make it a vector again
         .collect::<_>();
 
@@ -62,9 +66,11 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         let package = packages_to_install[selection];
         println!("\nInstalling \"{}\"", package);
 
-        call(package.install_command(), false)?;
-
-        println!("Installed.");
+        if call(package.install_command(), false)? {
+            println!("Installed");
+        } else {
+            println!("Installation failed");
+        }
     }
 
     Ok(())
