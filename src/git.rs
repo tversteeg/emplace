@@ -1,6 +1,6 @@
 use std::{
     path::Path,
-    process::Command,
+    process::{Command, Stdio},
     error::Error
 };
 
@@ -15,7 +15,7 @@ fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P, dry_run: bool) -> 
     let cmd_name = iter.next().unwrap();
 
     let mut cmd = Command::new(cmd_name);
-
+    cmd.stdout(Stdio::null());
     cmd.current_dir(path);
 
     for arg in iter {
