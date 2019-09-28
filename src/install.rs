@@ -58,14 +58,14 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    println!("{}", Colour::Green.bold().paint("Select the packages you want to install:"));
+    println!("{}", Colour::Green.bold().paint("Select the packages you want to install (space to add):"));
     let selections = dialoguer::Checkboxes::new()
         .items(&package_names[..])
         .interact()?;
 
     for selection in selections {
         let package = packages_to_install[selection];
-        println!("\nInstalling \"{}\"", package);
+        println!("\nInstalling: {}", package.colour_name());
 
         if call(package.install_command(), false)? {
             println!("{}", Colour::Green.bold().paint("Installed successfully"));

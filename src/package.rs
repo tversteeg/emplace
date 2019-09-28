@@ -68,8 +68,8 @@ impl PackageSource {
 #[cfg(not(target_os = "windows"))]
     pub fn is_installed_script(&self) -> &str {
         match self {
-            PackageSource::Cargo => "cargo install --list | grep 'v[0-9]\\.' | grep -qsw ^",
-            PackageSource::Apt => "dpkg -s",
+            PackageSource::Cargo => "cargo install --list | grep 'v[0-9]' | grep -q",
+            PackageSource::Apt => "dpkg-query --show",
             _ => ""
         }
     }
@@ -79,6 +79,14 @@ impl PackageSource {
             PackageSource::Cargo => "cargo --list | findstr",
             PackageSource::Chocolatey => "choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color",
             _ => ""
+        }
+    }
+
+    pub fn needs_root(&self) -> bool {
+        match self {
+            PackageSource::Cargo => false,
+            PackageSource::Apt => true,
+            PackageSource::Chocolatey => true,
         }
     }
 }
@@ -115,6 +123,9 @@ impl Package {
 
     pub fn install_command(&self) -> Vec<&str> {
         let mut commands = self.source.install_command();
+        if self.source.needs_root() {
+            commands.insert(0, "sudo");
+        }
         commands.push(&*self.name);
 
         commands
@@ -126,7 +137,7 @@ impl Package {
         options.exit_on_error = true;
         options.print_commands = false;
 
-        let (code, output, error) = run_script::run(&*self.is_installed_script(), &vec![], &options)?;
+        let (code, _output, _error) = run_script::run(&*self.is_installed_script(), &vec![], &options)?;
 
         Ok(code == 0)
     }
