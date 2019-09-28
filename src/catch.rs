@@ -34,7 +34,7 @@ fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 
 fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref APT_RE: Regex = Regex::new(r"apt\S*\s+install\s+(?P<name>\S+)+").unwrap();
+        static ref APT_RE: Regex = Regex::new(r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>\S+)").unwrap();
     }
 
     let mut packages = vec![];
@@ -58,4 +58,38 @@ fn match_choco(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     }
 
     Ok(packages)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn single_match<F>(match_func: F, result: &str, command: &str) where
+        F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>
+    {
+        let command = match_func(command).unwrap();
+        assert_eq!(1, command.len());
+        assert_eq!(result, command[0].name)
+    }
+
+    #[test]
+    fn test_cargo_matches() {
+        // Regular invocation
+        single_match(match_cargo, "test", "cargo install test");
+    }
+
+    #[test]
+    fn test_apt_matches() {
+        // Regular invocation
+        single_match(match_apt, "test", "apt install test");
+        single_match(match_apt, "test", "sudo apt install test");
+        single_match(match_apt, "test", "sudo apt-get install test");
+
+        // Command names
+        single_match(match_apt, "lib32gfortran5-x32-cross", "sudo apt install lib32gfortran5-x32-cross");
+
+        // With flags
+        single_match(match_apt, "test", "sudo apt -qq install test");
+        //single_apt_match("test", "sudo apt install -t experimental test");
+    }
 }
