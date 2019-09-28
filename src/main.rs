@@ -15,6 +15,7 @@ mod repo;
 mod git;
 mod install;
 
+use ansi_term::Colour;
 use clap::{App, AppSettings, Arg, SubCommand};
 
 use config::Config;
@@ -74,8 +75,8 @@ fn main() {
 
             // Print the info
             match len {
-                1 => println!("Mirror this command?"),
-                n => println!("Mirror these {} commands?", n)
+                1 => println!("{}", Colour::Green.bold().paint("Mirror this command?")),
+                n => println!("{}", Colour::Green.bold().paint(format!("Mirror these {} commands?", n))),
             }
             for catch in catches.0.iter() {
                 println!("- {}", catch);

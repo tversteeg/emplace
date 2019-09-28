@@ -1,3 +1,4 @@
+use ansi_term::Colour;
 use serde::{Serialize, Deserialize};
 use std::{
     fmt,
@@ -80,7 +81,7 @@ impl PackageSource {
 
 impl fmt::Display for PackageSource {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.full_name())
+        write!(f, "{}", Colour::Cyan.italic().paint(format!("({})", self.full_name())))
     }
 }
 
@@ -121,7 +122,7 @@ impl Package {
 
 impl fmt::Display for Package {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} ({})", self.name, self.source)
+        write!(f, "{} {}", Colour::Yellow.paint(&self.name), self.source)
     }
 }
 
