@@ -1,9 +1,11 @@
 use ansi_term::Colour;
 use serde::{Serialize, Deserialize};
+use run_script::ScriptOptions;
 use std::{
     fmt,
     string::String,
-    slice::Iter
+    slice::Iter,
+    error::Error,
 };
 
 #[derive(Debug, Serialize, Deserialize, EnumIter)]
@@ -23,6 +25,10 @@ impl PackageSource {
             PackageSource::Apt => "Advanced Package Tool",
             PackageSource::Chocolatey => "Chocolatey",
         }
+    }
+
+    pub fn colour_full_name(&self) -> String {
+        Colour::Cyan.italic().paint(format!("({})", self.full_name())).to_string()
     }
 
 #[cfg(not(target_os = "windows"))]
@@ -45,7 +51,7 @@ impl PackageSource {
 #[cfg(not(target_os = "windows"))]
     pub fn install_command(&self) -> Vec<&str> {
         match self {
-            PackageSource::Cargo => vec!["cargo", "install"],
+            PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::Apt => vec!["apt", "install"],
             _ => vec![]
         }
@@ -53,35 +59,33 @@ impl PackageSource {
 #[cfg(target_os = "windows")]
     pub fn install_command(&self) -> Vec<&str> {
         match self {
-            PackageSource::Cargo => vec!["cargo", "install"],
+            PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::Chocolatey => vec!["choco", "install", "-y"],
             _ => vec![]
         }
     }
 
 #[cfg(not(target_os = "windows"))]
-    pub fn is_installed_command(&self) -> Vec<&str> {
+    pub fn is_installed_script(&self) -> &str {
         match self {
-            PackageSource::Cargo => vec!["sh", "-c", "\"cargo --list | grep -q\""],
-            PackageSource::Apt => vec!["dpkg", "-s"],
-            _ => vec![]
+            PackageSource::Cargo => "cargo install --list | grep 'v[0-9]\\.' | grep -qsw ^",
+            PackageSource::Apt => "dpkg -s",
+            _ => ""
         }
     }
 #[cfg(target_os = "windows")]
-    pub fn is_installed_command(&self) -> Vec<&str> {
+    pub fn is_installed_script(&self) -> &str {
         match self {
-            PackageSource::Cargo => vec!["cmd", "/k",
-                "cargo --list | findstr"],
-            PackageSource::Chocolatey => vec!["cmd", "/k",
-                "choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color"],
-            _ => vec![]
+            PackageSource::Cargo => "cargo --list | findstr",
+            PackageSource::Chocolatey => "choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color",
+            _ => ""
         }
     }
 }
 
 impl fmt::Display for PackageSource {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", Colour::Cyan.italic().paint(format!("({})", self.full_name())))
+        write!(f, "({})", self.full_name())
     }
 }
 
@@ -101,6 +105,10 @@ impl Package {
         }
     }
 
+    pub fn colour_name(&self) -> String {
+        format!("{} {}", Colour::Yellow.paint(&*self.name), self.source.colour_full_name())
+    }
+
     pub fn command(&self) -> &str {
         self.source.command()
     }
@@ -112,17 +120,25 @@ impl Package {
         commands
     }
 
-    pub fn is_installed_command(&self) -> Vec<&str> {
-        let mut commands = self.source.is_installed_command();
-        commands.push(&*self.name);
+    pub fn is_installed(&self) -> Result<bool, Box<dyn Error>> {
+        let mut options = ScriptOptions::new();
+        options.capture_output = true;
+        options.exit_on_error = true;
+        options.print_commands = false;
 
-        commands
+        let (code, output, error) = run_script::run(&*self.is_installed_script(), &vec![], &options)?;
+
+        Ok(code == 0)
+    }
+
+    fn is_installed_script(&self) -> String {
+        format!("{} {}", self.source.is_installed_script(), self.name)
     }
 }
 
 impl fmt::Display for Package {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} {}", Colour::Yellow.paint(&self.name), self.source)
+        write!(f, "{} {}", self.name, self.source)
     }
 }
 

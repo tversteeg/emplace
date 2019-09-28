@@ -41,13 +41,13 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         // Only keep packages where we have the package manager of
         .filter(|package| can_call(package.command()))
         // Only keep packages that can actually be installed
-        .filter(|package| !call(package.is_installed_command(), false).expect("Could not perform command"))
+        .filter(|package| !package.is_installed().expect("Could not perform command"))
         // Make it a vector again
         .collect::<_>();
 
     let package_names: Vec<String> = packages_to_install.iter()
         // Get the names
-        .map(|package| format!("{}", package))
+        .map(|package| package.colour_name())
         // Make it a vector again
         .collect::<_>();
     let package_names: Vec<&str> = package_names.iter().map(|name| name.as_str()).collect::<_>();
