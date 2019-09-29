@@ -6,6 +6,8 @@ Command-line tool to mirror installed software on multiple machines.
 [![](https://img.shields.io/crates/d/emplace.svg)](#downloads)
 [![](https://img.shields.io/crates/v/emplace.svg)](https://crates.io/crates/emplace)
 
+![Example](./docs/capture.svg)
+
 ## Installation
 
 ### Getting Started
