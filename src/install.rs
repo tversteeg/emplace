@@ -47,7 +47,7 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
 
     let package_names: Vec<String> = packages_to_install.iter()
         // Get the names
-        .map(|package| package.colour_name())
+        .map(|package| package.colour_full_name())
         // Make it a vector again
         .collect::<_>();
     let package_names: Vec<&str> = package_names.iter().map(|name| name.as_str()).collect::<_>();
@@ -65,7 +65,7 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
 
     for selection in selections {
         let package = packages_to_install[selection];
-        println!("\nInstalling: {}", package.colour_name());
+        println!("\nInstalling: {}", package.colour_full_name());
 
         if call(package.install_command(), false)? {
             println!("{}", Colour::Green.bold().paint("Installed successfully"));

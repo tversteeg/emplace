@@ -6,6 +6,7 @@ use std::{
     string::String,
     slice::Iter,
     error::Error,
+    cmp::Ordering,
 };
 
 #[derive(Debug, Serialize, Deserialize, EnumIter)]
@@ -113,7 +114,11 @@ impl Package {
         }
     }
 
-    pub fn colour_name(&self) -> String {
+    pub fn full_name(&self) -> String {
+        format!("{} {}", self.name, self.source.full_name())
+    }
+
+    pub fn colour_full_name(&self) -> String {
         format!("{} {}", Colour::Yellow.paint(&*self.name), self.source.colour_full_name())
     }
 
@@ -149,9 +154,29 @@ impl Package {
 
 impl fmt::Display for Package {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} {}", self.name, self.source)
+        write!(f, "{}", self.full_name())
     }
 }
+
+impl Ord for Package {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.full_name().cmp(&other.full_name())
+    }
+}
+
+impl PartialOrd for Package {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for Package {
+    fn eq(&self, other: &Self) -> bool {
+        self.full_name() == other.full_name()
+    }
+}
+
+impl Eq for Package {}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Packages(pub Vec<Package>);
@@ -162,7 +187,13 @@ impl Packages {
     }
 
     pub fn merge(&mut self, other: &mut Packages) {
+        // Add the other packages
         self.0.append(&mut other.0);
+
+        // Sort them so we can remove deduplicates
+        self.0.sort();
+        // Remove the duplicates
+        self.0.dedup();
     }
 
     pub fn commit_message(&self) -> String {
@@ -171,5 +202,25 @@ impl Packages {
             1 => format!("Emplace - mirror package \"{}\"", self.0[0]),
             n => format!("Emplace - mirror {} packages", n),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_packages_deduplication() {
+        let package = Package::new(PackageSource::Cargo, "test".to_string());
+        let duplicate_package = Package::new(PackageSource::Cargo, "test".to_string());
+
+        let packages_vec = vec![package];
+        let duplicate_packages_vec = vec![duplicate_package];
+
+        let mut packages = Packages(packages_vec);
+        let mut duplicate_packages = Packages(duplicate_packages_vec);
+
+        packages.merge(&mut duplicate_packages);
+        assert_eq!(1, packages.0.len());
     }
 }
