@@ -15,9 +15,17 @@ Command-line tool to mirror installed software on multiple machines.
 - [x] Automatic prompt after installing a package
 - [x] Integrates well with dotfiles repositories
 - [x] Package managers supported:
-   - [x] Chocolatey (_Windows_)
+   - [x] Cargo (_*_)
    - [x] Apt (_Linux_)
-   - [x] Cargo (_Windows & Linux_)
+   - [x] Chocolatey (_Windows_)
+   - [ ] Homebrew (_Mac_)
+   - [ ] Snap (_Linux_)
+   - [ ] Yum (_Linux_)
+   - [ ] DNF (_Linux_)
+   - [ ] Pacman (_Linux_)
+   - [ ] Portage (_Linux_)
+   - [ ] NPM (_*_)
+   - [ ] Pip (_*_)
 
 ## Installation
 
