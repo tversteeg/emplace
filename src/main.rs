@@ -77,7 +77,7 @@ fn main() {
                 n => println!("{}", Colour::Green.bold().paint(format!("Mirror these {} commands?", n))),
             }
             for catch in catches.0.iter() {
-                println!("- {}", catch);
+                println!("- {}", catch.colour_full_name());
             }
 
             // Ask if it needs to be mirrored
