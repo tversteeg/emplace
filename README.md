@@ -8,6 +8,17 @@ Command-line tool to mirror installed software on multiple machines.
 
 ![Example](./docs/capture.svg)
 
+## Features
+
+- [x] Version control with git to automatically push & pull updates
+- [x] Automatic prompt after installing a package
+- [x] Human-readable output format (JSON)
+- [x] Integrates well with dotfiles repositories
+- [x] Package managers supported:
+   - [x] Chocolatey (_Windows_)
+   - [x] Apt (_Linux_)
+   - [x] Cargo (_Windows & Linux_)
+
 ## Installation
 
 ### Getting Started
