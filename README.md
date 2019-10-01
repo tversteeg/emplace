@@ -18,6 +18,8 @@ Command-line tool to mirror installed software on multiple machines.
    - [x] Cargo (_*_)
    - [x] Apt (_Linux_)
    - [x] Chocolatey (_Windows_)
+   - [x] Python Pip (_*_)
+   - [x] Python Pip 3 (_*_)
    - [ ] Homebrew (_Mac_)
    - [ ] Snap (_Linux_)
    - [ ] Yum (_Linux_)
@@ -25,7 +27,6 @@ Command-line tool to mirror installed software on multiple machines.
    - [ ] Pacman (_Linux_)
    - [ ] Portage (_Linux_)
    - [ ] NPM (_*_)
-   - [ ] Pip (_*_)
 
 ## Installation
 

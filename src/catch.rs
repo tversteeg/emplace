@@ -15,6 +15,16 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     // Parse Chocolatey
     packages.append(&mut match_choco(line)?);
 
+    // Parse Pip
+    packages.append(&mut match_pip(line)?);
+    // Parse Pip User
+    packages.append(&mut match_pip_user(line)?);
+
+    // Parse Pip3
+    packages.append(&mut match_pip3(line)?);
+    // Parse Pip3 User
+    packages.append(&mut match_pip3_user(line)?);
+
     Ok(Packages(packages))
 }
 
@@ -22,47 +32,75 @@ fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref CARGO_RE: Regex = Regex::new(r"cargo\s+install\s+(?P<name>\S+)+").unwrap();
     }
-
-    let mut packages = vec![];
-
-    for capture in CARGO_RE.captures_iter(line) {
-        packages.push(Package::new(PackageSource::Cargo, capture["name"].to_string()));
-    }
-
-    Ok(packages)
+    Ok(CARGO_RE.captures_iter(line)
+        .map(|capture| Package::new(PackageSource::Cargo, capture["name"].to_string()))
+        .collect::<_>())
 }
 
 fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref APT_RE: Regex = Regex::new(r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>\S+)").unwrap();
     }
-
-    let mut packages = vec![];
-
-    for capture in APT_RE.captures_iter(line) {
-        packages.push(Package::new(PackageSource::Apt, capture["name"].to_string()));
-    }
-
-    Ok(packages)
+    Ok(APT_RE.captures_iter(line)
+        .map(|capture| Package::new(PackageSource::Apt, capture["name"].to_string()))
+        .collect::<_>())
 }
 
 fn match_choco(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref CHOCO_RE: Regex = Regex::new(r"choco\S*\s+install\s+(?P<name>\S+)+").unwrap();
     }
+    Ok(CHOCO_RE.captures_iter(line)
+        .map(|capture| Package::new(PackageSource::Chocolatey, capture["name"].to_string()))
+        .collect::<_>())
+}
 
-    let mut packages = vec![];
-
-    for capture in CHOCO_RE.captures_iter(line) {
-        packages.push(Package::new(PackageSource::Chocolatey, capture["name"].to_string()));
+fn match_pip(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    lazy_static! {
+        static ref PIP_RE: Regex = Regex::new(r"pip\s+install\s+(?P<name>\S+)+").unwrap();
     }
+    Ok(PIP_RE.captures_iter(line)
+        .map(|capture| Package::new(PackageSource::Pip, capture["name"].to_string()))
+        .collect::<_>())
+}
 
-    Ok(packages)
+fn match_pip_user(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    lazy_static! {
+        static ref PIP_USER_RE: Regex = Regex::new(r"pip\s+--user\s+install\s+(?P<name>\S+)+").unwrap();
+    }
+    Ok(PIP_USER_RE.captures_iter(line)
+        .map(|capture| Package::new(PackageSource::PipUser, capture["name"].to_string()))
+        .collect::<_>())
+}
+
+fn match_pip3(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    lazy_static! {
+        static ref PIP3_RE: Regex = Regex::new(r"pip3\s+install\s+(?P<name>\S+)+").unwrap();
+    }
+    Ok(PIP3_RE.captures_iter(line)
+        .map(|capture| Package::new(PackageSource::Pip3, capture["name"].to_string()))
+        .collect::<_>())
+}
+
+fn match_pip3_user(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    lazy_static! {
+        static ref PIP3_USER_RE: Regex = Regex::new(r"pip3\s+--user\s+install\s+(?P<name>\S+)+").unwrap();
+    }
+    Ok(PIP3_USER_RE.captures_iter(line)
+        .map(|capture| Package::new(PackageSource::Pip3User, capture["name"].to_string()))
+        .collect::<_>())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn no_match<F>(match_func: F, command: &str) where
+        F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>
+    {
+        let command = match_func(command).unwrap();
+        assert_eq!(0, command.len());
+    }
 
     fn single_match<F>(match_func: F, result: &str, command: &str) where
         F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>
@@ -91,5 +129,24 @@ mod tests {
         // With flags
         single_match(match_apt, "test", "sudo apt -qq install test");
         //single_apt_match("test", "sudo apt install -t experimental test");
+    }
+
+    #[test]
+    fn test_pip_matches() {
+        // Regular invocation
+        single_match(match_pip, "test", "pip install test");
+        single_match(match_pip_user, "test", "pip --user install test");
+        single_match(match_pip3, "test", "pip3 install test");
+        single_match(match_pip3_user, "test", "pip3 --user install test");
+
+        // Shouldn't match
+        no_match(match_pip, "pip --user test");
+        no_match(match_pip, "pip3 test");
+        no_match(match_pip_user, "pip test");
+        no_match(match_pip_user, "pip3 --user test");
+        no_match(match_pip3, "pip3 --user test");
+        no_match(match_pip3, "pip test");
+        no_match(match_pip3_user, "pip3 test");
+        no_match(match_pip3_user, "pip --user test");
     }
 }

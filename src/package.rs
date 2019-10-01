@@ -17,6 +17,14 @@ pub enum PackageSource {
     Apt,
     /// Windows chocolatey.
     Chocolatey,
+    /// Python Pip
+    Pip,
+    /// Python Pip --user
+    PipUser,
+    /// Python Pip 3
+    Pip3,
+    /// Python Pip 3 --user
+    Pip3User,
 }
 
 impl PackageSource {
@@ -25,6 +33,10 @@ impl PackageSource {
             PackageSource::Cargo => "Cargo Rust",
             PackageSource::Apt => "Advanced Package Tool",
             PackageSource::Chocolatey => "Chocolatey",
+            PackageSource::Pip => "Python Pip",
+            PackageSource::PipUser => "Python Pip --user",
+            PackageSource::Pip3 => "Python Pip 3",
+            PackageSource::Pip3User => "Python Pip 3 --user",
         }
     }
 
@@ -37,6 +49,10 @@ impl PackageSource {
         match self {
             PackageSource::Cargo => "cargo",
             PackageSource::Apt => "apt",
+            PackageSource::Pip => "pip",
+            PackageSource::PipUser => "pip",
+            PackageSource::Pip3 => "pip3",
+            PackageSource::Pip3User => "pip3",
             _ => ""
         }
     }
@@ -45,6 +61,10 @@ impl PackageSource {
         match self {
             PackageSource::Cargo => "cargo",
             PackageSource::Chocolatey => "choco",
+            PackageSource::Pip => "pip",
+            PackageSource::PipUser => "pip",
+            PackageSource::Pip3 => "pip3",
+            PackageSource::Pip3User => "pip3",
             _ => ""
         }
     }
@@ -54,6 +74,10 @@ impl PackageSource {
         match self {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::Apt => vec!["apt", "install"],
+            PackageSource::Pip => vec!["pip", "install", "-q"],
+            PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
+            PackageSource::Pip3 => vec!["pip3", "install", "-q"],
+            PackageSource::Pip3User => vec!["pip3", "install", "-q", "--user"],
             _ => vec![]
         }
     }
@@ -62,6 +86,10 @@ impl PackageSource {
         match self {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::Chocolatey => vec!["choco", "install", "-y"],
+            PackageSource::Pip => vec!["pip", "install", "-q"],
+            PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
+            PackageSource::Pip3 => vec!["pip3", "install", "-q"],
+            PackageSource::Pip3User => vec!["pip3", "install", "-q", "--user"],
             _ => vec![]
         }
     }
@@ -71,6 +99,10 @@ impl PackageSource {
         match self {
             PackageSource::Cargo => "cargo install --list | grep 'v[0-9]' | grep -q",
             PackageSource::Apt => "dpkg-query --show",
+            PackageSource::Pip => "pip show -q",
+            PackageSource::PipUser => "pip show -q",
+            PackageSource::Pip3 => "pip3 show -q",
+            PackageSource::Pip3User => "pip3 show -q",
             _ => ""
         }
     }
@@ -79,6 +111,10 @@ impl PackageSource {
         match self {
             PackageSource::Cargo => "cargo install --list | findstr",
             PackageSource::Chocolatey => "choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color",
+            PackageSource::Pip => "pip show -q",
+            PackageSource::PipUser => "pip show -q",
+            PackageSource::Pip3 => "pip3 show -q",
+            PackageSource::Pip3User => "pip3 show -q",
             _ => ""
         }
     }
@@ -88,6 +124,10 @@ impl PackageSource {
             PackageSource::Cargo => false,
             PackageSource::Apt => true,
             PackageSource::Chocolatey => true,
+            PackageSource::Pip => true,
+            PackageSource::PipUser => false,
+            PackageSource::Pip3 => true,
+            PackageSource::Pip3User => false,
         }
     }
 }
