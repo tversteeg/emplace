@@ -77,7 +77,7 @@ impl PackageSource {
 #[cfg(target_os = "windows")]
     pub fn is_installed_script(&self) -> &str {
         match self {
-            PackageSource::Cargo => "cargo --list | findstr",
+            PackageSource::Cargo => "cargo install --list | findstr",
             PackageSource::Chocolatey => "choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color",
             _ => ""
         }
