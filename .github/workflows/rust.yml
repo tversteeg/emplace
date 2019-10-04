@@ -31,7 +31,7 @@ jobs:
             target: x86_64-unknown-linux-gnu
             bin: emplace
             name: emplace-x86_64-unknown-linux-gnu.tar.gz
-          - os: emplace-18.04
+          - os: ubuntu-18.04
             target: x86_64-unknown-linux-musl
             bin: emplace
             name: emplace-x86_64-unknown-linux-musl.tar.gz
