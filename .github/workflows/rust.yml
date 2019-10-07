@@ -155,7 +155,7 @@ jobs:
           fi
 
           cp "target/${{ matrix.target }}/release/${{ matrix.bin }}" "$release_name/"
-          cp README.md LICENSE-APACHE LICENSE-MIT "$release_name/"
+          cp README.md LICENSE "$release_name/"
           tar czvf "$release_tar" "$release_name"
 
           rm -r "$release_name"
