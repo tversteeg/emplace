@@ -77,11 +77,6 @@ jobs:
           # Install in debug mode since this part is sloooooow and
           # release doesn't really matter much for runtime
           args: --path . --debug
-      - name: self check
-        uses: actions-rs/cargo@v1
-        with:
-          command: deny
-          args: -L debug check
 
   publish-check:
     name: Publish Check
@@ -135,15 +130,15 @@ jobs:
           - os: ubuntu-latest
             rust: stable
             target: x86_64-unknown-linux-musl
-            bin: cargo-deny
+            bin: emplace
           - os: windows-latest
             rust: stable
             target: x86_64-pc-windows-msvc
-            bin: cargo-deny.exe
+            bin: emplace.exe
           - os: macOS-latest
             rust: stable
             target: x86_64-apple-darwin
-            bin: cargo-deny
+            bin: emplace
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install stable toolchain
@@ -171,7 +166,7 @@ jobs:
       - name: Package
         shell: bash
         run: |
-          name=cargo-deny
+          name=emplace
           tag=$(git describe --tags --abbrev=0)
           release_name="$name-$tag-${{ matrix.target }}"
           release_tar="${release_name}.tar.gz"
@@ -198,6 +193,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           draft: true
-          files: 'cargo-deny*'
+          files: 'emplace*'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
