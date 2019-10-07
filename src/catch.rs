@@ -164,7 +164,11 @@ mod tests {
     #[test]
     fn test_rustup_component_matches() {
         // Regular invocation
-        single_match(match_rustup_component, "clippy", "rustup component add clippy");
+        single_match(
+            match_rustup_component,
+            "clippy",
+            "rustup component add clippy",
+        );
     }
 
     #[test]
