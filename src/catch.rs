@@ -148,10 +148,8 @@ mod tests {
         let command = match_func(command).unwrap();
         assert_eq!(results.len(), command.len());
 
-        let mut i: usize = 0;
-        for result in results.into_iter() {
+        for (i, result) in results.into_iter().enumerate() {
             assert_eq!(result, command[i].name);
-            i = i + 1;
         }
     }
 
