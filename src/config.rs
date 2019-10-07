@@ -1,10 +1,10 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::{
-    path::{Path, PathBuf},
-    fs::{self, File},
     error::Error,
-    string::String,
+    fs::{self, File},
     io::Read,
+    path::{Path, PathBuf},
+    string::String,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -42,7 +42,7 @@ impl RepoConfig {
 pub struct Config {
     #[serde(default = "Config::default_mirror_dir_string")]
     pub repo_directory: String,
-    pub repo: RepoConfig
+    pub repo: RepoConfig,
 }
 
 impl Config {
@@ -54,7 +54,7 @@ impl Config {
 
         let config = Config {
             repo_directory: Config::default_mirror_dir_string(),
-            repo: RepoConfig::new(repo_url)
+            repo: RepoConfig::new(repo_url),
         };
 
         // Save the config
@@ -69,7 +69,7 @@ impl Config {
 
     pub fn from_path<P: AsRef<Path>>(file_path: &P) -> Result<Option<Self>, Box<dyn Error>> {
         if !file_path.as_ref().exists() {
-            return Ok(None)
+            return Ok(None);
         }
 
         // Open the file
@@ -90,7 +90,12 @@ impl Config {
 
         fs::write(Config::default_path(), toml_string)?;
 
-        println!("Config saved to: \"{}\".", Config::default_path().to_str().expect("Could not unwrap path to string"));
+        println!(
+            "Config saved to: \"{}\".",
+            Config::default_path()
+                .to_str()
+                .expect("Could not unwrap path to string")
+        );
         println!("You can edit the git repository URL and other settings here later.");
 
         Ok(())
@@ -104,18 +109,21 @@ impl Config {
     }
 
     fn default_path() -> PathBuf {
-        dirs::config_dir().expect("Could not find config dir")
+        dirs::config_dir()
+            .expect("Could not find config dir")
             .join("emplace.toml")
     }
 
     fn default_mirror_dir() -> PathBuf {
-        dirs::data_local_dir().expect("Could not find local data dir")
+        dirs::data_local_dir()
+            .expect("Could not find local data dir")
             .join("emplace")
     }
 
     fn default_mirror_dir_string() -> String {
-         Config::default_mirror_dir()
-            .to_str().expect("Could not get directory")
+        Config::default_mirror_dir()
+            .to_str()
+            .expect("Could not get directory")
             .to_string()
     }
 }

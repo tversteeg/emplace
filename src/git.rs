@@ -1,10 +1,14 @@
 use std::{
+    error::Error,
     path::Path,
     process::{Command, Stdio},
-    error::Error
 };
 
-fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P, dry_run: bool) -> Result<bool, Box<dyn Error>> {
+fn call_on_path<P: AsRef<Path>>(
+    command: Vec<&str>,
+    path: &P,
+    dry_run: bool,
+) -> Result<bool, Box<dyn Error>> {
     if dry_run {
         println!("cd {}", path.as_ref().display());
         println!("{}", command.join(" "));
@@ -31,7 +35,12 @@ fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P, dry_run: bool) -> 
     Ok(result.success())
 }
 
-pub fn commit_all<P: AsRef<Path>>(dir: &P, msg: &str, sign: bool, dry_run: bool) -> Result<bool, Box<dyn Error>> {
+pub fn commit_all<P: AsRef<Path>>(
+    dir: &P,
+    msg: &str,
+    sign: bool,
+    dry_run: bool,
+) -> Result<bool, Box<dyn Error>> {
     call_on_path(
         vec!["git", "commit", if sign { "-S" } else { "" }, "-am", msg],
         dir,
@@ -47,10 +56,31 @@ pub fn pull<P: AsRef<Path>>(dir: &P, dry_run: bool) -> Result<bool, Box<dyn Erro
     call_on_path(vec!["git", "pull"], dir, dry_run)
 }
 
-pub fn clone_single_branch<P: AsRef<Path>>(dir: &P, url: &str, branch: &str, dry_run: bool) -> Result<bool, Box<dyn Error>> {
-    call_on_path(vec!["git", "clone", "--single-branch", "--branch", branch, url, "."], dir, dry_run)
+pub fn clone_single_branch<P: AsRef<Path>>(
+    dir: &P,
+    url: &str,
+    branch: &str,
+    dry_run: bool,
+) -> Result<bool, Box<dyn Error>> {
+    call_on_path(
+        vec![
+            "git",
+            "clone",
+            "--single-branch",
+            "--branch",
+            branch,
+            url,
+            ".",
+        ],
+        dir,
+        dry_run,
+    )
 }
 
-pub fn add_file<P: AsRef<Path>>(dir: &P, file: &str, dry_run: bool) -> Result<bool, Box<dyn Error>> {
+pub fn add_file<P: AsRef<Path>>(
+    dir: &P,
+    file: &str,
+    dry_run: bool,
+) -> Result<bool, Box<dyn Error>> {
     call_on_path(vec!["git", "add", file], dir, dry_run)
 }

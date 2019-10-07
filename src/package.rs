@@ -1,13 +1,7 @@
 use ansi_term::Colour;
-use serde::{Serialize, Deserialize};
 use run_script::ScriptOptions;
-use std::{
-    fmt,
-    string::String,
-    slice::Iter,
-    error::Error,
-    cmp::Ordering,
-};
+use serde::{Deserialize, Serialize};
+use std::{cmp::Ordering, error::Error, fmt, slice::Iter, string::String};
 
 #[derive(Debug, Serialize, Deserialize, EnumIter)]
 pub enum PackageSource {
@@ -41,10 +35,13 @@ impl PackageSource {
     }
 
     pub fn colour_full_name(&self) -> String {
-        Colour::Cyan.italic().paint(format!("({})", self.full_name())).to_string()
+        Colour::Cyan
+            .italic()
+            .paint(format!("({})", self.full_name()))
+            .to_string()
     }
 
-#[cfg(not(target_os = "windows"))]
+    #[cfg(not(target_os = "windows"))]
     pub fn command(&self) -> &str {
         match self {
             PackageSource::Cargo => "cargo",
@@ -53,10 +50,10 @@ impl PackageSource {
             PackageSource::PipUser => "pip",
             PackageSource::Pip3 => "pip3",
             PackageSource::Pip3User => "pip3",
-            _ => ""
+            _ => "",
         }
     }
-#[cfg(target_os = "windows")]
+    #[cfg(target_os = "windows")]
     pub fn command(&self) -> &str {
         match self {
             PackageSource::Cargo => "cargo",
@@ -65,11 +62,11 @@ impl PackageSource {
             PackageSource::PipUser => "pip",
             PackageSource::Pip3 => "pip3",
             PackageSource::Pip3User => "pip3",
-            _ => ""
+            _ => "",
         }
     }
 
-#[cfg(not(target_os = "windows"))]
+    #[cfg(not(target_os = "windows"))]
     pub fn install_command(&self) -> Vec<&str> {
         match self {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
@@ -78,10 +75,10 @@ impl PackageSource {
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
             PackageSource::Pip3 => vec!["pip3", "install", "-q"],
             PackageSource::Pip3User => vec!["pip3", "install", "-q", "--user"],
-            _ => vec![]
+            _ => vec![],
         }
     }
-#[cfg(target_os = "windows")]
+    #[cfg(target_os = "windows")]
     pub fn install_command(&self) -> Vec<&str> {
         match self {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
@@ -90,11 +87,11 @@ impl PackageSource {
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
             PackageSource::Pip3 => vec!["pip3", "install", "-q"],
             PackageSource::Pip3User => vec!["pip3", "install", "-q", "--user"],
-            _ => vec![]
+            _ => vec![],
         }
     }
 
-#[cfg(not(target_os = "windows"))]
+    #[cfg(not(target_os = "windows"))]
     pub fn is_installed_script(&self) -> &str {
         match self {
             PackageSource::Cargo => "cargo install --list | grep 'v[0-9]' | grep -q",
@@ -103,10 +100,10 @@ impl PackageSource {
             PackageSource::PipUser => "pip show -q",
             PackageSource::Pip3 => "pip3 show -q",
             PackageSource::Pip3User => "pip3 show -q",
-            _ => ""
+            _ => "",
         }
     }
-#[cfg(target_os = "windows")]
+    #[cfg(target_os = "windows")]
     pub fn is_installed_script(&self) -> &str {
         match self {
             PackageSource::Cargo => "cargo install --list | findstr",
@@ -148,10 +145,7 @@ pub struct Package {
 
 impl Package {
     pub fn new(source: PackageSource, name: String) -> Self {
-        Self {
-            source,
-            name,
-        }
+        Self { source, name }
     }
 
     pub fn full_name(&self) -> String {
@@ -159,7 +153,11 @@ impl Package {
     }
 
     pub fn colour_full_name(&self) -> String {
-        format!("{} {}", Colour::Yellow.paint(&*self.name), self.source.colour_full_name())
+        format!(
+            "{} {}",
+            Colour::Yellow.paint(&*self.name),
+            self.source.colour_full_name()
+        )
     }
 
     pub fn command(&self) -> &str {
@@ -182,7 +180,8 @@ impl Package {
         options.exit_on_error = true;
         options.print_commands = false;
 
-        let (code, _output, _error) = run_script::run(&*self.is_installed_script(), &vec![], &options)?;
+        let (code, _output, _error) =
+            run_script::run(&*self.is_installed_script(), &vec![], &options)?;
 
         Ok(code == 0)
     }

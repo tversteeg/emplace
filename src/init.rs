@@ -1,16 +1,16 @@
-use strum::IntoEnumIterator;
-use std:: {
-    env,
-    error:: Error
-};
 use crate::package::PackageSource;
+use std::{env, error::Error};
+use strum::IntoEnumIterator;
 
 pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
-    let exe_path = env::current_exe()?.into_os_string().into_string().expect("Could not convert path to string");
+    let exe_path = env::current_exe()?
+        .into_os_string()
+        .into_string()
+        .expect("Could not convert path to string");
 
     let check_str = match shell_name {
         "bash" => BASH_CHECK,
-        _ => panic!("Shell \"{}\" is not supported at the moment", shell_name)
+        _ => panic!("Shell \"{}\" is not supported at the moment", shell_name),
     };
     // Get all the different package sources and replace them into the check strings
     let checks: String = PackageSource::iter()
@@ -20,7 +20,7 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
 
     let setup_script = match shell_name {
         "bash" => BASH_INIT,
-        _ => panic!("Shell \"{}\" is not supported at the moment", shell_name)
+        _ => panic!("Shell \"{}\" is not supported at the moment", shell_name),
     };
 
     let script = setup_script

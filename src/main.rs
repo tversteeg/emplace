@@ -5,13 +5,13 @@ extern crate lazy_static;
 #[macro_use]
 extern crate strum_macros;
 
-mod package;
-mod init;
-mod config;
 mod catch;
-mod repo;
+mod config;
 mod git;
+mod init;
 mod install;
+mod package;
+mod repo;
 
 use ansi_term::Colour;
 use clap::{App, AppSettings, Arg, SubCommand};
@@ -59,7 +59,7 @@ fn main() {
         ("init", Some(sub_m)) => {
             let shell_name = sub_m.value_of("shell").expect("Shell name is missing.");
             init::init_main(shell_name).expect("Could not initialize terminal script");
-        },
+        }
         ("catch", Some(sub_m)) => {
             let line = sub_m.value_of("line").expect("Line is missing");
             let catches = catch::catch(line).expect("Could not parse line");
@@ -74,7 +74,12 @@ fn main() {
             // Print the info
             match len {
                 1 => println!("{}", Colour::Green.bold().paint("Mirror this command?")),
-                n => println!("{}", Colour::Green.bold().paint(format!("Mirror these {} commands?", n))),
+                n => println!(
+                    "{}",
+                    Colour::Green
+                        .bold()
+                        .paint(format!("Mirror these {} commands?", n))
+                ),
             }
             for catch in catches.0.iter() {
                 println!("- {}", catch.colour_full_name());
@@ -83,33 +88,34 @@ fn main() {
             // Ask if it needs to be mirrored
             if !dialoguer::Confirmation::new()
                 .interact()
-                .expect("Could not create dialogue") {
+                .expect("Could not create dialogue")
+            {
                 // Exit, we don't need to do anything
-                return
+                return;
             }
 
             // Get the config
             let config = match Config::from_default_file().expect("Retrieving config went wrong") {
                 Some(config) => config,
-                None => Config::new().expect("Initializing new config failed")
+                None => Config::new().expect("Initializing new config failed"),
             };
 
             let repo = Repo::new(config).expect("Could not initialize git repository");
 
             repo.mirror(catches).expect("Could not mirror commands");
-        },
+        }
         ("install", Some(_)) => {
             // Get the config
             let config = match Config::from_default_file().expect("Retrieving config went wrong") {
                 Some(config) => config,
-                None => Config::new().expect("Initializing new config failed")
+                None => Config::new().expect("Initializing new config failed"),
             };
 
             let repo = Repo::new(config).expect("Could not initialize git repository");
 
             let packages = repo.read().expect("Could not get packages from repository");
             crate::install::install(packages).expect("Could not install new changes");
-        },
-        (&_, _) => { }
+        }
+        (&_, _) => {}
     }
 }

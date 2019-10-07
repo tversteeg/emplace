@@ -36,8 +36,15 @@ fn call(command: Vec<&str>, dry_run: bool) -> Result<bool, Box<dyn Error>> {
 }
 
 pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
-    println!("{}", Colour::White.dimmed().italic().paint("Checking which packages haven't been installed yet.."));
-    let packages_to_install: Vec<&Package> = packages.iter()
+    println!(
+        "{}",
+        Colour::White
+            .dimmed()
+            .italic()
+            .paint("Checking which packages haven't been installed yet..")
+    );
+    let packages_to_install: Vec<&Package> = packages
+        .iter()
         // Only keep packages where we have the package manager of
         .filter(|package| can_call(package.command()))
         // Only keep packages that can actually be installed
@@ -45,12 +52,16 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         // Make it a vector again
         .collect::<_>();
 
-    let package_names: Vec<String> = packages_to_install.iter()
+    let package_names: Vec<String> = packages_to_install
+        .iter()
         // Get the names
         .map(|package| package.colour_full_name())
         // Make it a vector again
         .collect::<_>();
-    let package_names: Vec<&str> = package_names.iter().map(|name| name.as_str()).collect::<_>();
+    let package_names: Vec<&str> = package_names
+        .iter()
+        .map(|name| name.as_str())
+        .collect::<_>();
 
     // If there's nothing to install just return
     if package_names.is_empty() {
@@ -58,7 +69,12 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    println!("{}", Colour::Green.bold().paint("Select the packages you want to install (space to add):"));
+    println!(
+        "{}",
+        Colour::Green
+            .bold()
+            .paint("Select the packages you want to install (space to add):")
+    );
     let selections = dialoguer::Checkboxes::new()
         .items(&package_names[..])
         .interact()?;

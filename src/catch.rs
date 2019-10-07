@@ -1,7 +1,7 @@
 use regex::Regex;
 use std::error::Error;
 
-use crate::package::{Package, Packages, PackageSource};
+use crate::package::{Package, PackageSource, Packages};
 
 pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     let mut packages = vec![];
@@ -32,20 +32,24 @@ fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref CARGO_RE: Regex = Regex::new(r"cargo\s+install\s+(?P<name>\S+)+").unwrap();
     }
-    Ok(CARGO_RE.captures_iter(line)
+    Ok(CARGO_RE
+        .captures_iter(line)
         .map(|capture| Package::new(PackageSource::Cargo, capture["name"].to_string()))
         .collect::<_>())
 }
 
 fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref APT_RE: Regex = Regex::new(r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>[\w\s-]+)").unwrap();
+        static ref APT_RE: Regex =
+            Regex::new(r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>[\w\s-]+)").unwrap();
         static ref APT_MULTIPLE_RE: Regex = Regex::new(r"([[:word:]]\S*)").unwrap();
     }
     let mut result = vec![];
     for multiple_capture in APT_RE.captures_iter(line) {
         let multiple_iter = APT_MULTIPLE_RE.captures_iter(&multiple_capture["name"]);
-        let mut multiple_vec: Vec<Package> = multiple_iter.map(|capture| Package::new(PackageSource::Apt, capture[0].to_string())).collect::<_>();
+        let mut multiple_vec: Vec<Package> = multiple_iter
+            .map(|capture| Package::new(PackageSource::Apt, capture[0].to_string()))
+            .collect::<_>();
         result.append(&mut multiple_vec);
     }
     Ok(result)
@@ -55,7 +59,8 @@ fn match_choco(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref CHOCO_RE: Regex = Regex::new(r"choco\S*\s+install\s+(?P<name>\S+)+").unwrap();
     }
-    Ok(CHOCO_RE.captures_iter(line)
+    Ok(CHOCO_RE
+        .captures_iter(line)
         .map(|capture| Package::new(PackageSource::Chocolatey, capture["name"].to_string()))
         .collect::<_>())
 }
@@ -64,16 +69,19 @@ fn match_pip(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref PIP_RE: Regex = Regex::new(r"pip\s+install\s+(?P<name>\S+)+").unwrap();
     }
-    Ok(PIP_RE.captures_iter(line)
+    Ok(PIP_RE
+        .captures_iter(line)
         .map(|capture| Package::new(PackageSource::Pip, capture["name"].to_string()))
         .collect::<_>())
 }
 
 fn match_pip_user(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref PIP_USER_RE: Regex = Regex::new(r"pip\s+--user\s+install\s+(?P<name>\S+)+").unwrap();
+        static ref PIP_USER_RE: Regex =
+            Regex::new(r"pip\s+--user\s+install\s+(?P<name>\S+)+").unwrap();
     }
-    Ok(PIP_USER_RE.captures_iter(line)
+    Ok(PIP_USER_RE
+        .captures_iter(line)
         .map(|capture| Package::new(PackageSource::PipUser, capture["name"].to_string()))
         .collect::<_>())
 }
@@ -82,16 +90,19 @@ fn match_pip3(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref PIP3_RE: Regex = Regex::new(r"pip3\s+install\s+(?P<name>\S+)+").unwrap();
     }
-    Ok(PIP3_RE.captures_iter(line)
+    Ok(PIP3_RE
+        .captures_iter(line)
         .map(|capture| Package::new(PackageSource::Pip3, capture["name"].to_string()))
         .collect::<_>())
 }
 
 fn match_pip3_user(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref PIP3_USER_RE: Regex = Regex::new(r"pip3\s+--user\s+install\s+(?P<name>\S+)+").unwrap();
+        static ref PIP3_USER_RE: Regex =
+            Regex::new(r"pip3\s+--user\s+install\s+(?P<name>\S+)+").unwrap();
     }
-    Ok(PIP3_USER_RE.captures_iter(line)
+    Ok(PIP3_USER_RE
+        .captures_iter(line)
         .map(|capture| Package::new(PackageSource::Pip3User, capture["name"].to_string()))
         .collect::<_>())
 }
@@ -100,23 +111,26 @@ fn match_pip3_user(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 mod tests {
     use super::*;
 
-    fn no_match<F>(match_func: F, command: &str) where
-        F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>
+    fn no_match<F>(match_func: F, command: &str)
+    where
+        F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>,
     {
         let command = match_func(command).unwrap();
         assert_eq!(0, command.len());
     }
 
-    fn single_match<F>(match_func: F, result: &str, command: &str) where
-        F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>
+    fn single_match<F>(match_func: F, result: &str, command: &str)
+    where
+        F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>,
     {
         let command = match_func(command).unwrap();
         assert_eq!(1, command.len());
         assert_eq!(result, command[0].name)
     }
 
-    fn multiple_match<F>(match_func: F, results: Vec<&str>, command: &str) where
-        F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>
+    fn multiple_match<F>(match_func: F, results: Vec<&str>, command: &str)
+    where
+        F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>,
     {
         let command = match_func(command).unwrap();
         assert_eq!(results.len(), command.len());
@@ -143,10 +157,18 @@ mod tests {
 
         // Multiple
         multiple_match(match_apt, vec!["test", "test2"], "apt install test test2");
-        multiple_match(match_apt, vec!["test", "test2", "test3"], "apt install test test2 test3");
+        multiple_match(
+            match_apt,
+            vec!["test", "test2", "test3"],
+            "apt install test test2 test3",
+        );
 
         // Command names
-        single_match(match_apt, "lib32gfortran5-x32-cross", "sudo apt install lib32gfortran5-x32-cross");
+        single_match(
+            match_apt,
+            "lib32gfortran5-x32-cross",
+            "sudo apt install lib32gfortran5-x32-cross",
+        );
 
         // With flags
         single_match(match_apt, "test", "sudo apt -qq install test");
