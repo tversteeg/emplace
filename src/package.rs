@@ -7,6 +7,8 @@ use std::{cmp::Ordering, error::Error, fmt, slice::Iter, string::String};
 pub enum PackageSource {
     /// Rust cargo.
     Cargo,
+    /// Rust rustup component.
+    RustupComponent,
     /// Debian apt-get.
     Apt,
     /// Windows chocolatey.
@@ -25,6 +27,7 @@ impl PackageSource {
     pub fn full_name(&self) -> &str {
         match self {
             PackageSource::Cargo => "Cargo Rust",
+            PackageSource::RustupComponent => "Rustup Component",
             PackageSource::Apt => "Advanced Package Tool",
             PackageSource::Chocolatey => "Chocolatey",
             PackageSource::Pip => "Python Pip",
@@ -45,6 +48,7 @@ impl PackageSource {
     pub fn command(&self) -> &str {
         match self {
             PackageSource::Cargo => "cargo",
+            PackageSource::RustupComponent => "rustup",
             PackageSource::Apt => "apt",
             PackageSource::Pip => "pip",
             PackageSource::PipUser => "pip",
@@ -57,6 +61,7 @@ impl PackageSource {
     pub fn command(&self) -> &str {
         match self {
             PackageSource::Cargo => "cargo",
+            PackageSource::RustupComponent => "rustup",
             PackageSource::Chocolatey => "choco",
             PackageSource::Pip => "pip",
             PackageSource::PipUser => "pip",
@@ -70,6 +75,7 @@ impl PackageSource {
     pub fn install_command(&self) -> Vec<&str> {
         match self {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
+            PackageSource::RustupComponent => vec!["rustup", "component", "add"],
             PackageSource::Apt => vec!["apt", "install"],
             PackageSource::Pip => vec!["pip", "install", "-q"],
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
@@ -82,6 +88,7 @@ impl PackageSource {
     pub fn install_command(&self) -> Vec<&str> {
         match self {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
+            PackageSource::RustupComponent => vec!["rustup", "component", "add"],
             PackageSource::Chocolatey => vec!["choco", "install", "-y"],
             PackageSource::Pip => vec!["pip", "install", "-q"],
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
@@ -95,6 +102,7 @@ impl PackageSource {
     pub fn is_installed_script(&self) -> &str {
         match self {
             PackageSource::Cargo => "cargo install --list | grep 'v[0-9]' | grep -q",
+            PackageSource::RustupComponent => "rustup component list | grep -q",
             PackageSource::Apt => "dpkg-query --show",
             PackageSource::Pip => "pip show -q",
             PackageSource::PipUser => "pip show -q",
@@ -107,6 +115,7 @@ impl PackageSource {
     pub fn is_installed_script(&self) -> &str {
         match self {
             PackageSource::Cargo => "cargo install --list | findstr",
+            PackageSource::RustupComponent => "rustup component list | findstr",
             PackageSource::Chocolatey => "choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color",
             PackageSource::Pip => "pip show -q",
             PackageSource::PipUser => "pip show -q",
@@ -119,6 +128,7 @@ impl PackageSource {
     pub fn needs_root(&self) -> bool {
         match self {
             PackageSource::Cargo => false,
+            PackageSource::RustupComponent => false,
             PackageSource::Apt => true,
             PackageSource::Chocolatey => true,
             PackageSource::Pip => true,

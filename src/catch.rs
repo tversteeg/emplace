@@ -8,6 +8,8 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
 
     // Parse Cargo
     packages.append(&mut match_cargo(line)?);
+    // Parse Rustup components
+    packages.append(&mut match_rustup_component(line)?);
 
     // Parse APT
     packages.append(&mut match_apt(line)?);
@@ -26,6 +28,17 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     packages.append(&mut match_pip3_user(line)?);
 
     Ok(Packages(packages))
+}
+
+fn match_rustup_component(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    lazy_static! {
+        static ref RUSTUP_C_RE: Regex =
+            Regex::new(r"rustup\s+component\s+add\s+(?P<name>\S+)+").unwrap();
+    }
+    Ok(RUSTUP_C_RE
+        .captures_iter(line)
+        .map(|capture| Package::new(PackageSource::RustupComponent, capture["name"].to_string()))
+        .collect::<_>())
 }
 
 fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
@@ -146,6 +159,12 @@ mod tests {
     fn test_cargo_matches() {
         // Regular invocation
         single_match(match_cargo, "test", "cargo install test");
+    }
+
+    #[test]
+    fn test_rustup_component_matches() {
+        // Regular invocation
+        single_match(match_rustup_component, "clippy", "rustup component add clippy");
     }
 
     #[test]
