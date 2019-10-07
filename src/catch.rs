@@ -39,11 +39,16 @@ fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 
 fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref APT_RE: Regex = Regex::new(r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>\S+)").unwrap();
+        static ref APT_RE: Regex = Regex::new(r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>[\w\s-]+)").unwrap();
+        static ref APT_MULTIPLE_RE: Regex = Regex::new(r"([[:word:]]\S*)").unwrap();
     }
-    Ok(APT_RE.captures_iter(line)
-        .map(|capture| Package::new(PackageSource::Apt, capture["name"].to_string()))
-        .collect::<_>())
+    let mut result = vec![];
+    for multiple_capture in APT_RE.captures_iter(line) {
+        let multiple_iter = APT_MULTIPLE_RE.captures_iter(&multiple_capture["name"]);
+        let mut multiple_vec: Vec<Package> = multiple_iter.map(|capture| Package::new(PackageSource::Apt, capture[0].to_string())).collect::<_>();
+        result.append(&mut multiple_vec);
+    }
+    Ok(result)
 }
 
 fn match_choco(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
@@ -110,6 +115,19 @@ mod tests {
         assert_eq!(result, command[0].name)
     }
 
+    fn multiple_match<F>(match_func: F, results: Vec<&str>, command: &str) where
+        F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>
+    {
+        let command = match_func(command).unwrap();
+        assert_eq!(results.len(), command.len());
+
+        let mut i: usize = 0;
+        for result in results.into_iter() {
+            assert_eq!(result, command[i].name);
+            i = i + 1;
+        }
+    }
+
     #[test]
     fn test_cargo_matches() {
         // Regular invocation
@@ -123,12 +141,15 @@ mod tests {
         single_match(match_apt, "test", "sudo apt install test");
         single_match(match_apt, "test", "sudo apt-get install test");
 
+        // Multiple
+        multiple_match(match_apt, vec!["test", "test2"], "apt install test test2");
+        multiple_match(match_apt, vec!["test", "test2", "test3"], "apt install test test2 test3");
+
         // Command names
         single_match(match_apt, "lib32gfortran5-x32-cross", "sudo apt install lib32gfortran5-x32-cross");
 
         // With flags
         single_match(match_apt, "test", "sudo apt -qq install test");
-        //single_apt_match("test", "sudo apt install -t experimental test");
     }
 
     #[test]
