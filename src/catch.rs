@@ -73,7 +73,8 @@ fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 
 fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref PACMAN_RE: Regex = Regex::new(r"pacman\s+-Sy?\s+(-\S+\s+)*(?P<name>[\w\s-]+)").unwrap();
+        static ref PACMAN_RE: Regex =
+            Regex::new(r"pacman\s+-Sy?\s+(-\S+\s+)*(?P<name>[\w\s-]+)").unwrap();
         static ref PACMAN_MULTIPLE_RE: Regex = Regex::new(r"([[:word:]]\S*)").unwrap();
     }
     let mut result = vec![];
