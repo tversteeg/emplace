@@ -11,6 +11,8 @@ pub enum PackageSource {
     RustupComponent,
     /// Debian apt-get.
     Apt,
+    /// Arch Pacman.
+    Pacman,
     /// Windows chocolatey.
     Chocolatey,
     /// Python Pip
@@ -29,6 +31,7 @@ impl PackageSource {
             PackageSource::Cargo => "Cargo Rust",
             PackageSource::RustupComponent => "Rustup Component",
             PackageSource::Apt => "Advanced Package Tool",
+            PackageSource::Pacman => "Pacman",
             PackageSource::Chocolatey => "Chocolatey",
             PackageSource::Pip => "Python Pip",
             PackageSource::PipUser => "Python Pip --user",
@@ -50,6 +53,7 @@ impl PackageSource {
             PackageSource::Cargo => "cargo",
             PackageSource::RustupComponent => "rustup",
             PackageSource::Apt => "apt",
+            PackageSource::Pacman => "pacman",
             PackageSource::Pip => "pip",
             PackageSource::PipUser => "pip",
             PackageSource::Pip3 => "pip3",
@@ -77,6 +81,7 @@ impl PackageSource {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::RustupComponent => vec!["rustup", "component", "add"],
             PackageSource::Apt => vec!["apt", "install"],
+            PackageSource::Pacman => vec!["pacman", "-Sy", "--noconfirm", "--quiet"],
             PackageSource::Pip => vec!["pip", "install", "-q"],
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
             PackageSource::Pip3 => vec!["pip3", "install", "-q"],
@@ -104,6 +109,7 @@ impl PackageSource {
             PackageSource::Cargo => "cargo install --list | grep 'v[0-9]' | grep -q",
             PackageSource::RustupComponent => "rustup component list | grep -q",
             PackageSource::Apt => "dpkg-query --show",
+            PackageSource::Pacman => "pacman -Q",
             PackageSource::Pip => "pip show -q",
             PackageSource::PipUser => "pip show -q",
             PackageSource::Pip3 => "pip3 show -q",
@@ -130,6 +136,7 @@ impl PackageSource {
             PackageSource::Cargo => false,
             PackageSource::RustupComponent => false,
             PackageSource::Apt => true,
+            PackageSource::Pacman => true,
             PackageSource::Chocolatey => true,
             PackageSource::Pip => true,
             PackageSource::PipUser => false,

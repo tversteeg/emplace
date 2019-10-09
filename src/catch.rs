@@ -14,6 +14,9 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     // Parse APT
     packages.append(&mut match_apt(line)?);
 
+    // Parse Pacman
+    packages.append(&mut match_pacman(line)?);
+
     // Parse Chocolatey
     packages.append(&mut match_choco(line)?);
 
@@ -62,6 +65,22 @@ fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
         let multiple_iter = APT_MULTIPLE_RE.captures_iter(&multiple_capture["name"]);
         let mut multiple_vec: Vec<Package> = multiple_iter
             .map(|capture| Package::new(PackageSource::Apt, capture[0].to_string()))
+            .collect::<_>();
+        result.append(&mut multiple_vec);
+    }
+    Ok(result)
+}
+
+fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    lazy_static! {
+        static ref PACMAN_RE: Regex = Regex::new(r"pacman\s+-Sy?\s+(-\S+\s+)*(?P<name>[\w\s-]+)").unwrap();
+        static ref PACMAN_MULTIPLE_RE: Regex = Regex::new(r"([[:word:]]\S*)").unwrap();
+    }
+    let mut result = vec![];
+    for multiple_capture in PACMAN_RE.captures_iter(line) {
+        let multiple_iter = PACMAN_MULTIPLE_RE.captures_iter(&multiple_capture["name"]);
+        let mut multiple_vec: Vec<Package> = multiple_iter
+            .map(|capture| Package::new(PackageSource::Pacman, capture[0].to_string()))
             .collect::<_>();
         result.append(&mut multiple_vec);
     }
@@ -193,6 +212,11 @@ mod tests {
 
         // With flags
         single_match(match_apt, "test", "sudo apt -qq install test");
+    }
+
+    #[test]
+    fn test_pacman_matches() {
+        multiple_match(match_pacman, vec!["test", "test2"], "pacman -Sy test test2");
     }
 
     #[test]

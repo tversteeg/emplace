@@ -20,11 +20,11 @@ Command-line tool to mirror installed software on multiple machines.
    - [x] Chocolatey (_Windows_)
    - [x] Python Pip (_*_)
    - [x] Python Pip 3 (_*_)
+   - [x] Pacman (_Linux_)
    - [ ] Homebrew (_Mac_)
    - [ ] Snap (_Linux_)
    - [ ] Yum (_Linux_)
    - [ ] DNF (_Linux_)
-   - [ ] Pacman (_Linux_)
    - [ ] Portage (_Linux_)
    - [ ] NPM (_*_)
 
