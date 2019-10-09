@@ -14,13 +14,13 @@ Command-line tool to mirror installed software on multiple machines.
 - [x] Automatic prompt after installing a package
 - [x] Integrates well with dotfiles repositories
 - [x] Package managers supported:
+   - [x] Apt (_Linux_)
+   - [x] Pacman (_Linux_)
+   - [x] Chocolatey (_Windows_)
    - [x] Cargo (_*_)
    - [x] Rustup Component (_*_)
-   - [x] Apt (_Linux_)
-   - [x] Chocolatey (_Windows_)
    - [x] Python Pip (_*_)
    - [x] Python Pip 3 (_*_)
-   - [x] Pacman (_Linux_)
    - [ ] Homebrew (_Mac_)
    - [ ] Snap (_Linux_)
    - [ ] Yum (_Linux_)
