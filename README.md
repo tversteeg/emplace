@@ -51,5 +51,3 @@ Command-line tool to mirror installed software on multiple machines.
    
    eval "$(emplace init bash)"
    ```
-
-[![Stargazers over time](https://starchart.cc/tversteeg/emplace.svg)](https://starchart.cc/tversteeg/emplace)
