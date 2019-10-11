@@ -73,9 +73,9 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         println!("\nInstalling: {}", package.colour_full_name());
 
         if call(package.install_command(), false)? {
-            println!("{}", "Installed successfully".green().bold());
+            println!("{} {}", package.colour_full_name(), "installed successfully".green().bold());
         } else {
-            println!("{}", "Installation failed".red().bold());
+            println!("{} {}", package.colour_full_name(), "installation failed".red().bold());
         }
     }
 
