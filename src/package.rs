@@ -1,4 +1,4 @@
-use ansi_term::Colour;
+use colored::*;
 use run_script::ScriptOptions;
 use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, error::Error, fmt, slice::Iter, string::String};
@@ -41,10 +41,7 @@ impl PackageSource {
     }
 
     pub fn colour_full_name(&self) -> String {
-        Colour::Cyan
-            .italic()
-            .paint(format!("({})", self.full_name()))
-            .to_string()
+        format!("({})", self.full_name()).cyan().italic().to_string()
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -170,11 +167,7 @@ impl Package {
     }
 
     pub fn colour_full_name(&self) -> String {
-        format!(
-            "{} {}",
-            Colour::Yellow.paint(&*self.name),
-            self.source.colour_full_name()
-        )
+        format!("{} {}", self.name.yellow(), self.source.colour_full_name())
     }
 
     pub fn command(&self) -> &str {

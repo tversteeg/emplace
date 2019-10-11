@@ -13,7 +13,7 @@ mod install;
 mod package;
 mod repo;
 
-use ansi_term::Colour;
+use colored::*;
 use clap::{App, AppSettings, Arg, SubCommand};
 
 use config::Config;
@@ -73,13 +73,8 @@ fn main() {
 
             // Print the info
             match len {
-                1 => println!("{}", Colour::Green.bold().paint("Mirror this command?")),
-                n => println!(
-                    "{}",
-                    Colour::Green
-                        .bold()
-                        .paint(format!("Mirror these {} commands?", n))
-                ),
+                1 => println!("{}", "Mirror this command?".green().bold()),
+                n => println!("{}", format!("Mirror these {} commands?", n).green().bold()),
             }
             for catch in catches.0.iter() {
                 println!("- {}", catch.colour_full_name());

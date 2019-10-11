@@ -7,16 +7,14 @@ edition = "2018"
 repository = "https://github.com/tversteeg/emplace"
 readme = "README.md"
 license = "AGPL-3.0-or-later"
-keywords = ["shell", "cli", "mirror"]
+keywords = ["shell", "cli", "mirror", "sync"]
 categories = ["command-line-utilities"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [badges]
 is-it-maintained-issue-resolution = { repository = "tversteeg/emplace" }
 is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
 
 [dependencies]
-ansi_term = "0.12.1"
 clap = "2.33.0"
 dialoguer = "0.4.0"
 dirs = "2.0.2"
@@ -29,3 +27,4 @@ toml = "0.5.3"
 strum = "0.16.0"
 strum_macros = "0.16.0"
 run_script = "0.3.2"
+colored = "1.8.0"

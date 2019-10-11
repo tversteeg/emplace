@@ -1,4 +1,4 @@
-use ansi_term::Colour;
+use colored::*;
 use std::{
     error::Error,
     fs::{self, File},
@@ -26,23 +26,11 @@ impl Repo {
 
         let repo_exists = path.join(".git").exists();
         if repo_exists {
-            println!(
-                "{}",
-                Colour::White
-                    .dimmed()
-                    .italic()
-                    .paint(format!("Opening existing repo: \"{}\"", path_str))
-            );
+            println!("{}", format!("Opening existing repo: \"{}\"", path_str).dimmed().italic());
 
             git::pull(&path, false)?;
         } else {
-            println!(
-                "{}",
-                Colour::White
-                    .dimmed()
-                    .italic()
-                    .paint(format!("Cloning repo \"{}\" to \"{}\"", repo_url, path_str))
-            );
+            println!("{}", format!("Cloning repo \"{}\" to \"{}\"", repo_url, path_str).dimmed().italic());
 
             fs::create_dir_all(path)?;
             git::clone_single_branch(&path, &*repo_url, &*repo_branch, false)?;
@@ -83,20 +71,11 @@ impl Repo {
         let toml_string = serde_json::to_string_pretty(&commands)?;
         fs::write(&full_path, toml_string)?;
 
-        println!(
-            "{}",
-            Colour::White
-                .dimmed()
-                .italic()
-                .paint(format!("Commiting with message \"{}\"", commit_msg))
-        );
+        println!("{}", format!("Commiting with message \"{}\"", commit_msg).dimmed().italic());
         git::add_file(&self.path, &*self.config.repo.file, false)?;
         git::commit_all(&self.path, &*commit_msg, false, false)?;
 
-        println!(
-            "{}",
-            Colour::White.dimmed().italic().paint("Pushing to remote")
-        );
+        println!("{}", "Pushing to remote".dimmed().italic());
         git::push(&self.path, false)?;
 
         Ok(())
