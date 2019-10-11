@@ -36,7 +36,12 @@ fn call(command: Vec<&str>, dry_run: bool) -> Result<bool, Box<dyn Error>> {
 }
 
 pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
-    println!("{}", "Checking which packages haven't been installed yet..".dimmed().italic());
+    println!(
+        "{}",
+        "Checking which packages haven't been installed yet.."
+            .dimmed()
+            .italic()
+    );
     let packages_to_install: Vec<&Package> = packages
         .iter()
         // Only keep packages where we have the package manager of
@@ -63,7 +68,10 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    println!("{}", "Select the packages you want to install (space to add)".bold());
+    println!(
+        "{}",
+        "Select the packages you want to install (space to add)".bold()
+    );
     let selections = dialoguer::Checkboxes::new()
         .items(&package_names[..])
         .interact()?;
@@ -73,9 +81,17 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         println!("\nInstalling: {}", package.colour_full_name());
 
         if call(package.install_command(), false)? {
-            println!("{} {}", package.colour_full_name(), "installed successfully".green().bold());
+            println!(
+                "{} {}",
+                package.colour_full_name(),
+                "installed successfully".green().bold()
+            );
         } else {
-            println!("{} {}", package.colour_full_name(), "installation failed".red().bold());
+            println!(
+                "{} {}",
+                package.colour_full_name(),
+                "installation failed".red().bold()
+            );
         }
     }
 

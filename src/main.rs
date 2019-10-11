@@ -13,8 +13,8 @@ mod install;
 mod package;
 mod repo;
 
-use colored::*;
 use clap::{App, AppSettings, Arg, SubCommand};
+use colored::*;
 
 use config::Config;
 use repo::Repo;

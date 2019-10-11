@@ -41,7 +41,10 @@ impl PackageSource {
     }
 
     pub fn colour_full_name(&self) -> String {
-        format!("({})", self.full_name()).cyan().italic().to_string()
+        format!("({})", self.full_name())
+            .cyan()
+            .italic()
+            .to_string()
     }
 
     #[cfg(not(target_os = "windows"))]
