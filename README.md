@@ -66,3 +66,21 @@ Command-line tool to mirror installed software on multiple machines.
    
    eval "$(emplace init zsh)"
    ```
+   
+## Usage
+
+### Mirroring Packages
+
+Invoke the supported package manager of choice using the command line in a normal way and you will automatically be prompted to mirror the package:
+
+```sh
+cargo install emplace
+```
+
+### Synchronizing On Another Machine
+
+Just invoke `emplace install` and you will be prompted with the packages to install:
+
+```sh
+emplace install
+```
