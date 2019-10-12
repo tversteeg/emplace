@@ -21,12 +21,12 @@ Command-line tool to mirror installed software on multiple machines.
    - [x] Rustup Component (_*_)
    - [x] Python Pip (_*_)
    - [x] Python Pip 3 (_*_)
+   - [x] Node Package Manager (_*_)
    - [ ] Homebrew (_Mac_)
    - [ ] Snap (_Linux_)
    - [ ] Yum (_Linux_)
    - [ ] DNF (_Linux_)
    - [ ] Portage (_Linux_)
-   - [ ] NPM (_*_)
 
 ## Installation
 

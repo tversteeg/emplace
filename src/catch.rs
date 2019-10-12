@@ -30,6 +30,9 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     // Parse Pip3 User
     packages.append(&mut match_pip3_user(line)?);
 
+    // Parse NPM
+    packages.append(&mut match_npm(line)?);
+
     Ok(Packages(packages))
 }
 
@@ -100,7 +103,7 @@ fn match_choco(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 
 fn match_pip(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref PIP_RE: Regex = Regex::new(r"pip\s+install\s+(?P<name>\S+)+").unwrap();
+        static ref PIP_RE: Regex = Regex::new(r"pip\s+install\s+(?P<name>\w\S+)+").unwrap();
     }
     Ok(PIP_RE
         .captures_iter(line)
@@ -111,7 +114,7 @@ fn match_pip(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 fn match_pip_user(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref PIP_USER_RE: Regex =
-            Regex::new(r"pip\s+--user\s+install\s+(?P<name>\S+)+").unwrap();
+            Regex::new(r"pip\s+(install\s+--user|--user\s+install)\s+(?P<name>\w\S+)+").unwrap();
     }
     Ok(PIP_USER_RE
         .captures_iter(line)
@@ -121,7 +124,7 @@ fn match_pip_user(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 
 fn match_pip3(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
-        static ref PIP3_RE: Regex = Regex::new(r"pip3\s+install\s+(?P<name>\S+)+").unwrap();
+        static ref PIP3_RE: Regex = Regex::new(r"pip3\s+install\s+(?P<name>\w\S+)+").unwrap();
     }
     Ok(PIP3_RE
         .captures_iter(line)
@@ -132,11 +135,22 @@ fn match_pip3(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 fn match_pip3_user(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref PIP3_USER_RE: Regex =
-            Regex::new(r"pip3\s+--user\s+install\s+(?P<name>\S+)+").unwrap();
+            Regex::new(r"pip3\s+(install\s+--user|--user\s+install)\s+(?P<name>\w\S+)+").unwrap();
     }
     Ok(PIP3_USER_RE
         .captures_iter(line)
         .map(|capture| Package::new(PackageSource::Pip3User, capture["name"].to_string()))
+        .collect::<_>())
+}
+
+fn match_npm(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    lazy_static! {
+        static ref NPM_RE: Regex =
+            Regex::new(r"npm\s+(install\s+-g|-g\s+install)\s+(?P<name>\S+)+").unwrap();
+    }
+    Ok(NPM_RE
+        .captures_iter(line)
+        .map(|capture| Package::new(PackageSource::Npm, capture["name"].to_string()))
         .collect::<_>())
 }
 
@@ -225,17 +239,28 @@ mod tests {
         // Regular invocation
         single_match(match_pip, "test", "pip install test");
         single_match(match_pip_user, "test", "pip --user install test");
+        single_match(match_pip_user, "test", "pip install --user test");
         single_match(match_pip3, "test", "pip3 install test");
-        single_match(match_pip3_user, "test", "pip3 --user install test");
+        single_match(match_pip3_user, "test", "pip3 install --user test");
 
         // Shouldn't match
-        no_match(match_pip, "pip --user test");
-        no_match(match_pip, "pip3 test");
-        no_match(match_pip_user, "pip test");
-        no_match(match_pip_user, "pip3 --user test");
-        no_match(match_pip3, "pip3 --user test");
-        no_match(match_pip3, "pip test");
-        no_match(match_pip3_user, "pip3 test");
-        no_match(match_pip3_user, "pip --user test");
+        no_match(match_pip, "pip install --user test");
+        no_match(match_pip, "pip3 install test");
+        no_match(match_pip_user, "pip install test");
+        no_match(match_pip_user, "pip3 install --user test");
+        no_match(match_pip3, "pip3 install --user test");
+        no_match(match_pip3, "pip install test");
+        no_match(match_pip3_user, "pip3 install test");
+        no_match(match_pip3_user, "pip install --user test");
+    }
+
+    #[test]
+    fn test_npm_matches() {
+        // Regular invocation
+        single_match(match_npm, "test", "npm install -g test");
+        single_match(match_npm, "test", "npm -g install test");
+
+        // Shouldn't match
+        no_match(match_npm, "npm install test");
     }
 }

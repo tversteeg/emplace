@@ -23,6 +23,8 @@ pub enum PackageSource {
     Pip3,
     /// Python Pip 3 --user
     Pip3User,
+    /// Node Package Manager
+    Npm,
 }
 
 impl PackageSource {
@@ -37,6 +39,7 @@ impl PackageSource {
             PackageSource::PipUser => "Python Pip --user",
             PackageSource::Pip3 => "Python Pip 3",
             PackageSource::Pip3User => "Python Pip 3 --user",
+            PackageSource::Npm => "Node Package Manager",
         }
     }
 
@@ -58,6 +61,7 @@ impl PackageSource {
             PackageSource::PipUser => "pip",
             PackageSource::Pip3 => "pip3",
             PackageSource::Pip3User => "pip3",
+            PackageSource::Npm => "npm",
             _ => "",
         }
     }
@@ -71,6 +75,7 @@ impl PackageSource {
             PackageSource::PipUser => "pip",
             PackageSource::Pip3 => "pip3",
             PackageSource::Pip3User => "pip3",
+            PackageSource::Npm => "npm",
             _ => "",
         }
     }
@@ -86,6 +91,7 @@ impl PackageSource {
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
             PackageSource::Pip3 => vec!["pip3", "install", "-q"],
             PackageSource::Pip3User => vec!["pip3", "install", "-q", "--user"],
+            PackageSource::Npm => vec!["npm", "install", "-g"],
             _ => vec![],
         }
     }
@@ -99,6 +105,7 @@ impl PackageSource {
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
             PackageSource::Pip3 => vec!["pip3", "install", "-q"],
             PackageSource::Pip3User => vec!["pip3", "install", "-q", "--user"],
+            PackageSource::Npm => vec!["npm", "install", "-g"],
             _ => vec![],
         }
     }
@@ -114,6 +121,7 @@ impl PackageSource {
             PackageSource::PipUser => "pip show -q",
             PackageSource::Pip3 => "pip3 show -q",
             PackageSource::Pip3User => "pip3 show -q",
+            PackageSource::Npm => "npm list --depth=0 -g | grep -q",
             _ => "",
         }
     }
@@ -127,6 +135,7 @@ impl PackageSource {
             PackageSource::PipUser => "pip show -q",
             PackageSource::Pip3 => "pip3 show -q",
             PackageSource::Pip3User => "pip3 show -q",
+            PackageSource::Npm => "npm list --depth=0 -g | findstr",
             _ => ""
         }
     }
@@ -142,6 +151,7 @@ impl PackageSource {
             PackageSource::PipUser => false,
             PackageSource::Pip3 => true,
             PackageSource::Pip3User => false,
+            PackageSource::Npm => false,
         }
     }
 }
