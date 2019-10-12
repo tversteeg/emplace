@@ -13,7 +13,7 @@ Command-line tool to mirror installed software on multiple machines.
 - [x] Version control with git to automatically push & pull updates
 - [x] Automatic prompt after installing a package
 - [x] Integrates well with dotfiles repositories
-- [x] Package managers supported:
+- Package managers supported:
    - [x] Apt (_Linux_)
    - [x] Pacman (_Linux_)
    - [x] Chocolatey (_Windows_)
@@ -27,6 +27,11 @@ Command-line tool to mirror installed software on multiple machines.
    - [ ] Yum (_Linux_)
    - [ ] DNF (_Linux_)
    - [ ] Portage (_Linux_)
+- Shells supported:
+   - [x] Bash
+   - [x] Zsh
+   - [ ] Fish
+   - [ ] nu
 
 ## Installation
 
@@ -50,4 +55,14 @@ Command-line tool to mirror installed software on multiple machines.
    # ~/.bashrc
    
    eval "$(emplace init bash)"
+   ```
+
+   #### Zsh
+   
+   Add the following to the end of `~/.zshrc`:
+   
+   ```sh
+   # ~/.zshrc
+   
+   eval "$(emplace init zsh)"
    ```
