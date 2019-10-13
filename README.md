@@ -39,6 +39,12 @@ Command-line tool to mirror installed software on multiple machines.
 
 1. Install the *emplace* binary:
 
+   #### Snap
+
+   ```sh
+   sudo snap install emplace
+   ```
+
    #### Rust
    
    ```sh
