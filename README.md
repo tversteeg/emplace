@@ -71,10 +71,22 @@ Command-line tool to mirror installed software on multiple machines.
 
 ### Mirroring Packages
 
-Invoke the supported package manager of choice using the command line in a normal way and you will automatically be prompted to mirror the package:
+Invoke the supported package manager of choice using the command line in a normal way and you will automatically be prompted to mirror the package, for example:
 
 ```sh
-cargo install emplace
+cargo install topgrade
+# -- or --
+sudo apt install meld
+# -- or --
+rustup component add rustfmt
+# -- or --
+pacman -Sy zsh
+# -- or --
+npm install -g release
+# -- or --
+pip3 install --user termtosvg
+# -- or --
+choco install neovim
 ```
 
 ### Synchronizing On Another Machine
