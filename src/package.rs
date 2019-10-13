@@ -13,6 +13,8 @@ pub enum PackageSource {
     Apt,
     /// Arch Pacman.
     Pacman,
+    /// Linux Snap.
+    Snap,
     /// Windows chocolatey.
     Chocolatey,
     /// Python Pip
@@ -34,6 +36,7 @@ impl PackageSource {
             PackageSource::RustupComponent => "Rustup Component",
             PackageSource::Apt => "Advanced Package Tool",
             PackageSource::Pacman => "Pacman",
+            PackageSource::Snap => "Snap",
             PackageSource::Chocolatey => "Chocolatey",
             PackageSource::Pip => "Python Pip",
             PackageSource::PipUser => "Python Pip --user",
@@ -57,6 +60,7 @@ impl PackageSource {
             PackageSource::RustupComponent => "rustup",
             PackageSource::Apt => "apt",
             PackageSource::Pacman => "pacman",
+            PackageSource::Snap => "snap",
             PackageSource::Pip => "pip",
             PackageSource::PipUser => "pip",
             PackageSource::Pip3 => "pip3",
@@ -87,6 +91,7 @@ impl PackageSource {
             PackageSource::RustupComponent => vec!["rustup", "component", "add"],
             PackageSource::Apt => vec!["apt", "install"],
             PackageSource::Pacman => vec!["pacman", "-Sy", "--noconfirm", "--quiet"],
+            PackageSource::Snap => vec!["snap", "install"],
             PackageSource::Pip => vec!["pip", "install", "-q"],
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
             PackageSource::Pip3 => vec!["pip3", "install", "-q"],
@@ -117,6 +122,7 @@ impl PackageSource {
             PackageSource::RustupComponent => "rustup component list | grep -q",
             PackageSource::Apt => "dpkg-query --show",
             PackageSource::Pacman => "pacman -Q",
+            PackageSource::Snap => "snap | grep -Eo '^[^ ]+' | grep -q",
             PackageSource::Pip => "pip show -q",
             PackageSource::PipUser => "pip show -q",
             PackageSource::Pip3 => "pip3 show -q",
@@ -146,6 +152,7 @@ impl PackageSource {
             PackageSource::RustupComponent => false,
             PackageSource::Apt => true,
             PackageSource::Pacman => true,
+            PackageSource::Snap => true,
             PackageSource::Chocolatey => true,
             PackageSource::Pip => true,
             PackageSource::PipUser => false,

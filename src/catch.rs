@@ -17,6 +17,9 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     // Parse Pacman
     packages.append(&mut match_pacman(line)?);
 
+    // Parse Snap
+    packages.append(&mut match_snap(line)?);
+
     // Parse Chocolatey
     packages.append(&mut match_choco(line)?);
 
@@ -83,6 +86,23 @@ fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     let mut result = vec![];
     for multiple_capture in PACMAN_RE.captures_iter(line) {
         let multiple_iter = PACMAN_MULTIPLE_RE.captures_iter(&multiple_capture["name"]);
+        let mut multiple_vec: Vec<Package> = multiple_iter
+            .map(|capture| Package::new(PackageSource::Pacman, capture[0].to_string()))
+            .collect::<_>();
+        result.append(&mut multiple_vec);
+    }
+    Ok(result)
+}
+
+fn match_snap(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    lazy_static! {
+        static ref SNAP_RE: Regex =
+            Regex::new(r"snap\s+install\s+(-\S+\s+)*(?P<name>[\w\s-]+)").unwrap();
+        static ref SNAP_MULTIPLE_RE: Regex = Regex::new(r"([[:word:]]\S*)").unwrap();
+    }
+    let mut result = vec![];
+    for multiple_capture in SNAP_RE.captures_iter(line) {
+        let multiple_iter = SNAP_MULTIPLE_RE.captures_iter(&multiple_capture["name"]);
         let mut multiple_vec: Vec<Package> = multiple_iter
             .map(|capture| Package::new(PackageSource::Pacman, capture[0].to_string()))
             .collect::<_>();
@@ -166,13 +186,15 @@ mod tests {
         assert_eq!(0, command.len());
     }
 
-    fn single_match<F>(match_func: F, result: &str, command: &str)
+    fn single_match<F>(match_func: F, result: &str, command_str: &str)
     where
         F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>,
     {
-        let command = match_func(command).unwrap();
+        let command = match_func(command_str).unwrap();
         assert_eq!(1, command.len());
-        assert_eq!(result, command[0].name)
+        assert_eq!(result, command[0].name);
+        // Make sure it doesn't match anything else as well
+        assert_eq!(command.len(), catch(command_str).unwrap().0.len())
     }
 
     fn multiple_match<F>(match_func: F, results: Vec<&str>, command: &str)
@@ -232,6 +254,15 @@ mod tests {
     #[test]
     fn test_pacman_matches() {
         multiple_match(match_pacman, vec!["test", "test2"], "pacman -Sy test test2");
+    }
+
+    #[test]
+    fn test_snap_matches() {
+        multiple_match(
+            match_snap,
+            vec!["test", "test2"],
+            "sudo snap install test test2",
+        );
     }
 
     #[test]
