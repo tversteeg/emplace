@@ -16,6 +16,7 @@ Command-line tool to mirror installed software on multiple machines.
 - Package managers supported:
    - [x] Apt (_Linux_)
    - [x] Pacman (_Linux_)
+   - [x] Snap (_Linux_)
    - [x] Chocolatey (_Windows_)
    - [x] Cargo (_*_)
    - [x] Rustup Component (_*_)
@@ -23,7 +24,6 @@ Command-line tool to mirror installed software on multiple machines.
    - [x] Python Pip 3 (_*_)
    - [x] Node Package Manager (_*_)
    - [ ] Homebrew (_Mac_)
-   - [ ] Snap (_Linux_)
    - [ ] Yum (_Linux_)
    - [ ] DNF (_Linux_)
    - [ ] Portage (_Linux_)
@@ -76,11 +76,13 @@ Invoke the supported package manager of choice using the command line in a norma
 ```sh
 cargo install topgrade
 # -- or --
-sudo apt install meld
-# -- or --
 rustup component add rustfmt
 # -- or --
+sudo apt install meld
+# -- or --
 pacman -Sy zsh
+# -- or --
+sudo snap install scrcpy
 # -- or --
 npm install -g release
 # -- or --
