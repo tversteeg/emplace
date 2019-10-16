@@ -9,7 +9,7 @@ Command-line tool to mirror installed software on multiple machines.
 
 ## Features
 
-- [x] Outputs a human-readable (JSON) file to sync between machines: `.emplace`
+- [x] Outputs a human-readable (RON) file to sync between machines: `.emplace`
 - [x] Version control with git to automatically push & pull updates
 - [x] Automatic prompt after installing a package
 - [x] Integrates well with dotfiles repositories
