@@ -1,4 +1,8 @@
 use colored::*;
+use ron::{
+    de::from_str,
+    ser::{to_string_pretty, PrettyConfig},
+};
 use std::{
     error::Error,
     fs::{self, File},
@@ -61,7 +65,7 @@ impl Repo {
         file.read_to_string(&mut contents)?;
 
         // Deserialize the file into the struct
-        Ok(serde_json::from_str(&*contents)?)
+        Ok(from_str(&*contents)?)
     }
 
     pub fn mirror(&self, mut commands: Packages) -> Result<(), Box<dyn Error>> {
@@ -78,7 +82,13 @@ impl Repo {
         }
 
         // There's no file yet, just serialize everything and write it to a new file
-        let toml_string = serde_json::to_string_pretty(&commands)?;
+        let pretty = PrettyConfig {
+            depth_limit: 2,
+            indentor: "".into(),
+            ..PrettyConfig::default()
+        };
+        let toml_string = to_string_pretty(&commands, pretty)?;
+
         fs::write(&full_path, toml_string)?;
 
         println!(
