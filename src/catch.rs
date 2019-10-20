@@ -64,13 +64,14 @@ fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref APT_RE: Regex =
             Regex::new(r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>[\w\s-]+)").unwrap();
-        static ref APT_MULTIPLE_RE: Regex = Regex::new(r"([[:word:]]\S*)").unwrap();
+        static ref APT_MULTIPLE_RE: Regex = Regex::new(r"^([[:alpha:]]\S*)").unwrap();
     }
     let mut result = vec![];
     for multiple_capture in APT_RE.captures_iter(line) {
-        let multiple_iter = APT_MULTIPLE_RE.captures_iter(&multiple_capture["name"]);
-        let mut multiple_vec: Vec<Package> = multiple_iter
-            .map(|capture| Package::new(PackageSource::Apt, capture[0].to_string()))
+        let mut multiple_vec = multiple_capture["name"]
+            .split_whitespace()
+            .filter_map(|capture| APT_MULTIPLE_RE.captures(capture))
+            .map(|package| Package::new(PackageSource::Apt, package[0].to_string()))
             .collect::<_>();
         result.append(&mut multiple_vec);
     }
@@ -183,7 +184,7 @@ mod tests {
         F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>,
     {
         let command = match_func(command).unwrap();
-        assert_eq!(0, command.len());
+        assert_eq!(command, vec![]);
     }
 
     fn single_match<F>(match_func: F, result: &str, command_str: &str)
@@ -249,6 +250,10 @@ mod tests {
 
         // With flags
         single_match(match_apt, "test", "sudo apt -qq install test");
+
+        // Flags shouldn't trigger
+        no_match(match_apt, "apt install -f");
+        single_match(match_apt, "test", "sudo apt install test -f");
     }
 
     #[test]
