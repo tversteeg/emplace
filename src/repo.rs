@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use colored::*;
 use ron::{
     de::from_str,
@@ -58,7 +59,8 @@ impl Repo {
 
     pub fn read(&self) -> Result<Packages, Box<dyn Error>> {
         // Open the file
-        let mut file = File::open(&self.config.full_file_path())?;
+        let mut file = File::open(&self.config.full_file_path())
+            .context("failed opening Emplace mirrors file")?;
 
         // Read the contents
         let mut contents = String::new();

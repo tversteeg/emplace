@@ -13,13 +13,14 @@ mod install;
 mod package;
 mod repo;
 
+use anyhow::Result;
 use clap::{App, AppSettings, Arg, SubCommand};
 use colored::*;
 
 use config::Config;
 use repo::Repo;
 
-fn main() {
+fn main() -> Result<()> {
     let matches = App::new("emplace")
         .version(crate_version!())
         .author(crate_authors!())
@@ -68,7 +69,7 @@ fn main() {
 
             // Nothing found, just return
             if len == 0 {
-                return;
+                return Ok(());
             }
 
             // Print the info
@@ -86,7 +87,7 @@ fn main() {
                 .expect("Could not create dialogue")
             {
                 // Exit, we don't need to do anything
-                return;
+                return Ok(());
             }
 
             // Get the config
@@ -112,5 +113,7 @@ fn main() {
             crate::install::install(packages).expect("Could not install new changes");
         }
         (&_, _) => {}
-    }
+    };
+
+    Ok(())
 }
