@@ -167,7 +167,7 @@ fn match_pip3_user(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 fn match_npm(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     lazy_static! {
         static ref NPM_RE: Regex =
-            Regex::new(r"npm\s+(install\s+-g|-g\s+install)\s+(?P<name>\S+)+").unwrap();
+            Regex::new(r"npm\s+(install\s+(-g|--global)|(-g|--global)\s+install)\s+(?P<name>\S+)+").unwrap();
     }
     Ok(NPM_RE
         .captures_iter(line)
@@ -295,6 +295,8 @@ mod tests {
         // Regular invocation
         single_match(match_npm, "test", "npm install -g test");
         single_match(match_npm, "test", "npm -g install test");
+        single_match(match_npm, "test", "npm install --global test");
+        single_match(match_npm, "test", "npm --global install test");
 
         // Shouldn't match
         no_match(match_npm, "npm install test");
