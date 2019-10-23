@@ -110,8 +110,10 @@ fn main() -> Result<()> {
             let repo = Repo::new(config).expect("Could not initialize git repository");
 
             match repo.read() {
-                Ok(packages) => crate::install::install(packages).expect("Could not install new changes"),
-                Err(err) => println!("{}", format!("Error: {}", err).red().bold())
+                Ok(packages) => {
+                    crate::install::install(packages).expect("Could not install new changes")
+                }
+                Err(err) => println!("{}", format!("Error: {}", err).red().bold()),
             };
         }
         (&_, _) => {}
