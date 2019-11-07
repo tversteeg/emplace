@@ -260,6 +260,8 @@ mod tests {
     #[test]
     fn test_pacman_matches() {
         multiple_match(match_pacman, vec!["test", "test2"], "pacman -Sy test test2");
+
+        no_match(match_pacman, "sudo snap install tor-middle-relay");
     }
 
     #[test]
