@@ -58,7 +58,7 @@ fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     match_multiple(
         line,
-        &PackageSource::Apt,
+        PackageSource::Apt,
         r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>[\w\s-]+)",
         r"^([[:alpha:]]\S*)",
     )
@@ -67,7 +67,7 @@ fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     match_multiple(
         line,
-        &PackageSource::Pacman,
+        PackageSource::Pacman,
         r"pacman\s+-Sy?\s+(-\S+\s+)*(?P<name>[\w\s-]+)",
         r"([[:word:]]\S*)",
     )
@@ -76,7 +76,7 @@ fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 fn match_snap(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     match_multiple(
         line,
-        &PackageSource::Snap,
+        PackageSource::Snap,
         r"snap\s+install\s+(-\S+\s+)*(?P<name>[\w\s-]+)",
         r"([[:word:]]\S*)",
     )
@@ -143,7 +143,7 @@ fn match_single(
 
 fn match_multiple(
     line: &str,
-    source: &PackageSource,
+    source: PackageSource,
     command_regex: &str,
     arg_regex: &str,
 ) -> Result<Vec<Package>, Box<dyn Error>> {
@@ -155,7 +155,7 @@ fn match_multiple(
         let mut multiple_vec = multiple_capture["name"]
             .split_whitespace()
             .filter_map(|capture| arg_re.captures(capture))
-            .map(|package| Package::new(*source, package[0].to_string()))
+            .map(|package| Package::new(source, package[0].to_string()))
             .collect::<_>();
         result.append(&mut multiple_vec);
     }

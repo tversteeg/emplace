@@ -46,6 +46,7 @@ impl PackageSource {
         }
     }
 
+    #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn colour_full_name(&self) -> String {
         format!("({})", self.full_name())
             .cyan()
@@ -84,6 +85,7 @@ impl PackageSource {
         }
     }
 
+    #[allow(clippy::trivially_copy_pass_by_ref)]
     #[cfg(not(target_os = "windows"))]
     pub fn install_command(&self) -> Vec<&str> {
         match self {
@@ -146,6 +148,7 @@ impl PackageSource {
         }
     }
 
+    #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn needs_root(&self) -> bool {
         match self {
             PackageSource::Cargo => false,
