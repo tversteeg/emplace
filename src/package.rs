@@ -3,7 +3,7 @@ use run_script::ScriptOptions;
 use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, error::Error, fmt, slice::Iter, string::String};
 
-#[derive(Debug, Serialize, Deserialize, EnumIter)]
+#[derive(Debug, Serialize, Deserialize, Copy, Clone, EnumIter)]
 pub enum PackageSource {
     /// Rust cargo.
     Cargo,
