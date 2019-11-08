@@ -15,6 +15,7 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
     };
     // Get all the different package sources and replace them into the check strings
     let checks: String = PackageSource::iter()
+        .filter(|s| s.command() != "")
         .map(|s| check_str.replace("## EMPLACE ##", s.command()))
         .collect::<Vec<String>>()
         .join(" || ");
@@ -40,7 +41,7 @@ emplace_postexec_invoke_exec () {
 
     local hist=`history 1`
     # optimization to check quickly for strings
-    ## EMPLACE_CHECKS ## || return;
+    ## EMPLACE_CHECKS ## || $(exit $?);
 
     local this_command=`HISTTIMEFORMAT= echo $hist | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
     ## EMPLACE ## catch "$this_command"
