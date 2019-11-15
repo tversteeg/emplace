@@ -1,3 +1,4 @@
+use anyhow::Context;
 use colored::*;
 use std::{
     error::Error,
@@ -74,7 +75,8 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
     );
     let selections = dialoguer::Checkboxes::new()
         .items(&package_names[..])
-        .interact()?;
+        .interact()
+        .context("failed constructing checkboxes")?;
 
     for selection in selections {
         let package = packages_to_install[selection];

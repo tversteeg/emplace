@@ -109,7 +109,14 @@ fn main() -> Result<()> {
 
             match repo.read() {
                 Ok(packages) => {
-                    crate::install::install(packages).expect("Could not install new changes")
+                    if let Err(err) = crate::install::install(packages) {
+                        println!(
+                            "{}",
+                            format!("Could not install new changes: {}", err)
+                                .red()
+                                .bold()
+                        );
+                    }
                 }
                 Err(err) => println!("{}", format!("Error: {}", err).red().bold()),
             };

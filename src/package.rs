@@ -1,3 +1,4 @@
+use anyhow::Context;
 use colored::*;
 use run_script::ScriptOptions;
 use serde::{Deserialize, Serialize};
@@ -214,7 +215,8 @@ impl Package {
         options.print_commands = false;
 
         let (code, _output, _error) =
-            run_script::run(&*self.is_installed_script(), &vec![], &options)?;
+            run_script::run(&*self.is_installed_script(), &vec![], &options)
+                .context("could not run is installed script")?;
 
         Ok(code == 0)
     }
