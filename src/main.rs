@@ -18,8 +18,8 @@ use colored::*;
 use config::Config;
 use repo::Repo;
 
-fn main() -> Result<()> {
-    let matches = App::new("emplace")
+fn clap_app<'a, 'b>() -> App<'a, 'b> {
+    App::new("emplace")
         .version(crate_version!())
         .author(crate_authors!())
         .after_help("https://github.com/tversteeg/emplace")
@@ -52,7 +52,10 @@ fn main() -> Result<()> {
             SubCommand::with_name("install")
             .about("Install the packages that have been mirrored from other machines")
         )
-        .get_matches();
+}
+
+fn main() -> Result<()> {
+    let matches = clap_app().get_matches();
 
     match matches.subcommand() {
         ("init", Some(sub_m)) => {

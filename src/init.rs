@@ -1,5 +1,5 @@
-use crate::package::PackageSource;
-use std::{env, error::Error};
+use crate::{clap_app, package::PackageSource};
+use std::{env, error::Error, io};
 use strum::IntoEnumIterator;
 
 pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
@@ -8,9 +8,9 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
         .into_string()
         .expect("Could not convert path to string");
 
-    let check_str = match shell_name {
-        "bash" => BASH_CHECK,
-        "zsh" => ZSH_CHECK,
+    let (check_str, setup_script, shell) = match shell_name {
+        "bash" => (BASH_CHECK, BASH_INIT, clap::Shell::Bash),
+        "zsh" => (ZSH_CHECK, ZSH_INIT, clap::Shell::Zsh),
         _ => panic!("Shell \"{}\" is not supported at the moment", shell_name),
     };
     // Get all the different package sources and replace them into the check strings
@@ -20,16 +20,13 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
         .collect::<Vec<String>>()
         .join(" || ");
 
-    let setup_script = match shell_name {
-        "bash" => BASH_INIT,
-        "zsh" => ZSH_INIT,
-        _ => panic!("Shell \"{}\" is not supported at the moment", shell_name),
-    };
-
     let script = setup_script
         .replace("## EMPLACE ##", &format!("\"{}\"", exe_path))
         .replace("## EMPLACE_CHECKS ##", &*checks);
-    print!("{}", script);
+    println!("{}", script);
+
+    // Print the completions
+    clap_app().gen_completions_to("emplace", shell, &mut io::stdout());
 
     Ok(())
 }
