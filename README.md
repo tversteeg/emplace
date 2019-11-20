@@ -55,7 +55,7 @@ Command-line tool to mirror installed software on multiple machines.
    ```sh
    # ~/.bashrc
    
-   eval "$(emplace init bash)"
+   source <(emplace init bash)
    ```
 
    #### Zsh
