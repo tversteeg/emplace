@@ -64,12 +64,29 @@ fn main() -> Result<()> {
         }
         ("catch", Some(sub_m)) => {
             let line = sub_m.value_of("line").expect("Line is missing");
-            let catches = catch::catch(line).expect("Could not parse line");
+            let mut catches = catch::catch(line).expect("Could not parse line");
+
+            if catches.0.len() == 0 {
+                // Nothing found, just return
+                return Ok(());
+            }
+
+            // Filter out the packages that are already in the repository
+            // Get the config
+            let config = match Config::from_default_file().expect("Retrieving config went wrong") {
+                Some(config) => config,
+                None => Config::new().expect("Initializing new config failed"),
+            };
+            let repo = Repo::new(config).expect("Could not initialize git repository");
+            catches.filter_saved_packages(
+                &repo
+                    .read()
+                    .expect("Could not read packages file from repository"),
+            );
 
             let len = catches.0.len();
-
-            // Nothing found, just return
             if len == 0 {
+                // Nothing found after filtering
                 return Ok(());
             }
 
@@ -90,14 +107,6 @@ fn main() -> Result<()> {
                 // Exit, we don't need to do anything
                 return Ok(());
             }
-
-            // Get the config
-            let config = match Config::from_default_file().expect("Retrieving config went wrong") {
-                Some(config) => config,
-                None => Config::new().expect("Initializing new config failed"),
-            };
-
-            let repo = Repo::new(config).expect("Could not initialize git repository");
 
             repo.mirror(catches).expect("Could not mirror commands");
         }

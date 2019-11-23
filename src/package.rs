@@ -173,7 +173,15 @@ impl fmt::Display for PackageSource {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+impl PartialEq for PackageSource {
+    fn eq(&self, other: &Self) -> bool {
+        self.full_name() == other.full_name()
+    }
+}
+
+impl Eq for PackageSource {}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Package {
     /// The package manager's name.
     pub source: PackageSource,
@@ -246,7 +254,7 @@ impl PartialOrd for Package {
 
 impl PartialEq for Package {
     fn eq(&self, other: &Self) -> bool {
-        self.full_name() == other.full_name()
+        self.full_name() == other.full_name() && self.source == other.source
     }
 }
 
@@ -268,6 +276,15 @@ impl Packages {
         self.0.sort();
         // Remove the duplicates
         self.0.dedup();
+    }
+
+    pub fn filter_saved_packages(&mut self, old: &Packages) {
+        self.0 = self
+            .0
+            .iter()
+            .filter(|package| !old.iter().any(|old_package| *package == old_package))
+            .cloned()
+            .collect();
     }
 
     pub fn commit_message(&self) -> String {
