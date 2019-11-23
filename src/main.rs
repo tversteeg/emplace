@@ -66,7 +66,7 @@ fn main() -> Result<()> {
             let line = sub_m.value_of("line").expect("Line is missing");
             let mut catches = catch::catch(line).expect("Could not parse line");
 
-            if catches.0.len() == 0 {
+            if catches.0.is_empty() {
                 // Nothing found, just return
                 return Ok(());
             }
