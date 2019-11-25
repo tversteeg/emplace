@@ -24,6 +24,7 @@ Command-line tool to mirror installed software on multiple machines.
    - [x] Python Pip 3 (_*_)
    - [x] Node Package Manager (_*_)
    - [ ] Homebrew (_Mac_)
+   - [ ] Nix (_Linux_)
    - [ ] Yum (_Linux_)
    - [ ] DNF (_Linux_)
    - [ ] Portage (_Linux_)
