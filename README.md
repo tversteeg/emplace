@@ -18,6 +18,7 @@ Command-line tool to mirror installed software on multiple machines.
    - [x] Pacman (_Linux_)
    - [x] Snap (_Linux_)
    - [x] Chocolatey (_Windows_)
+   - [x] Scoop (_Windows_)
    - [x] Cargo (_*_)
    - [x] Rustup Component (_*_)
    - [x] Python Pip (_*_)
@@ -90,6 +91,8 @@ npm install -g release
 pip3 install --user termtosvg
 # -- or --
 choco install neovim
+# -- or --
+scoop install curl
 ```
 
 ### Synchronizing On Another Machine

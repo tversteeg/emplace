@@ -23,6 +23,9 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     // Parse Chocolatey
     packages.append(&mut match_choco(line)?);
 
+    // Parse Scoop
+    packages.append(&mut match_scoop(line)?);
+
     // Parse Pip
     packages.append(&mut match_pip(line)?);
     // Parse Pip User
@@ -87,6 +90,14 @@ fn match_choco(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
         line,
         PackageSource::Chocolatey,
         r"choco\S*\s+install\s+(?P<name>\S+)+",
+    )
+}
+
+fn match_scoop(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    match_single(
+        line,
+        PackageSource::Scoop,
+        r"scoop\S*\s+install\s+(-\S+\s+)*(?P<name>\S+)+",
     )
 }
 
@@ -248,6 +259,12 @@ mod tests {
         multiple_match(match_pacman, vec!["test", "test2"], "pacman -Sy test test2");
 
         no_match(match_pacman, "sudo snap install tor-middle-relay");
+    }
+
+    #[test]
+    fn test_scoop_matches() {
+        single_match(match_scoop, "test", "scoop install test");
+        single_match(match_scoop, "test", "scoop install -g test");
     }
 
     #[test]

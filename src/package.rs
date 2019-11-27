@@ -6,18 +6,20 @@ use std::{cmp::Ordering, error::Error, fmt, slice::Iter, string::String};
 
 #[derive(Debug, Serialize, Deserialize, Copy, Clone, EnumIter)]
 pub enum PackageSource {
-    /// Rust cargo.
+    /// Rust cargo
     Cargo,
-    /// Rust rustup component.
+    /// Rust rustup component
     RustupComponent,
-    /// Debian apt-get.
+    /// Debian apt-get
     Apt,
-    /// Arch Pacman.
+    /// Arch Pacman
     Pacman,
-    /// Linux Snap.
+    /// Linux Snap
     Snap,
-    /// Windows chocolatey.
+    /// Windows chocolatey
     Chocolatey,
+    /// Windows scoop
+    Scoop,
     /// Python Pip
     Pip,
     /// Python Pip --user
@@ -39,6 +41,7 @@ impl PackageSource {
             PackageSource::Pacman => "Pacman",
             PackageSource::Snap => "Snap",
             PackageSource::Chocolatey => "Chocolatey",
+            PackageSource::Scoop => "Scoop",
             PackageSource::Pip => "Python Pip",
             PackageSource::PipUser => "Python Pip --user",
             PackageSource::Pip3 => "Python Pip 3",
@@ -77,6 +80,7 @@ impl PackageSource {
             PackageSource::Cargo => "cargo",
             PackageSource::RustupComponent => "rustup",
             PackageSource::Chocolatey => "choco",
+            PackageSource::Scoop => "scoop",
             PackageSource::Pip => "pip",
             PackageSource::PipUser => "pip",
             PackageSource::Pip3 => "pip3",
@@ -109,6 +113,7 @@ impl PackageSource {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::RustupComponent => vec!["rustup", "component", "add"],
             PackageSource::Chocolatey => vec!["choco", "install", "-y"],
+            PackageSource::Scoop => vec!["scoop", "install"],
             PackageSource::Pip => vec!["pip", "install", "-q"],
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
             PackageSource::Pip3 => vec!["pip3", "install", "-q"],
@@ -140,6 +145,7 @@ impl PackageSource {
             PackageSource::Cargo => "cargo install --list | findstr",
             PackageSource::RustupComponent => "rustup component list | findstr",
             PackageSource::Chocolatey => "choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color",
+            PackageSource::Scoop => "scoop list | findstr",
             PackageSource::Pip => "pip show -q",
             PackageSource::PipUser => "pip show -q",
             PackageSource::Pip3 => "pip3 show -q",
@@ -158,6 +164,7 @@ impl PackageSource {
             PackageSource::Pacman => true,
             PackageSource::Snap => true,
             PackageSource::Chocolatey => true,
+            PackageSource::Scoop => true,
             PackageSource::Pip => true,
             PackageSource::PipUser => false,
             PackageSource::Pip3 => true,
