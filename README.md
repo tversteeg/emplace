@@ -1,9 +1,14 @@
-# emplace
-Command-line tool to mirror installed software on multiple machines.
+<h1 align="center">emplace</h1>
+<p align="center">
+   Command-line tool to mirror installed software on multiple machines.
+</p>
 
-[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftversteeg%2Femplace%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tversteeg/emplace/goto)
-[![](https://img.shields.io/crates/d/emplace.svg)](#downloads)
-[![](https://img.shields.io/crates/v/emplace.svg)](https://crates.io/crates/emplace)
+<p align="center">
+   <a href="https://actions-badge.atrox.dev/tversteeg/emplace/goto"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftversteeg%2Femplace%2Fbadge&style=flat" alt="Build Status"/></a>
+   <a href="https://github.com/tversteeg/emplace/releases"><img src="https://img.shields.io/crates/d/emplace.svg" alt="Downloads"/></a>
+   <a href="https://crates.io/crates/emplace"><img src="https://img.shields.io/crates/v/emplace.svg" alt="Version"/></a>
+   <br/>
+</p>
 
 ![Example](./docs/capture.svg)
 
