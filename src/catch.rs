@@ -54,7 +54,7 @@ fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     match_single(
         line,
         PackageSource::Cargo,
-        r"cargo\s+install\s+(?P<name>\S+)+",
+        r"cargo\s+install\s+(-\S+\s+)*(?P<name>\S+)+",
     )
 }
 
@@ -212,6 +212,8 @@ mod tests {
     fn test_cargo_matches() {
         // Regular invocation
         single_match(match_cargo, "test", "cargo install test");
+        single_match(match_cargo, "test", "cargo install test --force");
+        single_match(match_cargo, "test", "cargo install --force test");
     }
 
     #[test]
