@@ -132,23 +132,6 @@ jobs:
           command: test
           args: -- -Z unstable-options --include-ignored
 
-  # Publish emplace to Crates.io
-  cargo_publish:
-    if: startsWith(github.ref, 'refs/tags/v')
-    name: Publish Cargo Package
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - run: cargo login $CRATES_IO_TOKEN
-      - run: cargo publish
-    env:
-      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
-
   # Build sources for every OS
   github_build:
     if: startsWith(github.ref, 'refs/tags/v')
