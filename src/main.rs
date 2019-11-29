@@ -28,6 +28,7 @@ fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
             SubCommand::with_name("install")
                 .about("Install the packages that have been mirrored from other machines"),
         )
+        .subcommand(SubCommand::with_name("clean").about("Remove package synching"))
 }
 
 fn main() -> Result<()> {
@@ -129,6 +130,28 @@ fn main() -> Result<()> {
                         );
                     }
                 }
+                Err(err) => println!("{}", format!("Error: {}", err).red().bold()),
+            };
+        }
+        ("clean", Some(_)) => {
+            // Get the config
+            let config = match Config::from_default_file().expect("Retrieving config went wrong") {
+                Some(config) => config,
+                None => Config::new().expect("Initializing new config failed"),
+            };
+
+            let repo = Repo::new(config).expect("Could not initialize git repository");
+
+            match repo.read() {
+                Ok(packages) => match crate::install::clean(packages) {
+                    Ok(packages) => repo.clean(packages).expect("Could not clean repo"),
+                    Err(err) => println!(
+                        "{}",
+                        format!("Could not remove from repository: {}", err)
+                            .red()
+                            .bold()
+                    ),
+                },
                 Err(err) => println!("{}", format!("Error: {}", err).red().bold()),
             };
         }

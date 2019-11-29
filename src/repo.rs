@@ -84,12 +84,7 @@ impl Repo {
         }
 
         // There's no file yet, just serialize everything and write it to a new file
-        let pretty = PrettyConfig {
-            depth_limit: 2,
-            indentor: "".into(),
-            ..PrettyConfig::default()
-        };
-        let toml_string = to_string_pretty(&commands, pretty)?;
+        let toml_string = to_string_pretty(&commands, Repo::pretty_config())?;
 
         fs::write(&full_path, toml_string)?;
 
@@ -106,5 +101,36 @@ impl Repo {
         git::push(&self.path, false)?;
 
         Ok(())
+    }
+
+    pub fn clean(&self, commands: Packages) -> Result<(), Box<dyn Error>> {
+        // Overwrite the file
+        let toml_string = to_string_pretty(&commands, Repo::pretty_config())?;
+
+        let full_path = self.config.full_file_path();
+        fs::write(&full_path, toml_string)?;
+
+        let commit_msg = "Emplace - clean packages";
+        println!(
+            "{}",
+            format!("Commiting with message \"{}\"", commit_msg)
+                .dimmed()
+                .italic()
+        );
+        git::add_file(&self.path, &*self.config.repo.file, false)?;
+        git::commit_all(&self.path, &*commit_msg, false, false)?;
+
+        println!("{}", "Pushing to remote".dimmed().italic());
+        git::push(&self.path, false)?;
+
+        Ok(())
+    }
+
+    fn pretty_config() -> PrettyConfig {
+        PrettyConfig {
+            depth_limit: 2,
+            indentor: "".into(),
+            ..PrettyConfig::default()
+        }
     }
 }

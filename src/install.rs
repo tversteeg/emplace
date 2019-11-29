@@ -99,3 +99,47 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+pub fn clean(packages: Packages) -> Result<Packages, Box<dyn Error>> {
+    let package_names: Vec<String> = packages
+        .iter()
+        // Get the names
+        .map(|package| package.colour_full_name())
+        // Make it a vector again
+        .collect::<_>();
+    let package_names: Vec<&str> = package_names
+        .iter()
+        .map(|name| name.as_str())
+        .collect::<_>();
+
+    // If there's nothing to remove just return
+    if package_names.is_empty() {
+        println!("No packages have been added yet");
+        return Ok(packages);
+    }
+
+    println!(
+        "{}",
+        "Select the packages you want to stop syncing (space to remove)".bold()
+    );
+    let selections = dialoguer::Checkboxes::new()
+        .items(&package_names[..])
+        .interact()
+        .context("failed constructing checkboxes")?;
+
+    // Get the all the packages without the filtered ones
+    Ok(Packages(
+        packages
+            .iter()
+            .enumerate()
+            .filter_map(|(index, package)| {
+                for selection in &selections {
+                    if index == *selection {
+                        return Some(package.clone());
+                    }
+                }
+                None
+            })
+            .collect::<_>(),
+    ))
+}
