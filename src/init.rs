@@ -1,4 +1,4 @@
-use crate::{clap_app, package::PackageSource};
+use crate::{package::PackageSource, public_clap_app};
 use std::{env, error::Error, io};
 use strum::IntoEnumIterator;
 
@@ -26,7 +26,7 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
     println!("{}", script);
 
     // Print the completions
-    clap_app().gen_completions_to("emplace", shell, &mut io::stdout());
+    public_clap_app().gen_completions_to("emplace", shell, &mut io::stdout());
 
     Ok(())
 }

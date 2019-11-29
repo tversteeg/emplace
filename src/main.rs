@@ -18,12 +18,20 @@ use colored::*;
 use config::Config;
 use repo::Repo;
 
-fn clap_app<'a, 'b>() -> App<'a, 'b> {
+fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
     App::new("emplace")
         .version(crate_version!())
         .author(crate_authors!())
         .after_help("https://github.com/tversteeg/emplace")
         .setting(AppSettings::SubcommandRequiredElseHelp)
+        .subcommand(
+            SubCommand::with_name("install")
+                .about("Install the packages that have been mirrored from other machines"),
+        )
+}
+
+fn main() -> Result<()> {
+    let matches = public_clap_app()
         .subcommand(
             SubCommand::with_name("init")
             .about("Prints the shell function used to execute emplace")
@@ -38,24 +46,15 @@ fn clap_app<'a, 'b>() -> App<'a, 'b> {
         )
         .subcommand(
             SubCommand::with_name("catch")
-            .about("Capture a command entired in a terminal")
-            .arg(
-                Arg::with_name("line")
-                .value_name("LINE")
-                .help(
-                    "The command as entired in the terminal",
-                )
-                .required(true)
-            )
+                .about("Capture a command entired in a terminal")
+                .arg(
+                    Arg::with_name("line")
+                        .value_name("LINE")
+                        .help("The command as entired in the terminal")
+                        .required(true),
+                ),
         )
-        .subcommand(
-            SubCommand::with_name("install")
-            .about("Install the packages that have been mirrored from other machines")
-        )
-}
-
-fn main() -> Result<()> {
-    let matches = clap_app().get_matches();
+        .get_matches();
 
     match matches.subcommand() {
         ("init", Some(sub_m)) => {
