@@ -1,14 +1,10 @@
+use anyhow::{Context, Result};
 use std::{
-    error::Error,
     path::Path,
     process::{Command, Stdio},
 };
 
-fn call_on_path<P: AsRef<Path>>(
-    command: Vec<&str>,
-    path: &P,
-    dry_run: bool,
-) -> Result<bool, Box<dyn Error>> {
+fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P, dry_run: bool) -> Result<bool> {
     if dry_run {
         println!("cd {}", path.as_ref().display());
         println!("{}", command.join(" "));
@@ -29,31 +25,27 @@ fn call_on_path<P: AsRef<Path>>(
         }
     }
 
-    let mut child = cmd.spawn()?;
-    let result = child.wait()?;
+    let mut child = cmd.spawn().context("failed spawning process")?;
+    let result = child.wait().context("failed waiting for result")?;
 
     Ok(result.success())
 }
 
-pub fn commit_all<P: AsRef<Path>>(
-    dir: &P,
-    msg: &str,
-    sign: bool,
-    dry_run: bool,
-) -> Result<bool, Box<dyn Error>> {
+pub fn commit_all<P: AsRef<Path>>(dir: &P, msg: &str, sign: bool, dry_run: bool) -> Result<bool> {
     call_on_path(
         vec!["git", "commit", if sign { "-S" } else { "" }, "-am", msg],
         dir,
         dry_run,
     )
+    .context("failed commiting everything in git")
 }
 
-pub fn push<P: AsRef<Path>>(dir: &P, dry_run: bool) -> Result<bool, Box<dyn Error>> {
-    call_on_path(vec!["git", "push"], dir, dry_run)
+pub fn push<P: AsRef<Path>>(dir: &P, dry_run: bool) -> Result<bool> {
+    call_on_path(vec!["git", "push"], dir, dry_run).context("failed pushing in git")
 }
 
-pub fn pull<P: AsRef<Path>>(dir: &P, dry_run: bool) -> Result<bool, Box<dyn Error>> {
-    call_on_path(vec!["git", "pull"], dir, dry_run)
+pub fn pull<P: AsRef<Path>>(dir: &P, dry_run: bool) -> Result<bool> {
+    call_on_path(vec!["git", "pull"], dir, dry_run).context("failed pulling in git")
 }
 
 pub fn clone_single_branch<P: AsRef<Path>>(
@@ -61,7 +53,7 @@ pub fn clone_single_branch<P: AsRef<Path>>(
     url: &str,
     branch: &str,
     dry_run: bool,
-) -> Result<bool, Box<dyn Error>> {
+) -> Result<bool> {
     call_on_path(
         vec![
             "git",
@@ -75,12 +67,9 @@ pub fn clone_single_branch<P: AsRef<Path>>(
         dir,
         dry_run,
     )
+    .context("failed cloning branch in git")
 }
 
-pub fn add_file<P: AsRef<Path>>(
-    dir: &P,
-    file: &str,
-    dry_run: bool,
-) -> Result<bool, Box<dyn Error>> {
-    call_on_path(vec!["git", "add", file], dir, dry_run)
+pub fn add_file<P: AsRef<Path>>(dir: &P, file: &str, dry_run: bool) -> Result<bool> {
+    call_on_path(vec!["git", "add", file], dir, dry_run).context("failed adding file in git")
 }

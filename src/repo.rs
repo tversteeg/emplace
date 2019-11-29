@@ -5,7 +5,6 @@ use ron::{
     ser::{to_string_pretty, PrettyConfig},
 };
 use std::{
-    error::Error,
     fs::{self, File},
     io::Read,
     path::{Path, PathBuf},
@@ -21,7 +20,7 @@ pub struct Repo {
 }
 
 impl Repo {
-    pub fn new(config: Config) -> Result<Self, Box<dyn Error>> {
+    pub fn new(config: Config) -> Result<Self> {
         let repo_directory = config.repo_directory.clone();
         let repo_url = config.repo.url.clone();
         let repo_branch = config.repo.branch.clone();
@@ -57,7 +56,7 @@ impl Repo {
         })
     }
 
-    pub fn read(&self) -> Result<Packages, Box<dyn Error>> {
+    pub fn read(&self) -> Result<Packages> {
         // Open the file
         let mut file = File::open(&self.config.full_file_path())
             .context("failed opening Emplace mirrors file")?;
@@ -70,7 +69,7 @@ impl Repo {
         Ok(from_str(&*contents)?)
     }
 
-    pub fn mirror(&self, mut commands: Packages) -> Result<(), Box<dyn Error>> {
+    pub fn mirror(&self, mut commands: Packages) -> Result<()> {
         // Get the message first before the old stuff is added
         let commit_msg = commands.commit_message();
 
@@ -103,7 +102,7 @@ impl Repo {
         Ok(())
     }
 
-    pub fn clean(&self, commands: Packages) -> Result<(), Box<dyn Error>> {
+    pub fn clean(&self, commands: Packages) -> Result<()> {
         // Overwrite the file
         let toml_string = to_string_pretty(&commands, Repo::pretty_config())?;
 
