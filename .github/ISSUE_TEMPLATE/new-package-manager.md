@@ -10,7 +10,7 @@ assignees: tversteeg
 **What is the name of the package manager you would like to see support for?**
 
 
-**What operating systems or derivitive does this package manager support?**
+**What operating systems or derivative does this package manager support?**
 - [ ] Windows
 - [ ] Mac
 - [ ] Linux
