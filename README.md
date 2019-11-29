@@ -108,3 +108,7 @@ Just invoke `emplace install` and you will be prompted with the packages to inst
 ```sh
 emplace install
 ```
+
+### Removing Synchronized Packages
+
+Run `emplace clean` and select the packages you want to be cleaned, they won't be removed from your system.
