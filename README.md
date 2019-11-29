@@ -30,16 +30,9 @@
    - [x] Python Pip (_*_)
    - [x] Python Pip 3 (_*_)
    - [x] Node Package Manager (_*_)
-   - [ ] Homebrew (_Mac_)
-   - [ ] Nix (_Linux_)
-   - [ ] Yum (_Linux_)
-   - [ ] DNF (_Linux_)
-   - [ ] Portage (_Linux_)
 - Shells supported:
    - [x] Bash
    - [x] Zsh
-   - [ ] Fish
-   - [ ] nu
 
 ## Installation
 
