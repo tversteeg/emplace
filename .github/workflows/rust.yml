@@ -234,14 +234,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            emplace-x86_64-unknown-linux-gnu.tar.gz
-            emplace-x86_64-unknown-linux-gnu.tar.gz.sha256
-            emplace-x86_64-unknown-linux-musl.tar.gz
-            emplace-x86_64-unknown-linux-musl.tar.gz.sha256
-            emplace-x86_64-apple-darwin.tar.gz
-            emplace-x86_64-apple-darwin.tar.gz.sha256
-            emplace-x86_64-pc-windows-msvc.zip
-            emplace-x86_64-pc-windows-msvc.zip.sha256
-          body_path: RELEASE.md
+            emplace-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
