@@ -135,10 +135,10 @@ pub fn clean(packages: Packages) -> Result<Packages, Box<dyn Error>> {
             .filter_map(|(index, package)| {
                 for selection in &selections {
                     if index == *selection {
-                        return Some(package.clone());
+                        return None;
                     }
                 }
-                None
+                Some(package.clone())
             })
             .collect::<_>(),
     ))
