@@ -71,6 +71,8 @@
 
    #### Fish
 
+   Add the following to the end of `~/.config/fish/config.fish`:
+
 	```sh
 	# ~/.config/fish/config.fish
 
