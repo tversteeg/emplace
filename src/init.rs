@@ -11,6 +11,7 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
     let (check_str, setup_script, shell) = match shell_name {
         "bash" => (BASH_CHECK, BASH_INIT, clap::Shell::Bash),
         "zsh" => (ZSH_CHECK, ZSH_INIT, clap::Shell::Zsh),
+        "fish" => (FISH_CHECK, FISH_INIT, clap::Shell::Fish),
         _ => panic!("Shell \"{}\" is not supported at the moment", shell_name),
     };
     // Get all the different package sources and replace them into the check strings
@@ -67,3 +68,18 @@ fi
 "##;
 
 const ZSH_CHECK: &str = "[[ $hist == *\"## EMPLACE ##\"* ]]";
+
+const FISH_INIT: &str = r##"
+function emplace_postcmd --on-event fish_postexec
+    # quit when the previous command failed
+    if test $status -gt 0
+        return
+    end
+
+    # optimization disabled
+
+    ## EMPLACE ## catch "$argv"
+end
+"##;
+
+const FISH_CHECK: &str = "";

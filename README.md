@@ -33,6 +33,7 @@
 - Shells supported:
    - [x] Bash
    - [x] Zsh
+   - [X] Fish
 
 ## Installation
 
@@ -67,6 +68,14 @@
    
    eval "$(emplace init zsh)"
    ```
+
+   #### Fish
+
+	```sh
+	# ~/.config/fish/config.fish
+
+	emplace init fish | source
+	```
    
 ## Usage
 
