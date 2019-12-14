@@ -62,7 +62,7 @@ fn match_apt(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     match_multiple(
         line,
         PackageSource::Apt,
-        r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>[\w\s-]+)",
+        r"apt(-get)?\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
         r"^([[:alpha:]]\S*)",
     )
 }
@@ -71,7 +71,7 @@ fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     match_multiple(
         line,
         PackageSource::Pacman,
-        r"pacman\s+-Sy?\s+(-\S+\s+)*(?P<name>[\w\s-]+)",
+        r"pacman\s+-Sy?\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
         r"([[:word:]]\S*)",
     )
 }
@@ -80,7 +80,7 @@ fn match_snap(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     match_multiple(
         line,
         PackageSource::Snap,
-        r"snap\s+install\s+(-\S+\s+)*(?P<name>[\w\s-]+)",
+        r"snap\s+install\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
         r"([[:word:]]\S*)",
     )
 }
@@ -190,18 +190,18 @@ mod tests {
         F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>,
     {
         let command = match_func(command_str).unwrap();
-        assert_eq!(1, command.len());
+        assert_eq!(1, command.len(), "{}", command_str);
         assert_eq!(result, command[0].name);
         // Make sure it doesn't match anything else as well
         assert_eq!(command.len(), catch(command_str).unwrap().0.len())
     }
 
-    fn multiple_match<F>(match_func: F, results: Vec<&str>, command: &str)
+    fn multiple_match<F>(match_func: F, results: Vec<&str>, command_str: &str)
     where
         F: FnOnce(&str) -> Result<Vec<Package>, Box<dyn Error>>,
     {
-        let command = match_func(command).unwrap();
-        assert_eq!(results.len(), command.len());
+        let command = match_func(command_str).unwrap();
+        assert_eq!(results.len(), command.len(), "{}", command_str);
 
         for (i, result) in results.into_iter().enumerate() {
             assert_eq!(result, command[i].name);
@@ -247,6 +247,7 @@ mod tests {
             "lib32gfortran5-x32-cross",
             "sudo apt install lib32gfortran5-x32-cross",
         );
+        single_match(match_apt, "linux-perf-5.3", "apt install linux-perf-5.3");
 
         // With flags
         single_match(match_apt, "test", "sudo apt -qq install test");
