@@ -1,5 +1,5 @@
 use anyhow::Context;
-use colored::*;
+use log::{error, info};
 use std::{
     error::Error,
     process::{Command, Stdio},
@@ -37,12 +37,7 @@ fn call(command: Vec<&str>, dry_run: bool) -> Result<bool, Box<dyn Error>> {
 }
 
 pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
-    println!(
-        "{}",
-        "Checking which packages haven't been installed yet.."
-            .dimmed()
-            .italic()
-    );
+    info!("Checking which packages haven't been installed yet..");
     let packages_to_install: Vec<&Package> = packages
         .iter()
         // Only keep packages where we have the package manager of
@@ -65,35 +60,24 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
 
     // If there's nothing to install just return
     if package_names.is_empty() {
-        println!("Nothing to install");
+        info!("Nothing to install.");
         return Ok(());
     }
 
-    println!(
-        "{}",
-        "Select the packages you want to install (space to add)".bold()
-    );
     let selections = dialoguer::Checkboxes::new()
+        .with_prompt("Select the packages you want to install (space to add)")
         .items(&package_names[..])
         .interact()
         .context("failed constructing checkboxes")?;
 
     for selection in selections {
         let package = packages_to_install[selection];
-        println!("\nInstalling: {}", package.colour_full_name());
+        info!("Installing: {}.", package.colour_full_name());
 
         if call(package.install_command(), false)? {
-            println!(
-                "{} {}",
-                package.colour_full_name(),
-                "installed successfully".green().bold()
-            );
+            info!("{} installed successfully.", package.colour_full_name());
         } else {
-            println!(
-                "{} {}",
-                package.colour_full_name(),
-                "installation failed".red().bold()
-            );
+            error!("{} installed successfully.", package.colour_full_name());
         }
     }
 
@@ -114,15 +98,12 @@ pub fn clean(packages: Packages) -> Result<Packages, Box<dyn Error>> {
 
     // If there's nothing to remove just return
     if package_names.is_empty() {
-        println!("No packages have been added yet");
+        info!("No packages have been added yet.");
         return Ok(packages);
     }
 
-    println!(
-        "{}",
-        "Select the packages you want to stop syncing (space to remove)".bold()
-    );
     let selections = dialoguer::Checkboxes::new()
+        .with_prompt("Select the packages you want to stop syncing (space to select)")
         .items(&package_names[..])
         .interact()
         .context("failed constructing checkboxes")?;

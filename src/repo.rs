@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use colored::*;
+use log::info;
 use ron::{
     de::from_str,
     ser::{to_string_pretty, PrettyConfig},
@@ -30,21 +30,11 @@ impl Repo {
 
         let repo_exists = path.join(".git").exists();
         if repo_exists {
-            println!(
-                "{}",
-                format!("Opening existing repo: \"{}\"", path_str)
-                    .dimmed()
-                    .italic()
-            );
+            info!("Opening existing repo: \"{}\".", path_str);
 
             git::pull(&path, false)?;
         } else {
-            println!(
-                "{}",
-                format!("Cloning repo \"{}\" to \"{}\"", repo_url, path_str)
-                    .dimmed()
-                    .italic()
-            );
+            info!("Cloning repo \"{}\" to \"{}\".", repo_url, path_str);
 
             fs::create_dir_all(path)?;
             git::clone_single_branch(&path, &*repo_url, &*repo_branch, false)?;
@@ -87,16 +77,11 @@ impl Repo {
 
         fs::write(&full_path, toml_string)?;
 
-        println!(
-            "{}",
-            format!("Commiting with message \"{}\"", commit_msg)
-                .dimmed()
-                .italic()
-        );
+        info!("Commiting with message \"{}\".", commit_msg);
         git::add_file(&self.path, &*self.config.repo.file, false)?;
         git::commit_all(&self.path, &*commit_msg, false, false)?;
 
-        println!("{}", "Pushing to remote".dimmed().italic());
+        info!("Pushing to remote.");
         git::push(&self.path, false)?;
 
         Ok(())
@@ -110,16 +95,11 @@ impl Repo {
         fs::write(&full_path, toml_string)?;
 
         let commit_msg = "Emplace - clean packages";
-        println!(
-            "{}",
-            format!("Commiting with message \"{}\"", commit_msg)
-                .dimmed()
-                .italic()
-        );
+        info!("Commiting with message \"{}\".", commit_msg);
         git::add_file(&self.path, &*self.config.repo.file, false)?;
         git::commit_all(&self.path, &*commit_msg, false, false)?;
 
-        println!("{}", "Pushing to remote".dimmed().italic());
+        info!("Pushing to remote.");
         git::push(&self.path, false)?;
 
         Ok(())

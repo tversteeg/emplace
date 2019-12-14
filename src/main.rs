@@ -14,6 +14,8 @@ mod repo;
 use anyhow::Result;
 use clap::{App, AppSettings, Arg, SubCommand};
 use colored::*;
+use log::{error, info};
+use simplelog::{LevelFilter, TermLogger, TerminalMode};
 
 use config::Config;
 use repo::Repo;
@@ -32,6 +34,13 @@ fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
 }
 
 fn main() -> Result<()> {
+    TermLogger::init(
+        LevelFilter::Info,
+        simplelog::Config::default(),
+        TerminalMode::Mixed,
+    )
+    .expect("No interactive terminal");
+
     let matches = public_clap_app()
         .subcommand(
             SubCommand::with_name("init")
@@ -92,11 +101,11 @@ fn main() -> Result<()> {
 
             // Print the info
             match len {
-                1 => println!("{}", "Mirror this command?".green().bold()),
-                n => println!("{}", format!("Mirror these {} commands?", n).green().bold()),
+                1 => info!("{}", "Mirror this command?".green().bold()),
+                n => info!("{}", format!("Mirror these {} commands?", n).green().bold()),
             }
             for catch in catches.0.iter() {
-                println!("- {}", catch.colour_full_name());
+                info!("- {}", catch.colour_full_name());
             }
 
             // Ask if it needs to be mirrored
@@ -122,15 +131,10 @@ fn main() -> Result<()> {
             match repo.read() {
                 Ok(packages) => {
                     if let Err(err) = crate::install::install(packages) {
-                        println!(
-                            "{}",
-                            format!("Could not install new changes: {}", err)
-                                .red()
-                                .bold()
-                        );
+                        error!("Could not install new changes: {}.", err);
                     }
                 }
-                Err(err) => println!("{}", format!("Error: {}", err).red().bold()),
+                Err(err) => error!("{}", err),
             };
         }
         ("clean", Some(_)) => {
@@ -144,15 +148,10 @@ fn main() -> Result<()> {
 
             match repo.read() {
                 Ok(packages) => match crate::install::clean(packages) {
-                    Ok(packages) => repo.clean(packages).expect("Could not clean repo"),
-                    Err(err) => println!(
-                        "{}",
-                        format!("Could not remove from repository: {}", err)
-                            .red()
-                            .bold()
-                    ),
+                    Ok(packages) => repo.clean(packages).expect("Could not clean repo."),
+                    Err(err) => error!("Could not remove from repository: {}.", err),
                 },
-                Err(err) => println!("{}", format!("Error: {}", err).red().bold()),
+                Err(err) => error!("{}", err),
             };
         }
         (&_, _) => {}

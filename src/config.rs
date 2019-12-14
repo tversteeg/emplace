@@ -1,3 +1,4 @@
+use log::info;
 use serde::{Deserialize, Serialize};
 use std::{
     error::Error,
@@ -47,7 +48,7 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Result<Self, Box<dyn Error>> {
-        println!("No configuration file found.");
+        info!("No configuration file found.");
         let repo_url = dialoguer::Input::<String>::new()
             .with_prompt("The URL of the git repository you (want to) store the mirrors in")
             .interact()?;
@@ -90,13 +91,13 @@ impl Config {
 
         fs::write(Config::default_path(), toml_string)?;
 
-        println!(
+        info!(
             "Config saved to: \"{}\".",
             Config::default_path()
                 .to_str()
                 .expect("Could not unwrap path to string")
         );
-        println!("You can edit the git repository URL and other settings here later.");
+        info!("You can edit the git repository URL and other settings here later.");
 
         Ok(())
     }
