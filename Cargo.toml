@@ -23,7 +23,7 @@ serde = { version = "1.0.104", features = ["derive"] }
 ron = "0.5.1"
 toml = "0.5.5"
 strum = "0.17.1"
-strum_macros = "0.16.0"
+strum_macros = "0.17.1"
 run_script = "0.3.2"
 colored = "1.9.0"
 anyhow = "1.0.25"
