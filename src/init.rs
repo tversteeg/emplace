@@ -35,7 +35,7 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
 const BASH_INIT: &str = r##"
 emplace_postexec_invoke_exec () {
     # quit when the previous command failed
-    [ -z "$!" ] && exit
+    [ -z "$!" ] && exit $?
 
     local hist=`history 1`
     # optimization to check quickly for strings
