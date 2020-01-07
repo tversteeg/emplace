@@ -225,7 +225,6 @@ impl Package {
 
     pub fn is_installed(&self) -> Result<bool, Box<dyn Error>> {
         let mut options = ScriptOptions::new();
-        options.capture_output = true;
         options.exit_on_error = true;
         options.print_commands = false;
 
