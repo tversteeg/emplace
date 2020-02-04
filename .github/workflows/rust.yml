@@ -103,7 +103,7 @@ jobs:
       # Install Node.js at a fixed version
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.0.0"
+          node-version: "12.0"
 
       # Install Ruby at a fixed version
       - uses: actions/setup-ruby@v1
@@ -113,12 +113,12 @@ jobs:
       # Install Python at a fixed version
       - uses: actions/setup-python@v1
         with:
-          python-version: "3.7.5"
+          python-version: "3.7"
 
       # Install dotnet at a fixed version
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "2.2.402"
+          dotnet-version: "2.2"
 
       # Run the ignored tests that expect the above setup
       - name: Run all tests
