@@ -118,7 +118,7 @@ jobs:
       # Install dotnet at a fixed version
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "2.2"
+          dotnet-version: "2.2.402"
 
       # Run the ignored tests that expect the above setup
       - name: Run all tests
