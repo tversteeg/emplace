@@ -108,7 +108,7 @@ jobs:
       # Install Ruby at a fixed version
       - uses: actions/setup-ruby@v1
         with:
-          ruby-version: "2.6.3"
+          ruby-version: "2.6"
 
       # Install Python at a fixed version
       - uses: actions/setup-python@v1
