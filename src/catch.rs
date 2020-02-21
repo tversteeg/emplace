@@ -51,6 +51,17 @@ fn match_rustup_component(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
 }
 
 fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    // First try to get the "--git https://" part
+    let results = match_single(
+        line,
+        PackageSource::Cargo,
+        r"cargo\s+install\s+(?P<name>--git\s+\S+)+",
+    )?;
+    if results.len() > 0 {
+        return Ok(results);
+    }
+
+    // If no git part is found do the normal match
     match_single(
         line,
         PackageSource::Cargo,
@@ -214,6 +225,11 @@ mod tests {
         single_match(match_cargo, "test", "cargo install test");
         single_match(match_cargo, "test", "cargo install test --force");
         single_match(match_cargo, "test", "cargo install --force test");
+        single_match(
+            match_cargo,
+            "--git https://github.com/tversteeg/emplace",
+            "cargo install --git https://github.com/tversteeg/emplace",
+        );
     }
 
     #[test]
