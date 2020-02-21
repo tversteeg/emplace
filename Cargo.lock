@@ -204,7 +204,7 @@ dependencies = [
 
 [[package]]
 name = "emplace"
-version = "0.2.11-alpha.0"
+version = "0.2.11"
 dependencies = [
  "anyhow 1.0.26 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
