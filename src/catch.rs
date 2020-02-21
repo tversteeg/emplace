@@ -57,7 +57,7 @@ fn match_cargo(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
         PackageSource::Cargo,
         r"cargo\s+install\s+(?P<name>--git\s+\S+)+",
     )?;
-    if results.len() > 0 {
+    if !results.is_empty() {
         return Ok(results);
     }
 
