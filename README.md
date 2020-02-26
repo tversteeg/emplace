@@ -41,6 +41,16 @@
 
 1. Install the *emplace* binary:
 
+   ### Windows
+   
+   #### Scoop
+   
+   ```sh
+   scoop install emplace
+   ```
+   
+   ### Source
+
    #### Rust
    
    ```sh
