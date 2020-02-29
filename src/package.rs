@@ -256,14 +256,14 @@ impl Package {
     pub fn set_package_name(&mut self) {
         let package_name = self
             .name
-            .split(" ")
+            .split(' ')
             // If the string starts with - ignore it, so all the flags
-            .filter(|s| s.chars().next().unwrap() != '-')
+            .filter(|s| s.starts_with('-'))
             // If the string starts with http get the last part which is a gamble but most of the
             // times it matches the package name
             .map(|s| {
                 if s.starts_with("http") {
-                    s.split("/").last().unwrap()
+                    s.split('/').last().unwrap()
                 } else {
                     s
                 }
