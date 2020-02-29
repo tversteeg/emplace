@@ -129,7 +129,12 @@ fn main() -> Result<()> {
             let repo = Repo::new(config).expect("Could not initialize git repository");
 
             match repo.read() {
-                Ok(packages) => {
+                Ok(mut packages) => {
+                    // Set all the package names, this is not done in catch for performance reasons
+                    packages
+                        .iter_mut()
+                        .for_each(|package| package.set_package_name());
+
                     if let Err(err) = crate::install::install(packages) {
                         error!("Could not install new changes: {}.", err);
                     }
@@ -147,10 +152,16 @@ fn main() -> Result<()> {
             let repo = Repo::new(config).expect("Could not initialize git repository");
 
             match repo.read() {
-                Ok(packages) => match crate::install::clean(packages) {
-                    Ok(packages) => repo.clean(packages).expect("Could not clean repo."),
-                    Err(err) => error!("Could not remove from repository: {}.", err),
-                },
+                Ok(mut packages) => {
+                    // Set all the package names, this is not done in catch for performance reasons
+                    packages
+                        .iter_mut()
+                        .for_each(|package| package.set_package_name());
+                    match crate::install::clean(packages) {
+                        Ok(packages) => repo.clean(packages).expect("Could not clean repo."),
+                        Err(err) => error!("Could not remove from repository: {}.", err),
+                    }
+                }
                 Err(err) => error!("{}", err),
             };
         }

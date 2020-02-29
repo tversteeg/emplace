@@ -1,8 +1,15 @@
 use anyhow::Context;
 use colored::*;
+use itertools::Itertools;
 use run_script::ScriptOptions;
 use serde::{Deserialize, Serialize};
-use std::{cmp::Ordering, error::Error, fmt, slice::Iter, string::String};
+use std::{
+    cmp::Ordering,
+    error::Error,
+    fmt,
+    slice::{Iter, IterMut},
+    string::String,
+};
 
 #[derive(Debug, Serialize, Deserialize, Copy, Clone, EnumIter)]
 pub enum PackageSource {
@@ -194,11 +201,22 @@ pub struct Package {
     pub source: PackageSource,
     /// A list of packages that are going to be installed.
     pub name: String,
+    /// The name without the flags.
+    #[serde(skip)]
+    package_name: Option<String>,
 }
 
 impl Package {
     pub fn new(source: PackageSource, name: String) -> Self {
-        Self { source, name }
+        let mut package = Self {
+            source,
+            name,
+            package_name: None,
+        };
+
+        package.set_package_name();
+
+        package
     }
 
     pub fn full_name(&self) -> String {
@@ -235,8 +253,34 @@ impl Package {
         Ok(code == 0)
     }
 
+    pub fn set_package_name(&mut self) {
+        let package_name = self
+            .name
+            .split(" ")
+            // If the string starts with - ignore it, so all the flags
+            .filter(|s| s.chars().next().unwrap() != '-')
+            // If the string starts with http get the last part which is a gamble but most of the
+            // times it matches the package name
+            .map(|s| {
+                if s.starts_with("http") {
+                    s.split("/").last().unwrap()
+                } else {
+                    s
+                }
+            })
+            .join(" ");
+
+        self.package_name = Some(package_name);
+    }
+
     fn is_installed_script(&self) -> String {
-        format!("{} {}", self.source.is_installed_script(), self.name)
+        let package_name = match &self.package_name {
+            Some(package_name) => package_name,
+            None => {
+                panic!("Could not get package name, function `set_package_name` not called yet")
+            }
+        };
+        format!("{} {}", self.source.is_installed_script(), package_name)
     }
 }
 
@@ -272,6 +316,10 @@ pub struct Packages(pub Vec<Package>);
 impl Packages {
     pub fn iter(&self) -> Iter<Package> {
         self.0.iter()
+    }
+
+    pub fn iter_mut(&mut self) -> IterMut<Package> {
+        self.0.iter_mut()
     }
 
     pub fn merge(&mut self, other: &mut Packages) {
