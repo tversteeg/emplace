@@ -1,9 +1,6 @@
-use anyhow::Context;
+use anyhow::{anyhow, Context, Result};
 use log::{error, info};
-use std::{
-    error::Error,
-    process::{Command, Stdio},
-};
+use std::process::{Command, Stdio};
 
 use crate::package::{Package, Packages};
 
@@ -15,10 +12,10 @@ fn can_call(command: &str) -> bool {
         .is_ok()
 }
 
-fn call(command: Vec<&str>, dry_run: bool) -> Result<bool, Box<dyn Error>> {
+fn call(command: Vec<&str>, dry_run: bool) -> Result<()> {
     if dry_run {
         println!("{}", command.join(" "));
-        return Ok(true);
+        return Ok(());
     }
 
     let mut iter = command.iter();
@@ -32,11 +29,17 @@ fn call(command: Vec<&str>, dry_run: bool) -> Result<bool, Box<dyn Error>> {
     }
 
     let result = cmd.output()?;
+    // Return stderr when the command failed
+    if result.status.success() {
+        Ok(())
+    } else {
+        let stderr = String::from_utf8(result.stderr)?;
 
-    Ok(result.status.success())
+        Err(anyhow!("{}", stderr))
+    }
 }
 
-pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
+pub fn install(packages: Packages) -> Result<()> {
     info!("Checking which packages haven't been installed yet..");
     let packages_to_install: Vec<&Package> = packages
         .iter()
@@ -74,17 +77,16 @@ pub fn install(packages: Packages) -> Result<(), Box<dyn Error>> {
         let package = packages_to_install[selection];
         info!("Installing: {}.", package.colour_full_name());
 
-        if call(package.install_command(), false)? {
-            info!("{} installed successfully.", package.colour_full_name());
-        } else {
-            error!("{} installed successfully.", package.colour_full_name());
-        }
+        match call(package.install_command(), false) {
+            Ok(_) => info!("{} installed successfully.", package.colour_full_name()),
+            Err(err) => error!("{} {:?}", package.colour_full_name(), err),
+        };
     }
 
     Ok(())
 }
 
-pub fn clean(packages: Packages) -> Result<Packages, Box<dyn Error>> {
+pub fn clean(packages: Packages) -> Result<Packages> {
     let package_names: Vec<String> = packages
         .iter()
         // Get the names
