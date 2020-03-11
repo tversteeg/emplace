@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-   <a href="https://actions-badge.atrox.dev/tversteeg/emplace/goto"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftversteeg%2Femplace%2Fbadge&style=flat" alt="Build Status"/></a>
+   <a href="https://actions-badge.atrox.dev/tversteeg/emplace/goto"><img src="https://github.com/tversteeg/sprite-gen/workflows/CI/badge.svg" alt="Build Status"/></a>
    <a href="https://github.com/tversteeg/emplace/releases"><img src="https://img.shields.io/crates/d/emplace.svg" alt="Downloads"/></a>
    <a href="https://crates.io/crates/emplace"><img src="https://img.shields.io/crates/v/emplace.svg" alt="Version"/></a>
    <br/><br/>
