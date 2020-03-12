@@ -131,34 +131,34 @@ impl PackageSource {
     }
 
     #[cfg(not(target_os = "windows"))]
-    pub fn is_installed_script(&self) -> &str {
+    pub fn is_installed_script(&self) -> Option<&str> {
         match self {
-            PackageSource::Cargo => "cargo install --list | grep 'v[0-9]' | grep -q",
-            PackageSource::RustupComponent => "rustup component list | grep -q",
-            PackageSource::Apt => "dpkg-query --show",
-            PackageSource::Pacman => "pacman -Q",
-            PackageSource::Snap => "snap | grep -Eo '^[^ ]+' | grep -q",
-            PackageSource::Pip => "pip show -q",
-            PackageSource::PipUser => "pip show -q",
-            PackageSource::Pip3 => "pip3 show -q",
-            PackageSource::Pip3User => "pip3 show -q",
-            PackageSource::Npm => "npm list --depth=0 -g | grep -q",
-            _ => "",
+            PackageSource::Cargo => Some("cargo install --list | grep 'v[0-9]' | grep -q"),
+            PackageSource::RustupComponent => Some("rustup component list | grep -q"),
+            PackageSource::Apt => Some("dpkg-query --show"),
+            PackageSource::Pacman => Some("pacman -Q"),
+            PackageSource::Snap => Some("snap | grep -Eo '^[^ ]+' | grep -q"),
+            PackageSource::Pip => Some("pip show -q"),
+            PackageSource::PipUser => Some("pip show -q"),
+            PackageSource::Pip3 => Some("pip3 show -q"),
+            PackageSource::Pip3User => Some("pip3 show -q"),
+            PackageSource::Npm => Some("npm list --depth=0 -g | grep -q"),
+            _ => None,
         }
     }
     #[cfg(target_os = "windows")]
-    pub fn is_installed_script(&self) -> &str {
+    pub fn is_installed_script(&self) -> Option<&str> {
         match self {
-            PackageSource::Cargo => "cargo install --list | findstr",
-            PackageSource::RustupComponent => "rustup component list | findstr",
-            PackageSource::Chocolatey => "choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color",
-            PackageSource::Scoop => "scoop list | findstr",
-            PackageSource::Pip => "pip show -q",
-            PackageSource::PipUser => "pip show -q",
-            PackageSource::Pip3 => "pip3 show -q",
-            PackageSource::Pip3User => "pip3 show -q",
-            PackageSource::Npm => "npm list --depth=0 -g | findstr",
-            _ => ""
+            PackageSource::Cargo => Some("cargo install --list | findstr"),
+            PackageSource::RustupComponent => Some("rustup component list | findstr"),
+            PackageSource::Chocolatey => Some("choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color"),
+            PackageSource::Scoop => Some("scoop list | findstr"),
+            PackageSource::Pip => Some("pip show -q"),
+            PackageSource::PipUser => Some("pip show -q"),
+            PackageSource::Pip3 => Some("pip3 show -q"),
+            PackageSource::Pip3User => Some("pip3 show -q"),
+            PackageSource::Npm => Some("npm list --depth=0 -g | findstr"),
+            _ => None
         }
     }
 
@@ -246,9 +246,14 @@ impl Package {
         options.exit_on_error = true;
         options.print_commands = false;
 
-        let (code, _output, _error) =
-            run_script::run(&*self.is_installed_script(), &vec![], &options)
-                .context("could not run is installed script")?;
+        let install_script = match self.is_installed_script() {
+            Some(install_script) => install_script,
+            // Return that it's installed when this package is not available on this OS
+            None => return Ok(true),
+        };
+
+        let (code, _output, _error) = run_script::run(&*install_script, &vec![], &options)
+            .context("could not run is installed script")?;
 
         Ok(code == 0)
     }
@@ -258,7 +263,7 @@ impl Package {
             .name
             .split(' ')
             // If the string starts with - ignore it, so all the flags
-            .filter(|s| s.starts_with('-'))
+            .filter(|s| !s.starts_with('-'))
             // If the string starts with http get the last part which is a gamble but most of the
             // times it matches the package name
             .map(|s| {
@@ -273,14 +278,18 @@ impl Package {
         self.package_name = Some(package_name);
     }
 
-    fn is_installed_script(&self) -> String {
+    fn is_installed_script(&self) -> Option<String> {
         let package_name = match &self.package_name {
             Some(package_name) => package_name,
             None => {
                 panic!("Could not get package name, function `set_package_name` not called yet")
             }
         };
-        format!("{} {}", self.source.is_installed_script(), package_name)
+
+        match self.source.is_installed_script() {
+            Some(script) => Some(format!("{} {}", script, package_name)),
+            None => None,
+        }
     }
 }
 
