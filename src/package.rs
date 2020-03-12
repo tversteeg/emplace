@@ -57,8 +57,7 @@ impl PackageSource {
         }
     }
 
-    #[allow(clippy::trivially_copy_pass_by_ref)]
-    pub fn colour_full_name(&self) -> String {
+    pub fn colour_full_name(self) -> String {
         format!("({})", self.full_name())
             .cyan()
             .italic()
@@ -66,7 +65,7 @@ impl PackageSource {
     }
 
     #[cfg(not(target_os = "windows"))]
-    pub fn command(&self) -> &str {
+    pub fn command<'a>(self) -> &'a str {
         match self {
             PackageSource::Cargo => "cargo",
             PackageSource::RustupComponent => "rustup",
@@ -82,7 +81,7 @@ impl PackageSource {
         }
     }
     #[cfg(target_os = "windows")]
-    pub fn command(&self) -> &str {
+    pub fn command<'a>(self) -> &'a str {
         match self {
             PackageSource::Cargo => "cargo",
             PackageSource::RustupComponent => "rustup",
@@ -97,9 +96,8 @@ impl PackageSource {
         }
     }
 
-    #[allow(clippy::trivially_copy_pass_by_ref)]
     #[cfg(not(target_os = "windows"))]
-    pub fn install_command(&self) -> Vec<&str> {
+    pub fn install_command<'a>(self) -> Vec<&'a str> {
         match self {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::RustupComponent => vec!["rustup", "component", "add"],
@@ -115,7 +113,7 @@ impl PackageSource {
         }
     }
     #[cfg(target_os = "windows")]
-    pub fn install_command(&self) -> Vec<&str> {
+    pub fn install_command<'a>(self) -> Vec<&'a str> {
         match self {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::RustupComponent => vec!["rustup", "component", "add"],
@@ -131,7 +129,7 @@ impl PackageSource {
     }
 
     #[cfg(not(target_os = "windows"))]
-    pub fn is_installed_script(&self) -> Option<&str> {
+    pub fn is_installed_script<'a>(self) -> Option<&'a str> {
         match self {
             PackageSource::Cargo => Some("cargo install --list | grep 'v[0-9]' | grep -q"),
             PackageSource::RustupComponent => Some("rustup component list | grep -q"),
@@ -147,7 +145,7 @@ impl PackageSource {
         }
     }
     #[cfg(target_os = "windows")]
-    pub fn is_installed_script(&self) -> Option<&str> {
+    pub fn is_installed_script<'a>(self) -> Option<&'a str> {
         match self {
             PackageSource::Cargo => Some("cargo install --list | findstr"),
             PackageSource::RustupComponent => Some("rustup component list | findstr"),
@@ -162,8 +160,7 @@ impl PackageSource {
         }
     }
 
-    #[allow(clippy::trivially_copy_pass_by_ref)]
-    pub fn needs_root(&self) -> bool {
+    pub fn needs_root(self) -> bool {
         match self {
             PackageSource::Cargo => false,
             PackageSource::RustupComponent => false,
