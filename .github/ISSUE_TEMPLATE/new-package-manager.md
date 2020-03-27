@@ -28,3 +28,7 @@ assignees: tversteeg
 - [ ] Programming language specific (e.g. Cargo for Rust)
 - [ ] General purpose (e.g. APT on Debian)
 - [ ] Other, namely:
+
+**Are administrator priviliges required? (sudo, etc.)**
+- [ ] Yes
+- [ ] No
