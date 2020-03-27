@@ -21,6 +21,8 @@ pub enum PackageSource {
     Apt,
     /// Arch Pacman
     Pacman,
+    /// Arch RUA
+    Rua,
     /// Linux Snap
     Snap,
     /// Windows chocolatey
@@ -46,6 +48,7 @@ impl PackageSource {
             PackageSource::RustupComponent => "Rustup Component",
             PackageSource::Apt => "Advanced Package Tool",
             PackageSource::Pacman => "Pacman",
+            PackageSource::Rua => "RUA",
             PackageSource::Snap => "Snap",
             PackageSource::Chocolatey => "Chocolatey",
             PackageSource::Scoop => "Scoop",
@@ -71,6 +74,7 @@ impl PackageSource {
             PackageSource::RustupComponent => "rustup",
             PackageSource::Apt => "apt",
             PackageSource::Pacman => "pacman",
+            PackageSource::Rua => "rua",
             PackageSource::Snap => "snap",
             PackageSource::Pip => "pip",
             PackageSource::PipUser => "pip",
@@ -103,6 +107,7 @@ impl PackageSource {
             PackageSource::RustupComponent => vec!["rustup", "component", "add"],
             PackageSource::Apt => vec!["apt", "install"],
             PackageSource::Pacman => vec!["pacman", "-Sy", "--noconfirm", "--quiet"],
+            PackageSource::Rua => vec!["rua", "install"],
             PackageSource::Snap => vec!["snap", "install"],
             PackageSource::Pip => vec!["pip", "install", "-q"],
             PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
@@ -135,6 +140,7 @@ impl PackageSource {
             PackageSource::RustupComponent => Some("rustup component list | grep -q"),
             PackageSource::Apt => Some("dpkg-query --show"),
             PackageSource::Pacman => Some("pacman -Q"),
+            PackageSource::Rua => Some("rua search"),
             PackageSource::Snap => Some("snap | grep -Eo '^[^ ]+' | grep -q"),
             PackageSource::Pip => Some("pip show -q"),
             PackageSource::PipUser => Some("pip show -q"),
@@ -166,6 +172,7 @@ impl PackageSource {
             PackageSource::RustupComponent => false,
             PackageSource::Apt => true,
             PackageSource::Pacman => true,
+            PackageSource::Rua => false,
             PackageSource::Snap => true,
             PackageSource::Chocolatey => true,
             PackageSource::Scoop => true,

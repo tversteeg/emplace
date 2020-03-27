@@ -17,6 +17,9 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     // Parse Pacman
     packages.append(&mut match_pacman(line)?);
 
+    // Parse RUA
+    packages.append(&mut match_rua(line)?);
+
     // Parse Snap
     packages.append(&mut match_snap(line)?);
 
@@ -84,6 +87,15 @@ fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
         PackageSource::Pacman,
         r"pacman\s+-Sy?\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
         r"([[:word:]]\S*)",
+    )
+}
+
+fn match_rua(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    match_multiple(
+        line,
+        PackageSource::Rua,
+        r"rua\s+(-\S+\s+)*install\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
+        r"^([[:alpha:]]\S*)",
     )
 }
 
@@ -278,6 +290,11 @@ mod tests {
         multiple_match(match_pacman, vec!["test", "test2"], "pacman -Sy test test2");
 
         no_match(match_pacman, "sudo snap install tor-middle-relay");
+    }
+
+    #[test]
+    fn test_rua_matches() {
+        multiple_match(match_rua, vec!["test", "test2"], "rua install test test2");
     }
 
     #[test]
