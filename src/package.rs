@@ -106,7 +106,7 @@ impl PackageSource {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::RustupComponent => vec!["rustup", "component", "add"],
             PackageSource::Apt => vec!["apt", "install"],
-            PackageSource::Pacman => vec!["pacman", "-Sy", "--noconfirm", "--quiet"],
+            PackageSource::Pacman => vec!["pacman", "-S", "--noconfirm", "--quiet"],
             PackageSource::Rua => vec!["rua", "install"],
             PackageSource::Snap => vec!["snap", "install"],
             PackageSource::Pip => vec!["pip", "install", "-q"],
