@@ -85,7 +85,7 @@ fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     match_multiple(
         line,
         PackageSource::Pacman,
-        r"pacman\s+-Sy?\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
+        r"pacman\s+-S?\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
         r"([[:word:]]\S*)",
     )
 }
@@ -287,7 +287,7 @@ mod tests {
 
     #[test]
     fn test_pacman_matches() {
-        multiple_match(match_pacman, vec!["test", "test2"], "pacman -Sy test test2");
+        multiple_match(match_pacman, vec!["test", "test2"], "pacman -S test test2");
 
         no_match(match_pacman, "sudo snap install tor-middle-relay");
     }

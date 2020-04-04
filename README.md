@@ -112,7 +112,7 @@ rustup component add rustfmt
 # -- or --
 sudo apt install meld
 # -- or --
-pacman -Sy zsh
+pacman -S zsh
 # -- or --
 rua install peek
 # -- or --
