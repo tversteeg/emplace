@@ -105,7 +105,7 @@ impl PackageSource {
         match self {
             PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
             PackageSource::RustupComponent => vec!["rustup", "component", "add"],
-            PackageSource::Apt => vec!["apt", "install"],
+            PackageSource::Apt => vec!["apt-get", "install", "-y"],
             PackageSource::Pacman => vec!["pacman", "-S", "--noconfirm", "--quiet"],
             PackageSource::Rua => vec!["rua", "install"],
             PackageSource::Snap => vec!["snap", "install"],
@@ -138,7 +138,7 @@ impl PackageSource {
         match self {
             PackageSource::Cargo => Some("cargo install --list | grep 'v[0-9]' | grep -q"),
             PackageSource::RustupComponent => Some("rustup component list | grep -q"),
-            PackageSource::Apt => Some("dpkg-query --show"),
+            PackageSource::Apt => Some("dpkg -s"),
             PackageSource::Pacman => Some("pacman -Q"),
             PackageSource::Rua => Some("rua search"),
             PackageSource::Snap => Some("snap | grep -Eo '^[^ ]+' | grep -q"),
