@@ -39,6 +39,8 @@ pub enum PackageSource {
     Pip3User,
     /// Node Package Manager
     Npm,
+    ///AUR Helper written in go
+    Yay
 }
 
 impl PackageSource {
@@ -57,6 +59,7 @@ impl PackageSource {
             PackageSource::Pip3 => "Python Pip 3",
             PackageSource::Pip3User => "Python Pip 3 --user",
             PackageSource::Npm => "Node Package Manager",
+            PackageSource::Yay =>"AUR Helper written in go"
         }
     }
 
@@ -81,6 +84,7 @@ impl PackageSource {
             PackageSource::Pip3 => "pip3",
             PackageSource::Pip3User => "pip3",
             PackageSource::Npm => "npm",
+            PackageSource::Yay=>"yay",
             _ => "",
         }
     }
@@ -107,6 +111,7 @@ impl PackageSource {
             PackageSource::RustupComponent => vec!["rustup", "component", "add"],
             PackageSource::Apt => vec!["apt-get", "install", "-y"],
             PackageSource::Pacman => vec!["pacman", "-S", "--noconfirm", "--quiet"],
+            PackageSource::Yay => vec!["pacman", "-S", "--noconfirm", "--quiet"],
             PackageSource::Rua => vec!["rua", "install"],
             PackageSource::Snap => vec!["snap", "install"],
             PackageSource::Pip => vec!["pip", "install", "-q"],
@@ -140,6 +145,7 @@ impl PackageSource {
             PackageSource::RustupComponent => Some("rustup component list | grep -q"),
             PackageSource::Apt => Some("dpkg -s"),
             PackageSource::Pacman => Some("pacman -Q"),
+            PackageSource::Yay => Some("pacman -Q"),
             PackageSource::Rua => Some("rua search"),
             PackageSource::Snap => Some("snap | grep -Eo '^[^ ]+' | grep -q"),
             PackageSource::Pip => Some("pip show -q"),
@@ -181,6 +187,7 @@ impl PackageSource {
             PackageSource::Pip3 => true,
             PackageSource::Pip3User => false,
             PackageSource::Npm => false,
+            PackageSource::Yay=>false
         }
     }
 }
