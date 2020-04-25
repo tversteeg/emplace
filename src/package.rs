@@ -40,7 +40,7 @@ pub enum PackageSource {
     /// Node Package Manager
     Npm,
     ///AUR Helper written in go
-    Yay
+    Yay,
 }
 
 impl PackageSource {
@@ -59,7 +59,7 @@ impl PackageSource {
             PackageSource::Pip3 => "Python Pip 3",
             PackageSource::Pip3User => "Python Pip 3 --user",
             PackageSource::Npm => "Node Package Manager",
-            PackageSource::Yay =>"AUR Helper written in go"
+            PackageSource::Yay => "AUR Helper written in go",
         }
     }
 
@@ -84,7 +84,7 @@ impl PackageSource {
             PackageSource::Pip3 => "pip3",
             PackageSource::Pip3User => "pip3",
             PackageSource::Npm => "npm",
-            PackageSource::Yay=>"yay",
+            PackageSource::Yay => "yay",
             _ => "",
         }
     }
@@ -187,7 +187,7 @@ impl PackageSource {
             PackageSource::Pip3 => true,
             PackageSource::Pip3User => false,
             PackageSource::Npm => false,
-            PackageSource::Yay=>false
+            PackageSource::Yay => false,
         }
     }
 }

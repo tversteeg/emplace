@@ -91,7 +91,7 @@ fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     )
 }
 
-fn  match_yay(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+fn match_yay(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     match_multiple(
         line,
         PackageSource::Yay,
@@ -321,13 +321,13 @@ mod tests {
             "sudo snap install test test2",
         );
     }
-    
+
     #[test]
-    fn test_yay_matches()
-    {
+    fn test_yay_matches() {
         single_match(match_yay, "test", "yay -S test");
         multiple_match(match_yay, vec!["test", "test2"], "yay -S test test2");
     }
+
     #[test]
     fn test_pip_matches() {
         // Regular invocation
