@@ -16,7 +16,8 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
 
     // Parse Pacman
     packages.append(&mut match_pacman(line)?);
-
+    //Parse yay
+    packages.append(&mut match_yay(line)?);
     // Parse RUA
     packages.append(&mut match_rua(line)?);
 
@@ -86,6 +87,15 @@ fn match_pacman(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
         line,
         PackageSource::Pacman,
         r"pacman\s+-S?\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
+        r"([[:word:]]\S*)",
+    )
+}
+
+fn match_yay(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    match_multiple(
+        line,
+        PackageSource::Yay,
+        r"yay\s+-S?\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
         r"([[:word:]]\S*)",
     )
 }
@@ -310,6 +320,12 @@ mod tests {
             vec!["test", "test2"],
             "sudo snap install test test2",
         );
+    }
+
+    #[test]
+    fn test_yay_matches() {
+        single_match(match_yay, "test", "yay -S test");
+        multiple_match(match_yay, vec!["test", "test2"], "yay -S test test2");
     }
 
     #[test]
