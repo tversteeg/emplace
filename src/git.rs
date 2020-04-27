@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use log::error;
 use std::{
     path::Path,
     process::{Command, Stdio},
@@ -54,7 +55,7 @@ pub fn clone_single_branch<P: AsRef<Path>>(
     branch: &str,
     dry_run: bool,
 ) -> Result<bool> {
-    call_on_path(
+    let success = call_on_path(
         vec![
             "git",
             "clone",
@@ -67,7 +68,14 @@ pub fn clone_single_branch<P: AsRef<Path>>(
         dir,
         dry_run,
     )
-    .context("failed cloning branch in git")
+    .context("failed cloning branch in git")?;
+
+    if !success {
+        // The git process reported that it succeeded but no clone has been done successfully
+        error!("Cloning git branch failed, please execute the following code manually:\n\n\tgit clone --single-branch --branch {} {} {}\n", branch, url, dir.as_ref().to_str().unwrap())
+    }
+
+    Ok(success)
 }
 
 pub fn add_file<P: AsRef<Path>>(dir: &P, file: &str, dry_run: bool) -> Result<bool> {
