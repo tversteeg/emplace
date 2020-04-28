@@ -1,131 +1,58 @@
-
 name: CI
 on:
   push:
+    branches:
+      - master
+    tags:
+      - v*
     paths-ignore:
       - "docs/**"
       - "**.md"
   pull_request:
+    branches:
+      - master
+    tags:
+      - v*
     paths-ignore:
       - "docs/**"
       - "**.md"
 
 jobs:
-  # Run the `rustfmt` code formatter
-  rustfmt:
-    name: Rustfmt [Formatter]
+  rust:
+    name: cargo fmt & cargo clippy & cargo bloat
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          components: rustfmt
-          override: true
-      - run: rustup component add rustfmt
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - uses: actions/checkout@v2
 
-  # Run the `clippy` linting tool
-  clippy:
-    name: Clippy [Linter]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions-rs/toolchain@v1
+      - name: install rust
+        uses: actions-rs/toolchain@v1
         with:
-          profile: minimal
+          profile: default
           toolchain: stable
-          components: clippy
           override: true
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-targets --all-features -- -D clippy::all
 
-  # Run a security audit on dependencies
-  cargo_audit:
-    name: Cargo Audit [Security]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - run: cargo install --force cargo-audit
-      - run: cargo generate-lockfile
-      - uses: actions-rs/cargo@v1
-        with:
-          command: audit
-
-  # Ensure that the project could be successfully compiled
-  cargo_check:
-    name: Compile
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - uses: actions-rs/cargo@v1
+      - name: cargo check
+        uses: actions-rs/cargo@v1
         with:
           command: check
           args: --all
 
-  # Run tests on Linux, macOS, and Windows
-  # On both Rust stable and Rust nightly
-  test:
-    name: Test Suite
-    needs: [cargo_check]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        rust: [stable, nightly]
-    steps:
-      # Checkout the branch being tested
-      - uses: actions/checkout@v1
-
-      # Install all the required dependencies for testing
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-
-      # Install Node.js at a fixed version
-      - uses: actions/setup-node@v1
-        with:
-          node-version: "12.0"
-
-      # Install Ruby at a fixed version
-      - uses: actions/setup-ruby@v1
-        with:
-          ruby-version: "2.6"
-
-      # Install Python at a fixed version
-      - uses: actions/setup-python@v1
-        with:
-          python-version: "3.7"
-
-      # Install dotnet at a fixed version
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "2.2.402"
-
-      # Run the ignored tests that expect the above setup
-      - name: Run all tests
+      - name: cargo fmt
         uses: actions-rs/cargo@v1
         with:
-          command: test
-          args: -- -Z unstable-options --include-ignored
+          command: fmt
+          args: --all -- --check
+
+      - name: cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-targets --all-features -- -D clippy::all
+
+      - name: cargo bloat
+        uses: orf/cargo-bloat-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   # Build sources for every OS
   github_build:
@@ -136,22 +63,18 @@ jobs:
       matrix:
         target:
           - x86_64-unknown-linux-gnu
-          - x86_64-unknown-linux-musl
           - x86_64-apple-darwin
           - x86_64-pc-windows-msvc
         include:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            name: emplace-x86_64-unknown-linux-gnu.tar.gz
-          - target: x86_64-unknown-linux-musl
-            os: ubuntu-latest
-            name: emplace-x86_64-unknown-linux-musl.tar.gz
+            name: emplace-x86_64-unknown-linux-gnu
           - target: x86_64-apple-darwin
             os: macOS-latest
-            name: emplace-x86_64-apple-darwin.tar.gz
+            name: emplace-x86_64-apple-darwin
           - target: x86_64-pc-windows-msvc
             os: windows-latest
-            name: emplace-x86_64-pc-windows-msvc.zip
+            name: emplace-x86_64-pc-windows-msvc.exe
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
@@ -164,10 +87,6 @@ jobs:
           override: true
           target: ${{ matrix.target }}
 
-      - name: Install musl tools
-        if: matrix.target == 'x86_64-unknown-linux-musl'
-        run: sudo apt-get install -y musl-tools
-
       - name: Build target
         uses: actions-rs/cargo@v1
         with:
@@ -179,7 +98,7 @@ jobs:
         run: |
           cd target/${{ matrix.target }}/release
           strip emplace.exe
-          7z a ../../../${{ matrix.name }} emplace.exe
+          mv emplace.exe ../../../${{ matrix.name }}
           cd -
 
       - name: Prepare build artifacts [-nix]
@@ -187,7 +106,7 @@ jobs:
         run: |
           cd target/${{ matrix.target }}/release
           strip emplace
-          tar czvf ../../../${{ matrix.name }} emplace
+          mv emplace ../../../${{ matrix.name }}
           cd -
 
       - name: Upload build artifact
@@ -209,22 +128,17 @@ jobs:
       - name: Download releases from github_build
         uses: actions/download-artifact@v1
         with:
-          name: emplace-x86_64-unknown-linux-gnu.tar.gz
+          name: emplace-x86_64-unknown-linux-gnu
           path: .
       - name: Download releases from github_build
         uses: actions/download-artifact@v1
         with:
-          name: emplace-x86_64-unknown-linux-musl.tar.gz
+          name: emplace-x86_64-apple-darwin
           path: .
       - name: Download releases from github_build
         uses: actions/download-artifact@v1
         with:
-          name: emplace-x86_64-apple-darwin.tar.gz
-          path: .
-      - name: Download releases from github_build
-        uses: actions/download-artifact@v1
-        with:
-          name: emplace-x86_64-pc-windows-msvc.zip
+          name: emplace-x86_64-pc-windows-msvc.exe
           path: .
 
       - name: Generate checksums
