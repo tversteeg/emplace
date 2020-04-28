@@ -38,6 +38,14 @@ impl Repo {
 
             fs::create_dir_all(path)?;
             git::clone_single_branch(&path, &*repo_url, &*repo_branch, false)?;
+
+            // Create the emplace file if it doesn't exist
+            let emplace_file = config.full_file_path();
+            if !emplace_file.exists() {
+                let empty_packages = Packages(vec![]);
+                let toml_string = to_string_pretty(&empty_packages, Repo::pretty_config())?;
+                fs::write(&emplace_file, toml_string)?;
+            }
         }
 
         Ok(Repo {
