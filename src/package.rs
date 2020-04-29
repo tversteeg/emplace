@@ -335,7 +335,7 @@ pub struct Packages(pub Vec<Package>);
 
 impl From<Vec<Package>> for Packages {
     fn from(x: Vec<Package>) -> Self {
-        Packages { 0: x }
+        Packages(x)
     }
 }
 

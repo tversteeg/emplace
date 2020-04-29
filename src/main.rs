@@ -19,7 +19,6 @@ use colored::*;
 use log::{error, info};
 use simplelog::{LevelFilter, TermLogger, TerminalMode};
 
-use crate::package::PackageSource::Cargo;
 use crate::package::{Package, Packages};
 use config::Config;
 use itertools::Itertools;
@@ -155,7 +154,7 @@ fn history_processing(matches: &ArgMatches) -> Result<()> {
     );
     let hist_file = File::open(histpath)?;
     let reader = BufReader::new(hist_file);
-    let mut catches: Vec<Package> = reader
+    let catches: Vec<Package> = reader
         .lines()
         .filter_map(|x| x.ok())
         .map(|x| x.split_whitespace().join(" "))
@@ -191,7 +190,7 @@ fn history_processing(matches: &ArgMatches) -> Result<()> {
         return Ok(());
     }
     let colored_selection: Vec<String> = catches.0.iter().map(|x| x.colour_full_name()).collect();
-    let mut ms = dialoguer::Checkboxes::with_theme(&dialoguer::theme::ColorfulTheme::default())
+    let ms = dialoguer::Checkboxes::with_theme(&dialoguer::theme::ColorfulTheme::default())
         .items(&colored_selection)
         .with_prompt("Select packages to sync")
         .paged(true)
@@ -208,10 +207,7 @@ fn history_processing(matches: &ArgMatches) -> Result<()> {
     // Print the info
     match len {
         1 => info!("{}", "Mirror this command?".green().bold()),
-        n => info!(
-            "{}",
-            format!("Mirror these {} commands?", len).green().bold()
-        ),
+        n => info!("{}", format!("Mirror these {} commands?", n).green().bold()),
     }
     for catch in checked.iter() {
         info!("- {}", catch.colour_full_name());
