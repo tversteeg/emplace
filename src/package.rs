@@ -159,17 +159,17 @@ impl PackageSource {
     #[cfg(target_os = "windows")]
     pub fn is_installed_script<'a>(self) -> Option<&'a str> {
         match self {
-            PackageSource::Cargo => Some("cargo install --list | findstr"),
-            PackageSource::RustupComponent => Some("rustup component list | findstr"),
-            PackageSource::Chocolatey => Some("choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color"),
-            PackageSource::Scoop => Some("scoop list | findstr"),
-            PackageSource::Pip => Some("pip show -q"),
-            PackageSource::PipUser => Some("pip show -q"),
-            PackageSource::Pip3 => Some("pip3 show -q"),
-            PackageSource::Pip3User => Some("pip3 show -q"),
-            PackageSource::Npm => Some("npm list --depth=0 -g | findstr"),
-            _ => None
-        }
+			PackageSource::Cargo => Some("cargo install --list | findstr"),
+			PackageSource::RustupComponent => Some("rustup component list | findstr"),
+			PackageSource::Chocolatey => Some("choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color"),
+			PackageSource::Scoop => Some("scoop list | findstr"),
+			PackageSource::Pip => Some("pip show -q"),
+			PackageSource::PipUser => Some("pip show -q"),
+			PackageSource::Pip3 => Some("pip3 show -q"),
+			PackageSource::Pip3User => Some("pip3 show -q"),
+			PackageSource::Npm => Some("npm list --depth=0 -g | findstr"),
+			_ => None
+		}
     }
 
     pub fn needs_root(self) -> bool {
@@ -214,7 +214,7 @@ pub struct Package {
     pub name: String,
     /// The name without the flags.
     #[serde(skip)]
-    package_name: Option<String>,
+    pub(crate) package_name: Option<String>,
 }
 
 impl Package {
@@ -332,6 +332,12 @@ impl Eq for Package {}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Packages(pub Vec<Package>);
+
+impl From<Vec<Package>> for Packages {
+    fn from(x: Vec<Package>) -> Self {
+        Packages { 0: x }
+    }
+}
 
 impl Packages {
     pub fn iter(&self) -> Iter<Package> {

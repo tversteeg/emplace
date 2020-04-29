@@ -2,6 +2,8 @@
 extern crate clap;
 #[macro_use]
 extern crate strum_macros;
+#[macro_use]
+extern crate lazy_static;
 
 mod catch;
 mod config;
@@ -17,12 +19,14 @@ use colored::*;
 use log::{error, info};
 use simplelog::{LevelFilter, TermLogger, TerminalMode};
 
+use crate::package::PackageSource::Cargo;
 use crate::package::{Package, Packages};
 use config::Config;
+use itertools::Itertools;
 use repo::Repo;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
     App::new("emplace")
@@ -46,39 +50,39 @@ fn main() -> Result<()> {
     .expect("No interactive terminal");
 
     let matches = public_clap_app()
-        .subcommand(
-            SubCommand::with_name("init")
-            .about("Prints the shell function used to execute emplace")
-            .arg(
-                Arg::with_name("shell")
-                .value_name("SHELL")
-                .help(
-                    "The name of the currently running shell\nCurrently supported options: bash & zsh",
-                )
-                .required(true)
-            )
-        )
-        .subcommand(
-            SubCommand::with_name("catch")
-                .about("Capture a command entered in a terminal")
-                .arg(
-                    Arg::with_name("line")
-                        .value_name("LINE")
-                        .help("The command as entired in the terminal")
-                        .required(true),
-                ),
-        )
-        .subcommand(
-            SubCommand::with_name("history")
-                .about("Parses your history file and retrieves installations")
-                .arg(
-                    Arg::with_name("history_parse")
-                        .help("Parses history. Just place `$HISTFILE` as input, and it will do all work;")
-                        .required(false)
-                        .takes_value(true)
-                ),
-        )
-        .get_matches();
+		.subcommand(
+			SubCommand::with_name("init")
+				.about("Prints the shell function used to execute emplace")
+				.arg(
+					Arg::with_name("shell")
+						.value_name("SHELL")
+						.help(
+							"The name of the currently running shell\nCurrently supported options: bash & zsh",
+						)
+						.required(true)
+				)
+		)
+		.subcommand(
+			SubCommand::with_name("catch")
+				.about("Capture a command entered in a terminal")
+				.arg(
+					Arg::with_name("line")
+						.value_name("LINE")
+						.help("The command as entired in the terminal")
+						.required(true),
+				),
+		)
+		.subcommand(
+			SubCommand::with_name("history")
+				.about("Parses your history file and retrieves installations")
+				.arg(
+					Arg::with_name("history_parse")
+						.help("Parses history. Just place `$HISTFILE` as input, and it will do all work;")
+						.required(false)
+						.takes_value(true)
+				),
+		)
+		.get_matches();
 
     match matches.subcommand() {
         ("init", Some(sub_m)) => {
@@ -87,7 +91,7 @@ fn main() -> Result<()> {
         }
         ("catch", Some(sub_m)) => {
             let line = sub_m.value_of("line").expect("Line is missing");
-            let mut catches = catch::catch(line).expect("Could not parse line");
+            let catches = catch::catch(line).expect("Could not parse line");
             catch_processing(catches)?
         }
         ("install", Some(_)) => {
@@ -154,13 +158,75 @@ fn history_processing(matches: &ArgMatches) -> Result<()> {
     let mut catches: Vec<Package> = reader
         .lines()
         .filter_map(|x| x.ok())
+        .map(|x| x.split_whitespace().join(" "))
+        .sorted()
+        .dedup()
         .map(|x| catch::catch(&x))
         .filter_map(|x| x.ok())
         .map(|x| x.0)
         .flatten()
+        .sorted()
+        .dedup()
         .collect();
-    catches.dedup();
-    println!("{}", catches.len());
+    if catches.is_empty() {
+        return Ok(());
+    };
+    // Filter out the packages that are already in the repository
+    // Get the config
+    let config = match Config::from_default_file().expect("Retrieving config went wrong") {
+        Some(config) => config,
+        None => Config::new().expect("Initializing new config failed"),
+    };
+    let repo = Repo::new(config).expect("Could not initialize git repository");
+    let mut catches = Packages::from(catches);
+    catches.filter_saved_packages(
+        &repo
+            .read()
+            .expect("Could not read packages file from repository"),
+    );
+
+    let len = catches.0.len();
+    if len == 0 {
+        // Nothing found after filtering
+        return Ok(());
+    }
+    let colored_selection: Vec<String> = catches.0.iter().map(|x| x.colour_full_name()).collect();
+    let mut ms = dialoguer::Checkboxes::with_theme(&dialoguer::theme::ColorfulTheme::default())
+        .items(&colored_selection)
+        .with_prompt("Select packages to sync")
+        .paged(true)
+        .interact()
+        .expect("Failed creating dialog");
+    let mut checked = vec![];
+    ms.iter().for_each(|x| checked.push(catches.0[*x].clone()));
+    let len = checked.len();
+    if len == 0 {
+        // Nothing found after filtering
+        info!("Nothing is checked");
+        return Ok(());
+    }
+    // Print the info
+    match len {
+        1 => info!("{}", "Mirror this command?".green().bold()),
+        n => info!(
+            "{}",
+            format!("Mirror these {} commands?", len).green().bold()
+        ),
+    }
+    for catch in checked.iter() {
+        info!("- {}", catch.colour_full_name());
+    }
+
+    if !dialoguer::Confirmation::new()
+        .interact()
+        .expect("Could not create dialogue")
+    {
+        // Exit, we don't need to do anything
+        return Ok(());
+    }
+
+    repo.mirror(Packages::from(checked))
+        .expect("Could not mirror commands");
     Ok(())
 }
 
