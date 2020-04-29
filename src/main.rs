@@ -12,13 +12,17 @@ mod package;
 mod repo;
 
 use anyhow::Result;
-use clap::{App, AppSettings, Arg, SubCommand};
+use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use colored::*;
 use log::{error, info};
 use simplelog::{LevelFilter, TermLogger, TerminalMode};
 
+use crate::package::{Package, Packages};
 use config::Config;
 use repo::Repo;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+use std::path::{Path, PathBuf};
 
 fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
     App::new("emplace")
@@ -56,12 +60,22 @@ fn main() -> Result<()> {
         )
         .subcommand(
             SubCommand::with_name("catch")
-                .about("Capture a command entired in a terminal")
+                .about("Capture a command entered in a terminal")
                 .arg(
                     Arg::with_name("line")
                         .value_name("LINE")
                         .help("The command as entired in the terminal")
                         .required(true),
+                ),
+        )
+        .subcommand(
+            SubCommand::with_name("history")
+                .about("Parses your history file and retrieves installations")
+                .arg(
+                    Arg::with_name("history_parse")
+                        .help("Parses history. Just place `$HISTFILE` as input, and it will do all work;")
+                        .required(false)
+                        .takes_value(true)
                 ),
         )
         .get_matches();
@@ -74,50 +88,7 @@ fn main() -> Result<()> {
         ("catch", Some(sub_m)) => {
             let line = sub_m.value_of("line").expect("Line is missing");
             let mut catches = catch::catch(line).expect("Could not parse line");
-
-            if catches.0.is_empty() {
-                // Nothing found, just return
-                return Ok(());
-            }
-
-            // Filter out the packages that are already in the repository
-            // Get the config
-            let config = match Config::from_default_file().expect("Retrieving config went wrong") {
-                Some(config) => config,
-                None => Config::new().expect("Initializing new config failed"),
-            };
-            let repo = Repo::new(config).expect("Could not initialize git repository");
-            catches.filter_saved_packages(
-                &repo
-                    .read()
-                    .expect("Could not read packages file from repository"),
-            );
-
-            let len = catches.0.len();
-            if len == 0 {
-                // Nothing found after filtering
-                return Ok(());
-            }
-
-            // Print the info
-            match len {
-                1 => info!("{}", "Mirror this command?".green().bold()),
-                n => info!("{}", format!("Mirror these {} commands?", n).green().bold()),
-            }
-            for catch in catches.0.iter() {
-                info!("- {}", catch.colour_full_name());
-            }
-
-            // Ask if it needs to be mirrored
-            if !dialoguer::Confirmation::new()
-                .interact()
-                .expect("Could not create dialogue")
-            {
-                // Exit, we don't need to do anything
-                return Ok(());
-            }
-
-            repo.mirror(catches).expect("Could not mirror commands");
+            catch_processing(catches)?
         }
         ("install", Some(_)) => {
             // Get the config
@@ -165,8 +136,77 @@ fn main() -> Result<()> {
                 Err(err) => error!("{}", err),
             };
         }
+        ("history", Some(path)) => history_processing(path)?,
         (&_, _) => {}
     };
 
+    Ok(())
+}
+
+fn history_processing(matches: &ArgMatches) -> Result<()> {
+    let histpath = PathBuf::from(
+        &matches
+            .value_of("history_parse")
+            .expect("Path to history file is not provided"),
+    );
+    let hist_file = File::open(histpath)?;
+    let reader = BufReader::new(hist_file);
+    let mut catches: Vec<Package> = reader
+        .lines()
+        .filter_map(|x| x.ok())
+        .map(|x| catch::catch(&x))
+        .filter_map(|x| x.ok())
+        .map(|x| x.0)
+        .flatten()
+        .collect();
+    catches.dedup();
+    println!("{}", catches.len());
+    Ok(())
+}
+
+fn catch_processing(mut catches: Packages) -> Result<()> {
+    if catches.0.is_empty() {
+        // Nothing found, just return
+        return Ok(());
+    }
+
+    // Filter out the packages that are already in the repository
+    // Get the config
+    let config = match Config::from_default_file().expect("Retrieving config went wrong") {
+        Some(config) => config,
+        None => Config::new().expect("Initializing new config failed"),
+    };
+    let repo = Repo::new(config).expect("Could not initialize git repository");
+    catches.filter_saved_packages(
+        &repo
+            .read()
+            .expect("Could not read packages file from repository"),
+    );
+
+    let len = catches.0.len();
+    if len == 0 {
+        // Nothing found after filtering
+        return Ok(());
+    }
+
+    // Print the info
+    match len {
+        1 => info!("{}", "Mirror this command?".green().bold()),
+        n => info!("{}", format!("Mirror these {} commands?", n).green().bold()),
+    }
+    for catch in catches.0.iter() {
+        info!("- {}", catch.colour_full_name());
+    }
+
+    // Ask if it needs to be mirrored
+    if !dialoguer::Confirmation::new()
+        .interact()
+        .expect("Could not create dialogue")
+    {
+        // Exit, we don't need to do anything
+        return Ok(());
+    }
+
+    repo.mirror(catches).expect("Could not mirror commands");
     Ok(())
 }
