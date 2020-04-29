@@ -67,7 +67,7 @@ pub fn install(packages: Packages) -> Result<()> {
         return Ok(());
     }
 
-    let selections = dialoguer::Checkboxes::new()
+    let selections = dialoguer::MultiSelect::new()
         .with_prompt("Select the packages you want to install (space to add)")
         .items(&package_names[..])
         .interact()
@@ -104,7 +104,7 @@ pub fn clean(packages: Packages) -> Result<Packages> {
         return Ok(packages);
     }
 
-    let selections = dialoguer::Checkboxes::new()
+    let selections = dialoguer::MultiSelect::new()
         .with_prompt("Select the packages you want to stop syncing (space to select)")
         .items(&package_names[..])
         .interact()

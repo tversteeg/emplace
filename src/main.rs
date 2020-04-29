@@ -109,7 +109,7 @@ fn main() -> Result<()> {
             }
 
             // Ask if it needs to be mirrored
-            if !dialoguer::Confirmation::new()
+            if !dialoguer::Confirm::new()
                 .interact()
                 .expect("Could not create dialogue")
             {
