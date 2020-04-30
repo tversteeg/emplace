@@ -2,6 +2,8 @@ use regex::Regex;
 use std::error::Error;
 
 use crate::package::{Package, PackageSource, Packages};
+use std::collections::HashMap;
+use std::sync::Mutex;
 
 pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     let mut packages = vec![];
@@ -174,12 +176,33 @@ fn match_npm(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
     )
 }
 
+//cache for args
+lazy_static! {
+    static ref ARG_REGEX_CACHE: Mutex<HashMap<&'static str, Regex>> = {
+        let m = HashMap::new();
+        Mutex::new(m)
+    };
+}
+
+//cache for comm validation
+lazy_static! {
+    static ref REGEX_COMM_CACHE: Mutex<HashMap<&'static str, Regex>> = {
+        let m = HashMap::new();
+        Mutex::new(m)
+    };
+}
+
 fn match_single(
     line: &str,
     source: PackageSource,
-    command_regex: &str,
+    command_regex: &'static str,
 ) -> Result<Vec<Package>, Box<dyn Error>> {
-    Ok(Regex::new(command_regex)?
+    let mut map = REGEX_COMM_CACHE.lock().unwrap();
+    let regex = map
+        .entry(&command_regex)
+        .or_insert_with(|| Regex::new(command_regex).unwrap());
+
+    Ok(regex
         .captures_iter(line)
         .map(|capture| Package::new(source, capture["name"].to_string()))
         .collect::<_>())
@@ -188,11 +211,17 @@ fn match_single(
 fn match_multiple(
     line: &str,
     source: PackageSource,
-    command_regex: &str,
-    arg_regex: &str,
+    command_regex: &'static str,
+    arg_regex: &'static str,
 ) -> Result<Vec<Package>, Box<dyn Error>> {
-    let command_re: Regex = Regex::new(command_regex)?;
-    let arg_re: Regex = Regex::new(arg_regex)?;
+    let mut map = REGEX_COMM_CACHE.lock().unwrap();
+    let mut arg_map = ARG_REGEX_CACHE.lock().unwrap();
+    let command_re = map
+        .entry(&command_regex)
+        .or_insert_with(|| Regex::new(&command_regex).unwrap());
+    let arg_re = arg_map
+        .entry(&arg_regex)
+        .or_insert_with(|| Regex::new(&arg_regex).unwrap());
 
     let mut result = vec![];
     for multiple_capture in command_re.captures_iter(line) {

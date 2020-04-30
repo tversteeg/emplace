@@ -19,7 +19,7 @@
 - [x] Version control with git to automatically push & pull updates
 - [x] Automatic prompt after installing a package
 - [x] Integrates well with dotfiles repositories
-
+- [x] Parses history file
 - Package managers supported:
 
     | OS | Package Manager |
@@ -129,10 +129,12 @@ choco install neovim
 # -- or --
 scoop install curl
 ```
-
+### History analysis
+Invoke `emplace history $HISTFILE` or `emplace history /path/to/history/file`.   
+It will parse your history and prompt to select, which packages do you want to synchronize. 
 ### Synchronizing On Another Machine
 
-Just invoke `emplace install` and you will be prompted with the packages to install:
+Just invoke `emplace install`, and you will be prompted with the packages to install:
 
 ```sh
 emplace install
