@@ -45,6 +45,9 @@ pub fn catch(line: &str) -> Result<Packages, Box<dyn Error>> {
     // Parse NPM
     packages.append(&mut match_npm(line)?);
 
+    // Parse nix
+    packages.append(&mut match_nix(line)?);
+
     Ok(Packages(packages))
 }
 
@@ -173,6 +176,14 @@ fn match_npm(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
         line,
         PackageSource::Npm,
         r"npm\s+(install\s+(-g|--global)|(-g|--global)\s+install)\s+(?P<name>\S+)+",
+    )
+}
+
+fn match_nix(line: &str) -> Result<Vec<Package>, Box<dyn Error>> {
+    match_single(
+        line,
+        PackageSource::Nix,
+        r"nix-env\s+(-\S+\s+)*-iA\s+(-\S+\s+)*(?P<name>[.\w\s-]+)",
     )
 }
 
@@ -387,5 +398,20 @@ mod tests {
 
         // Shouldn't match
         no_match(match_npm, "npm install test");
+    }
+
+    #[test]
+    fn test_nix_matches() {
+        single_match(match_nix, "nixos.test", "nix-env -iA nixos.test");
+        single_match(match_nix, "nixpkgs.test", "nix-env -iA nixpkgs.test");
+
+        // Installation by name is non-deterministic
+        no_match(match_nix, "nix-env -i test");
+
+        // Using '-f <channel>' instead of 'channel.package' is harder to parse
+        no_match(match_nix, "nix-env -f '<nixpkgs>' -iA test");
+
+        // Shouldn't match
+        no_match(match_nix, "nix-env -q test");
     }
 }
