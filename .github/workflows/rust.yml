@@ -8,6 +8,7 @@ on:
     paths-ignore:
       - "docs/**"
       - "**.md"
+      - ".all-contributorsrc"
   pull_request:
     branches:
       - master
@@ -16,6 +17,7 @@ on:
     paths-ignore:
       - "docs/**"
       - "**.md"
+      - ".all-contributorsrc"
 
 jobs:
   rust:
