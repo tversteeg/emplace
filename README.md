@@ -25,6 +25,7 @@
     | OS | Package Manager |
     | :---: | --- |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/debian.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/ubuntu.svg" width="18" height="18" /> | Apt |
+    | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/nixos.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/linux.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/apple.svg" width="18" height="18" /> | Nix |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | Pacman |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | RUA |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | Yay |
@@ -128,6 +129,8 @@ pip3 install --user termtosvg
 choco install neovim
 # -- or --
 scoop install curl
+# -- or --
+nix-env -iA nixpkgs.nixfmt
 ```
 
 ### Synchronizing On Another Machine

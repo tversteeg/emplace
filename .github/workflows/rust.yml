@@ -21,7 +21,7 @@ on:
 
 jobs:
   rust:
-    name: cargo fmt & cargo clippy & cargo bloat
+    name: cargo fmt & cargo clippy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -50,11 +50,6 @@ jobs:
         with:
           command: clippy
           args: --all-targets --all-features -- -D clippy::all
-
-      - name: cargo bloat
-        uses: orf/cargo-bloat-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
   # Build sources for every OS
   github_build:
