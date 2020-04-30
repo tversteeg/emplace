@@ -128,6 +128,8 @@ pip3 install --user termtosvg
 choco install neovim
 # -- or --
 scoop install curl
+# -- or --
+nix-env -iA nixpkgs.nixfmt
 ```
 
 ### Synchronizing On Another Machine

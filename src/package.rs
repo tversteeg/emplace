@@ -41,6 +41,8 @@ pub enum PackageSource {
     Npm,
     ///AUR Helper written in go
     Yay,
+    /// NixOS Nix
+    Nix,
 }
 
 impl PackageSource {
@@ -60,6 +62,7 @@ impl PackageSource {
             PackageSource::Pip3User => "Python Pip 3 --user",
             PackageSource::Npm => "Node Package Manager",
             PackageSource::Yay => "AUR Helper written in go",
+            PackageSource::Nix => "Nix",
         }
     }
 
@@ -85,6 +88,7 @@ impl PackageSource {
             PackageSource::Pip3User => "pip3",
             PackageSource::Npm => "npm",
             PackageSource::Yay => "yay",
+            PackageSource::Nix => "nix-env",
             _ => "",
         }
     }
@@ -119,6 +123,7 @@ impl PackageSource {
             PackageSource::Pip3 => vec!["pip3", "install", "-q"],
             PackageSource::Pip3User => vec!["pip3", "install", "-q", "--user"],
             PackageSource::Npm => vec!["npm", "install", "-g"],
+            PackageSource::Nix => vec!["nix-env", "-iA", "-g"],
             _ => vec![],
         }
     }
@@ -153,6 +158,7 @@ impl PackageSource {
             PackageSource::Pip3 => Some("pip3 show -q"),
             PackageSource::Pip3User => Some("pip3 show -q"),
             PackageSource::Npm => Some("npm list --depth=0 -g | grep -q"),
+            PackageSource::Nix => Some("nix-env -q | grep -q"),
             _ => None,
         }
     }
@@ -188,6 +194,7 @@ impl PackageSource {
             PackageSource::Pip3User => false,
             PackageSource::Npm => false,
             PackageSource::Yay => false,
+            PackageSource::Nix => false,
         }
     }
 }
