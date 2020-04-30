@@ -190,7 +190,7 @@ fn history_processing(matches: &ArgMatches) -> Result<()> {
         return Ok(());
     }
     let colored_selection: Vec<String> = catches.0.iter().map(|x| x.colour_full_name()).collect();
-    let ms = dialoguer::Checkboxes::with_theme(&dialoguer::theme::ColorfulTheme::default())
+    let ms = dialoguer::MultiSelect::with_theme(&dialoguer::theme::ColorfulTheme::default())
         .items(&colored_selection)
         .with_prompt("Select packages to sync")
         .paged(true)
@@ -213,7 +213,7 @@ fn history_processing(matches: &ArgMatches) -> Result<()> {
         info!("- {}", catch.colour_full_name());
     }
 
-    if !dialoguer::Confirmation::new()
+    if !dialoguer::Confirm::new()
         .interact()
         .expect("Could not create dialogue")
     {
@@ -261,7 +261,7 @@ fn catch_processing(mut catches: Packages) -> Result<()> {
     }
 
     // Ask if it needs to be mirrored
-    if !dialoguer::Confirmation::new()
+    if !dialoguer::Confirm::new()
         .interact()
         .expect("Could not create dialogue")
     {
