@@ -12,7 +12,7 @@
       "profile": "https://github.com/lberrymage",
       "contributions": [
         "bug"
-       ]
+      ]
     },
     {
       "login": "0xd34b33f",
@@ -21,6 +21,15 @@
       "profile": "https://github.com/0xd34b33f",
       "contributions": [
         "platform"
+      ]
+    },
+    {
+      "login": "filalex77",
+      "name": "Oleksii Filonenko",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/12615679?v=4",
+      "profile": "https://blog.brightone.space",
+      "contributions": [
+        "code"
       ]
     }
   ],
