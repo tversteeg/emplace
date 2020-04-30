@@ -12,7 +12,7 @@
       "profile": "https://github.com/lberrymage",
       "contributions": [
         "bug"
-       ]
+      ]
     },
     {
       "login": "0xd34b33f",
@@ -21,6 +21,15 @@
       "profile": "https://github.com/0xd34b33f",
       "contributions": [
         "platform"
+      ]
+    },
+    {
+      "login": "j2ghz",
+      "name": "Jozef Hollý",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1708197?v=4",
+      "profile": "https://stackoverflow.com/users/story/4363604",
+      "contributions": [
+        "ideas"
       ]
     }
   ],
