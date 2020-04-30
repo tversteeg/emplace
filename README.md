@@ -129,9 +129,7 @@ choco install neovim
 # -- or --
 scoop install curl
 ```
-### History analysis
-Invoke `emplace history $HISTFILE` or `emplace history /path/to/history/file`.   
-It will parse your history and prompt to select, which packages do you want to synchronize. 
+
 ### Synchronizing On Another Machine
 
 Just invoke `emplace install`, and you will be prompted with the packages to install:
@@ -139,6 +137,11 @@ Just invoke `emplace install`, and you will be prompted with the packages to ins
 ```sh
 emplace install
 ```
+
+### History Analysis
+
+Invoke `emplace history $HISTFILE` or `emplace history /path/to/history/file`.   
+It will parse your history and prompt to select, which packages you want to synchronize. 
 
 ### Removing Synchronized Packages
 
