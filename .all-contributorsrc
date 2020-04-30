@@ -11,8 +11,8 @@
       "avatar_url": "https://avatars0.githubusercontent.com/u/46338569?v=4",
       "profile": "https://github.com/lberrymage",
       "contributions": [
-        "bug",
-        "code"
+        "code",
+        "bug"
       ]
     },
     {
@@ -21,7 +21,9 @@
       "avatar_url": "https://avatars2.githubusercontent.com/u/32823131?v=4",
       "profile": "https://github.com/0xd34b33f",
       "contributions": [
-        "platform"
+        "platform",
+        "code",
+        "bug"
       ]
     },
     {
