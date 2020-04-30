@@ -153,6 +153,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/lberrymage"><img src="https://avatars0.githubusercontent.com/u/46338569?v=4" width="100px;" alt=""/><br /><sub><b>Logan Magee</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/issues?q=author%3Alberrymage" title="Bug reports">🐛</a> <a href="https://github.com/tversteeg/emplace/commits?author=lberrymage" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/0xd34b33f"><img src="https://avatars2.githubusercontent.com/u/32823131?v=4" width="100px;" alt=""/><br /><sub><b>Vladimir</b></sub></a><br /><a href="#platform-0xd34b33f" title="Packaging/porting to new platform">📦</a></td>
+    <td align="center"><a href="https://stackoverflow.com/users/story/4363604"><img src="https://avatars3.githubusercontent.com/u/1708197?v=4" width="100px;" alt=""/><br /><sub><b>Jozef Hollý</b></sub></a><br /><a href="#ideas-j2ghz" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
