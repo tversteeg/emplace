@@ -23,7 +23,17 @@ impl PackageManager {
 
     /// Try to find the proper package manager corresponding to a line.
     pub fn from_line(line: &str) -> Option<Self> {
-        Self::iter().find(|manager| line.contains(manager.get().command()))
+        // Iterate over all enum variations
+        Self::iter().find(|manager| {
+            // Iterate over all commands
+            manager
+                .get()
+                .commands()
+                .into_iter()
+                // Find the command that's in the file
+                .find(|command| line.contains(command))
+                .is_some()
+        })
     }
 
     /// Check whether a package is already installed.
@@ -52,62 +62,72 @@ impl PackageManager {
     pub fn catch(self, line: &str) -> Vec<Package> {
         let manager = self.get();
 
-        // Get the part right of the package manager invocation
-        match line.split(manager.command()).skip(1).next() {
-            Some(rest_of_line) => {
-                // Split all arguments
-                let mut args_iter = rest_of_line.split_ascii_whitespace();
+        // Try all different commands
+        manager
+            .commands()
+            .iter()
+            .map(|command| {
+                // Get the part right of the package manager invocation
+                // The command has another space so lengthened versions of itself don't collide,
+                // for example 'apt' & 'apt-get'
+                match line.split(&format!("{} ", command)).skip(1).next() {
+                    Some(rest_of_line) => {
+                        // Split all arguments
+                        let mut args_iter = rest_of_line.split_ascii_whitespace();
 
-                // The resulting packages strings
-                let mut package_strings = vec![];
+                        // The resulting packages strings
+                        let mut package_strings = vec![];
 
-                // A list of flags that we caught that we should keep track of
-                let mut catched_flags = vec![];
+                        // A list of flags that we caught that we should keep track of
+                        let mut catched_flags = vec![];
 
-                // Keep track of whether the installation subcommand is present
-                let mut has_sub_command = false;
+                        // Keep track of whether the installation subcommand is present
+                        let mut has_sub_command = false;
 
-                // Loop over the arguments handling flags in a special way
-                while let Some(arg) = args_iter.next() {
-                    // Ignore the sub command
-                    if !has_sub_command && arg == manager.sub_command() {
-                        has_sub_command = true;
-                        continue;
-                    }
+                        // Loop over the arguments handling flags in a special way
+                        while let Some(arg) = args_iter.next() {
+                            // Ignore the sub command
+                            if !has_sub_command && manager.sub_commands().contains(&arg) {
+                                has_sub_command = true;
+                                continue;
+                            }
 
-                    // Check if the argument is a flag
-                    if arg.chars().nth(0) == Some('-') {
-                        // If it's a flag we need to capture keep track of it
-                        if manager.capture_flags().contains(&arg) {
-                            catched_flags.push(arg.to_string());
+                            // Check if the argument is a flag
+                            if arg.chars().nth(0) == Some('-') {
+                                // If it's a flag we need to capture keep track of it
+                                if manager.capture_flags().contains(&arg) {
+                                    catched_flags.push(arg.to_string());
+                                }
+
+                                // If it's a flag containing an extra arguments besides it skip one
+                                if manager.known_flags_with_values().contains(&arg) {
+                                    // Skip the next item
+                                    args_iter.next();
+                                    continue;
+                                }
+                            } else {
+                                // We've found a package
+                                package_strings.push(arg.to_string());
+                            }
                         }
 
-                        // If it's a flag containing an extra arguments besides it skip one
-                        if manager.known_flags_with_values().contains(&arg) {
-                            // Skip the next item
-                            args_iter.next();
-                            continue;
+                        // No installation subcommand means no packages
+                        if !has_sub_command {
+                            return vec![];
                         }
-                    } else {
-                        // We've found a package
-                        package_strings.push(arg.to_string());
+
+                        // Now convert it into actual packages
+                        package_strings
+                            .into_iter()
+                            .map(|name| Package::new(self, name, catched_flags.clone()))
+                            .collect()
                     }
+                    // Package manager command was the last word of the line
+                    None => vec![],
                 }
-
-                // No installation subcommand means no packages
-                if !has_sub_command {
-                    return vec![];
-                }
-
-                // Now convert it into actual packages
-                package_strings
-                    .into_iter()
-                    .map(|name| Package::new(self, name, catched_flags.clone()))
-                    .collect()
-            }
-            // Package manager command was the last word of the line
-            None => vec![],
-        }
+            })
+            .flatten()
+            .collect()
     }
 
     /// Return the package manager trait object depending on the enum variant.
@@ -131,11 +151,11 @@ pub trait PackageManagerTrait:
     /// A descriptive name.
     fn full_name(self) -> &'static str;
 
-    /// The command-line word to invoke the package manager.
-    fn command(self) -> &'static str;
+    /// The command-line word(s) to invoke the package manager.
+    fn commands(self) -> Vec<&'static str>;
 
-    /// The command-line subcommand that's used to catch installing new packages.
-    fn sub_command(self) -> &'static str;
+    /// The command-line subcommand(s) that's used to catch installing new packages.
+    fn sub_commands(self) -> Vec<&'static str>;
 
     /// Command that's used to install new packages.
     fn install_command(self) -> &'static str;

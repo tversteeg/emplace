@@ -8,12 +8,12 @@ impl PackageManagerTrait for Apt {
         "Advance Package Tool"
     }
 
-    fn command(self) -> &'static str {
-        "apt"
+    fn commands(self) -> Vec<&'static str> {
+        vec!["apt", "apt-get"]
     }
 
-    fn sub_command(self) -> &'static str {
-        "install"
+    fn sub_commands(self) -> Vec<&'static str> {
+        vec!["install"]
     }
 
     fn install_command(self) -> &'static str {
