@@ -1,6 +1,5 @@
-use crate::{package::PackageSource, public_clap_app};
+use crate::public_clap_app;
 use std::{env, error::Error, io};
-use strum::IntoEnumIterator;
 
 pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
     let exe_path = env::current_exe()?
@@ -14,17 +13,11 @@ pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
         "fish" => (FISH_CHECK, FISH_INIT, clap::Shell::Fish),
         _ => panic!("Shell \"{}\" is not supported at the moment", shell_name),
     };
-    // Get all the different package sources and replace them into the check strings
-    let checks: String = PackageSource::iter()
-        .filter(|s| s.command() != "")
-        .map(|s| check_str.replace("## EMPLACE ##", s.command()))
-        .collect::<Vec<String>>()
-        .join(" || ");
 
-    let script = setup_script
-        .replace("## EMPLACE ##", &format!("\"{}\"", exe_path))
-        .replace("## EMPLACE_CHECKS ##", &*checks);
-    println!("{}", script);
+    println!(
+        "{}",
+        setup_script.replace("## EMPLACE ##", &format!("\"{}\"", exe_path))
+    );
 
     // Print the completions
     public_clap_app().gen_completions_to("emplace", shell, &mut io::stdout());
@@ -37,11 +30,7 @@ emplace_postexec_invoke_exec () {
     # quit when the previous command failed
     [ -z "$!" ] && exit $?
 
-    local hist=`history 1`
-    # optimization to check quickly for strings
-    ## EMPLACE_CHECKS ## || $(exit $?);
-
-    local this_command=`HISTTIMEFORMAT= echo $hist | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
+    local this_command=`HISTTIMEFORMAT= echo `history 1` | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
     ## EMPLACE ## catch "$this_command"
 }
 PROMPT_COMMAND="emplace_postexec_invoke_exec;$PROMPT_COMMAND"
@@ -54,11 +43,7 @@ emplace_precmd() {
     # quit when the previous command failed
     [ -z "$!" ] && exit
 
-    local hist=`history -1`
-    # optimization to check quickly for strings
-    ## EMPLACE_CHECKS ## || return;
-
-    local this_command=`HISTTIMEFORMAT= echo $hist | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
+    local this_command=`HISTTIMEFORMAT= echo `history -1` | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
     ## EMPLACE ## catch "$this_command"
 }
 # Don't hook them double in nested shells
@@ -75,8 +60,6 @@ function emplace_postcmd --on-event fish_postexec
     if test $status -gt 0
         return
     end
-
-    # optimization disabled
 
     ## EMPLACE ## catch "$argv"
 end

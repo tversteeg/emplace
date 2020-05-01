@@ -1,26 +1,16 @@
-mod catch;
 mod command;
-mod config;
-mod git;
+//mod config;
+//mod git;
 mod init;
-mod install;
+//mod install;
 mod package;
 mod package_manager;
-mod repo;
+//mod repo;
 
-use anyhow::Result;
-use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
-use colored::*;
-use log::{error, info};
+use crate::{package::Packages, package_manager::PackageManager};
+use anyhow::{Context, Result};
+use clap::{App, AppSettings, Arg, SubCommand};
 use simplelog::{LevelFilter, TermLogger, TerminalMode};
-
-use crate::package::{Package, Packages};
-use config::Config;
-use itertools::Itertools;
-use repo::Repo;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
 
 fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
     App::new("emplace")
@@ -41,7 +31,7 @@ fn main() -> Result<()> {
         simplelog::Config::default(),
         TerminalMode::Mixed,
     )
-    .expect("No interactive terminal");
+    .context("No interactive terminal")?;
 
     let matches = public_clap_app()
 		.subcommand(
@@ -80,14 +70,21 @@ fn main() -> Result<()> {
 
     match matches.subcommand() {
         ("init", Some(sub_m)) => {
-            let shell_name = sub_m.value_of("shell").expect("Shell name is missing.");
+            let shell_name = sub_m.value_of("shell").context("Shell name is missing.")?;
             init::init_main(shell_name).expect("Could not initialize terminal script");
         }
         ("catch", Some(sub_m)) => {
-            let line = sub_m.value_of("line").expect("Line is missing");
-            let catches = catch::catch(line).expect("Could not parse line");
-            catch_processing(catches)?
+            let line = sub_m.value_of("line").context("Line is missing")?;
+
+            // Do a quick check so it won't stall the terminal
+            if !PackageManager::detects_line(line) {
+                return Ok(());
+            }
+
+            // Get the packages from this line
+            let packages = Packages::from_line(line);
         }
+        /*
         ("install", Some(_)) => {
             // Get the config
             let config = match Config::from_default_file().expect("Retrieving config went wrong") {
@@ -135,12 +132,14 @@ fn main() -> Result<()> {
             };
         }
         ("history", Some(path)) => history_processing(path)?,
+        */
         (&_, _) => {}
     };
 
     Ok(())
 }
 
+/*
 fn history_processing(matches: &ArgMatches) -> Result<()> {
     let histpath = PathBuf::from(
         &matches
@@ -269,3 +268,4 @@ fn catch_processing(mut catches: Packages) -> Result<()> {
     repo.mirror(catches).expect("Could not mirror commands");
     Ok(())
 }
+*/
