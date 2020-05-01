@@ -1,16 +1,11 @@
-#[macro_use]
-extern crate clap;
-#[macro_use]
-extern crate strum_macros;
-#[macro_use]
-extern crate lazy_static;
-
 mod catch;
+mod command;
 mod config;
 mod git;
 mod init;
 mod install;
 mod package;
+mod package_manager;
 mod repo;
 
 use anyhow::Result;
@@ -29,8 +24,8 @@ use std::path::PathBuf;
 
 fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
     App::new("emplace")
-        .version(crate_version!())
-        .author(crate_authors!())
+        .version(clap::crate_version!())
+        .author(clap::crate_authors!())
         .after_help("https://github.com/tversteeg/emplace")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(

@@ -1,3 +1,4 @@
+use crate::package_manager::PackageManager;
 use anyhow::Context;
 use colored::*;
 use itertools::Itertools;
@@ -39,7 +40,7 @@ pub enum PackageSource {
     Pip3User,
     /// Node Package Manager
     Npm,
-    ///AUR Helper written in go
+    /// AUR Helper written in go
     Yay,
     /// NixOS Nix
     Nix,
@@ -64,13 +65,6 @@ impl PackageSource {
             PackageSource::Yay => "AUR Helper written in go",
             PackageSource::Nix => "Nix",
         }
-    }
-
-    pub fn colour_full_name(self) -> String {
-        format!("({})", self.full_name())
-            .cyan()
-            .italic()
-            .to_string()
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -197,6 +191,13 @@ impl PackageSource {
             PackageSource::Nix => false,
         }
     }
+
+    pub fn colour_full_name(self) -> String {
+        format!("({})", self.full_name())
+            .cyan()
+            .italic()
+            .to_string()
+    }
 }
 
 impl fmt::Display for PackageSource {
@@ -216,7 +217,7 @@ impl Eq for PackageSource {}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Package {
     /// The package manager's name.
-    pub source: PackageSource,
+    pub source: PackageManager,
     /// A list of packages that are going to be installed.
     pub name: String,
     /// The name without the flags.
