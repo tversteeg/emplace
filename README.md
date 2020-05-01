@@ -25,6 +25,7 @@
     | OS | Package Manager |
     | :---: | --- |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/debian.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/ubuntu.svg" width="18" height="18" /> | Apt |
+    | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/nixos.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/linux.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/apple.svg" width="18" height="18" /> | Nix |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | Pacman |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | RUA |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | Yay |
@@ -128,10 +129,10 @@ pip3 install --user termtosvg
 choco install neovim
 # -- or --
 scoop install curl
+# -- or --
+nix-env -iA nixpkgs.nixfmt
 ```
-### History analysis
-Invoke `emplace history $HISTFILE` or `emplace history /path/to/history/file`.   
-It will parse your history and prompt to select, which packages do you want to synchronize. 
+
 ### Synchronizing On Another Machine
 
 Just invoke `emplace install`, and you will be prompted with the packages to install:
@@ -139,6 +140,11 @@ Just invoke `emplace install`, and you will be prompted with the packages to ins
 ```sh
 emplace install
 ```
+
+### History Analysis
+
+Invoke `emplace history $HISTFILE` or `emplace history /path/to/history/file`.   
+It will parse your history and prompt to select, which packages you want to synchronize. 
 
 ### Removing Synchronized Packages
 
@@ -153,8 +159,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/lberrymage"><img src="https://avatars0.githubusercontent.com/u/46338569?v=4" width="100px;" alt=""/><br /><sub><b>Logan Magee</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/issues?q=author%3Alberrymage" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://github.com/0xd34b33f"><img src="https://avatars2.githubusercontent.com/u/32823131?v=4" width="100px;" alt=""/><br /><sub><b>Vladimir</b></sub></a><br /><a href="#platform-0xd34b33f" title="Packaging/porting to new platform">📦</a></td>
+    <td align="center"><a href="https://github.com/lberrymage"><img src="https://avatars0.githubusercontent.com/u/46338569?v=4" width="100px;" alt=""/><br /><sub><b>Logan Magee</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/commits?author=lberrymage" title="Code">💻</a> <a href="https://github.com/tversteeg/emplace/issues?q=author%3Alberrymage" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/0xd34b33f"><img src="https://avatars2.githubusercontent.com/u/32823131?v=4" width="100px;" alt=""/><br /><sub><b>Vladimir</b></sub></a><br /><a href="#platform-0xd34b33f" title="Packaging/porting to new platform">📦</a> <a href="https://github.com/tversteeg/emplace/commits?author=0xd34b33f" title="Code">💻</a> <a href="https://github.com/tversteeg/emplace/issues?q=author%3A0xd34b33f" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://stackoverflow.com/users/story/4363604"><img src="https://avatars3.githubusercontent.com/u/1708197?v=4" width="100px;" alt=""/><br /><sub><b>Jozef Hollý</b></sub></a><br /><a href="#ideas-j2ghz" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://blog.brightone.space"><img src="https://avatars1.githubusercontent.com/u/12615679?v=4" width="100px;" alt=""/><br /><sub><b>Oleksii Filonenko</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/commits?author=filalex77" title="Code">💻</a> <a href="#platform-filalex77" title="Packaging/porting to new platform">📦</a></td>
   </tr>
 </table>
 

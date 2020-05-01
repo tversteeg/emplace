@@ -11,8 +11,9 @@
       "avatar_url": "https://avatars0.githubusercontent.com/u/46338569?v=4",
       "profile": "https://github.com/lberrymage",
       "contributions": [
+        "code",
         "bug"
-       ]
+      ]
     },
     {
       "login": "0xd34b33f",
@@ -20,6 +21,27 @@
       "avatar_url": "https://avatars2.githubusercontent.com/u/32823131?v=4",
       "profile": "https://github.com/0xd34b33f",
       "contributions": [
+        "platform",
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "j2ghz",
+      "name": "Jozef Hollý",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1708197?v=4",
+      "profile": "https://stackoverflow.com/users/story/4363604",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "filalex77",
+      "name": "Oleksii Filonenko",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/12615679?v=4",
+      "profile": "https://blog.brightone.space",
+      "contributions": [
+        "code",
         "platform"
       ]
     }
