@@ -12,8 +12,8 @@ macro_rules! catch {
             // Create an iterator for the catches
             let mut packages = manager.catch($line).into_iter();
             $(
-                let package = packages.next().unwrap();
-                assert_eq!($package, package.full_command());
+                let package = packages.next().expect("Expected package not catched");
+                assert_eq!($package, package.name(), "Package \"{}\" should be matched, but it's not", package.full_command());
             )*
             assert!(packages.next().is_none());
         }
@@ -27,7 +27,7 @@ macro_rules! catch {
             // Create an iterator for the catches
             let mut packages = manager.catch($line).into_iter();
             $(
-                let package = packages.next().unwrap();
+                let package = packages.next().expect("Expected package not catched");
                 assert_eq!($package, package.name(), "Package \"{}\" should be matched, but it's not", package.full_command());
 
                 catch!(package, $flags);

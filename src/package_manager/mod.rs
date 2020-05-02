@@ -2,8 +2,10 @@
 pub mod test_macro;
 
 mod apt;
+mod cargo;
 
 use apt::Apt;
+use cargo::Cargo;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -16,6 +18,7 @@ use strum_macros::EnumIter;
 #[derive(Debug, Copy, Clone, Eq, PartialEq, EnumIter, Serialize, Deserialize)]
 pub enum PackageManager {
     Apt,
+    Cargo,
 }
 
 /// Trait that needs to be implemented for a new package manager.
