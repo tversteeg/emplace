@@ -1,14 +1,6 @@
 use crate::package_manager::PackageManager;
-use anyhow::Context;
 use itertools::Itertools;
-use run_script::ScriptOptions;
-use std::{
-    cmp::Ordering,
-    error::Error,
-    fmt, iter,
-    slice::{Iter, IterMut},
-    string::String,
-};
+use std::{iter, string::String};
 
 #[derive(Debug, Clone)]
 pub struct Package {
@@ -30,9 +22,14 @@ impl Package {
         }
     }
 
+    /// Only the package name.
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     /// The name including the flags.
     pub fn full_command(&self) -> String {
-        iter::once(&self.name).chain(self.flags.iter()).join(" ")
+        self.flags.iter().chain(iter::once(&self.name)).join(" ")
     }
 }
 

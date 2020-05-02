@@ -3,11 +3,12 @@ mod command;
 //mod git;
 mod init;
 //mod install;
+mod catch;
 mod package;
 mod package_manager;
+mod package_manager_impl;
 //mod repo;
 
-use crate::{package::Packages, package_manager::PackageManager};
 use anyhow::{Context, Result};
 use clap::{App, AppSettings, Arg, SubCommand};
 use simplelog::{LevelFilter, TermLogger, TerminalMode};
@@ -71,18 +72,13 @@ fn main() -> Result<()> {
     match matches.subcommand() {
         ("init", Some(sub_m)) => {
             let shell_name = sub_m.value_of("shell").context("Shell name is missing.")?;
-            init::init_main(shell_name).expect("Could not initialize terminal script");
+
+            init::init_main(shell_name)
         }
         ("catch", Some(sub_m)) => {
             let line = sub_m.value_of("line").context("Line is missing")?;
 
-            // Do a quick check so it won't stall the terminal
-            if !PackageManager::detects_line(line) {
-                return Ok(());
-            }
-
-            // Get the packages from this line
-            let packages = Packages::from_line(line);
+            catch::catch(line)
         }
         /*
         ("install", Some(_)) => {
@@ -133,10 +129,8 @@ fn main() -> Result<()> {
         }
         ("history", Some(path)) => history_processing(path)?,
         */
-        (&_, _) => {}
-    };
-
-    Ok(())
+        (&_, _) => Ok(()),
+    }
 }
 
 /*

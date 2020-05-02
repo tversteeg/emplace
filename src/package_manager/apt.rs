@@ -49,8 +49,23 @@ mod tests {
 
     #[test]
     fn test_catch() {
+        // Regular invocation
         catch!(PackageManager::Apt, "sudo apt install test" => "test");
+        catch!(PackageManager::Apt, "apt install test" => "test");
+        catch!(PackageManager::Apt, "sudo apt-get install test" => "test");
+        catch!(PackageManager::Apt, "sudo apt install lib32gfortran5-x32-cross" => "lib32gfortran5-x32-cross");
+        catch!(PackageManager::Apt, "sudo apt install linux-perf-5.3" => "linux-perf-5.3");
+
+        // Multiple
         catch!(PackageManager::Apt, "sudo apt install test test2" => "test", "test2");
+
+        // Ignore
         catch!(PackageManager::Apt, "sudo apt test test2" => ());
+
+        // With flags
+        catch!(PackageManager::Apt, "sudo apt -qq install test" => "test");
+        catch!(PackageManager::Apt, "sudo apt install -f" => ());
+        catch!(PackageManager::Apt, "sudo apt install test -f" => "test");
+        catch!(PackageManager::Apt, "sudo apt install -c file test" => "test");
     }
 }

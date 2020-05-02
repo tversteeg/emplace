@@ -1,16 +1,17 @@
 use crate::public_clap_app;
-use std::{env, error::Error, io};
+use anyhow::Result;
+use std::{env, io};
 
-pub fn init_main(shell_name: &str) -> Result<(), Box<dyn Error>> {
+pub fn init_main(shell_name: &str) -> Result<()> {
     let exe_path = env::current_exe()?
         .into_os_string()
         .into_string()
         .expect("Could not convert path to string");
 
-    let (check_str, setup_script, shell) = match shell_name {
-        "bash" => (BASH_CHECK, BASH_INIT, clap::Shell::Bash),
-        "zsh" => (ZSH_CHECK, ZSH_INIT, clap::Shell::Zsh),
-        "fish" => (FISH_CHECK, FISH_INIT, clap::Shell::Fish),
+    let (setup_script, shell) = match shell_name {
+        "bash" => (BASH_INIT, clap::Shell::Bash),
+        "zsh" => (ZSH_INIT, clap::Shell::Zsh),
+        "fish" => (FISH_INIT, clap::Shell::Fish),
         _ => panic!("Shell \"{}\" is not supported at the moment", shell_name),
     };
 
@@ -36,8 +37,6 @@ emplace_postexec_invoke_exec () {
 PROMPT_COMMAND="emplace_postexec_invoke_exec;$PROMPT_COMMAND"
 "##;
 
-const BASH_CHECK: &str = "[[ $hist == *\"## EMPLACE ##\"* ]]";
-
 const ZSH_INIT: &str = r##"
 emplace_precmd() {
     # quit when the previous command failed
@@ -52,8 +51,6 @@ if [[ ${precmd_functions[(ie)emplace_precmd]} -gt ${#precmd_functions} ]]; then
 fi
 "##;
 
-const ZSH_CHECK: &str = "[[ $hist == *\"## EMPLACE ##\"* ]]";
-
 const FISH_INIT: &str = r##"
 function emplace_postcmd --on-event fish_postexec
     # quit when the previous command failed
@@ -64,5 +61,3 @@ function emplace_postcmd --on-event fish_postexec
     ## EMPLACE ## catch "$argv"
 end
 "##;
-
-const FISH_CHECK: &str = "";
