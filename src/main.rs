@@ -1,13 +1,13 @@
 mod command;
 mod config;
-//mod git;
+mod git;
 mod init;
 //mod install;
 mod catch;
 mod package;
 mod package_manager;
 mod package_manager_impl;
-//mod repo;
+mod repo;
 
 use anyhow::{Context, Result};
 use clap::{App, AppSettings, Arg, SubCommand};

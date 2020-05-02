@@ -1,5 +1,6 @@
+use crate::{config::Config, git, package::Packages};
 use anyhow::{Context, Result};
-use log::info;
+use log::debug;
 use ron::{
     de::from_str,
     ser::{to_string_pretty, PrettyConfig},
@@ -10,10 +11,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::config::Config;
-use crate::git;
-use crate::package::Packages;
-
+/// Git repository where the emplace file lives.
+#[derive(Debug)]
 pub struct Repo {
     config: Config,
     path: PathBuf,
@@ -21,6 +20,8 @@ pub struct Repo {
 
 impl Repo {
     pub fn new(config: Config) -> Result<Self> {
+        debug!("Retrieving repository");
+
         let repo_directory = config.repo_directory.clone();
         let repo_url = config.repo.url.clone();
         let repo_branch = config.repo.branch.clone();
@@ -30,19 +31,19 @@ impl Repo {
 
         let repo_exists = path.join(".git").exists();
         if repo_exists {
-            info!("Opening existing repo: \"{}\".", path_str);
+            println!("Opening Emplace repo: \"{}\".", path_str);
 
-            git::pull(&path, false)?;
+            git::pull(&path, &repo_branch)?;
         } else {
-            info!("Cloning repo \"{}\" to \"{}\".", repo_url, path_str);
+            println!("Cloning Emplace repo \"{}\" to \"{}\".", repo_url, path_str);
 
             fs::create_dir_all(path)?;
-            git::clone_single_branch(&path, &*repo_url, &*repo_branch, false)?;
+            git::clone_single_branch(&path, &*repo_url, &*repo_branch)?;
 
             // Create the emplace file if it doesn't exist
             let emplace_file = config.full_file_path();
             if !emplace_file.exists() {
-                let empty_packages = Packages(vec![]);
+                let empty_packages = Packages::empty();
                 let toml_string = to_string_pretty(&empty_packages, Repo::pretty_config())?;
                 fs::write(&emplace_file, toml_string)?;
             }
@@ -61,10 +62,11 @@ impl Repo {
 
         // Read the contents
         let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
+        file.read_to_string(&mut contents)
+            .context("reading packages from repository")?;
 
         // Deserialize the file into the struct
-        Ok(from_str(&*contents)?)
+        Ok(from_str(&*contents).context("reading packages from repository")?)
     }
 
     pub fn mirror(&self, mut commands: Packages) -> Result<()> {
@@ -85,12 +87,12 @@ impl Repo {
 
         fs::write(&full_path, toml_string)?;
 
-        info!("Commiting with message \"{}\".", commit_msg);
-        git::add_file(&self.path, &*self.config.repo.file, false)?;
-        git::commit_all(&self.path, &*commit_msg, false, false)?;
+        println!("Commiting with message \"{}\".", commit_msg);
+        git::add_file(&self.path, &*self.config.repo.file)?;
+        git::commit_all(&self.path, &*commit_msg, false)?;
 
-        info!("Pushing to remote.");
-        git::push(&self.path, false)?;
+        println!("Pushing to remote.");
+        git::push(&self.path)?;
 
         Ok(())
     }
@@ -103,12 +105,12 @@ impl Repo {
         fs::write(&full_path, toml_string)?;
 
         let commit_msg = "Emplace - clean packages";
-        info!("Commiting with message \"{}\".", commit_msg);
-        git::add_file(&self.path, &*self.config.repo.file, false)?;
-        git::commit_all(&self.path, &*commit_msg, false, false)?;
+        println!("Commiting with message \"{}\".", commit_msg);
+        git::add_file(&self.path, &*self.config.repo.file)?;
+        git::commit_all(&self.path, &*commit_msg, false)?;
 
-        info!("Pushing to remote.");
-        git::push(&self.path, false)?;
+        println!("Pushing to remote.");
+        git::push(&self.path)?;
 
         Ok(())
     }

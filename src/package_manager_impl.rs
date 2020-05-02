@@ -4,7 +4,7 @@ use crate::{
 };
 use anyhow::{Context, Result};
 use run_script::ScriptOptions;
-use std::fmt;
+use std::{cmp::Ordering, fmt};
 use strum::IntoEnumIterator;
 
 impl PackageManager {
@@ -65,7 +65,7 @@ impl PackageManager {
                 match line.split(&format!("{} ", command)).skip(1).next() {
                     Some(rest_of_line) => {
                         // Split all arguments
-                        let mut args_iter = rest_of_line.split_ascii_whitespace();
+                        let mut args_iter = rest_of_line.split_ascii_whitespace().peekable();
 
                         // The resulting packages strings
                         let mut package_strings = vec![];
@@ -87,8 +87,31 @@ impl PackageManager {
                             // Check if the argument is a flag
                             if arg.chars().nth(0) == Some('-') {
                                 // If it's a flag we need to capture keep track of it
-                                if manager.capture_flags().contains(&arg) {
-                                    catched_flags.push(arg.to_string());
+                                let next_arg = args_iter.peek();
+                                if let Some((flag_first, flag_second)) = manager
+                                    .capture_flags()
+                                    .iter()
+                                    // Compare the first and optionally the second flags to the
+                                    // current and the next arguments
+                                    .find(|(flag_first, flag_second)| {
+                                        &arg == flag_first
+                                            && (next_arg.is_none()
+                                                || *next_arg.unwrap_or(&"")
+                                                    == flag_second.unwrap_or(""))
+                                    })
+                                {
+                                    catched_flags.push(match flag_second {
+                                        Some(flag_second) => {
+                                            // Skip the next item since it's the second flag
+                                            args_iter.next();
+                                            format!("{} {}", flag_first, flag_second)
+                                        }
+                                        None => format!("{}", flag_first),
+                                    });
+
+                                    // Continue since we captured the flag, don't need to do
+                                    // anything with it after that
+                                    continue;
                                 }
 
                                 // If it's a flag containing an extra arguments besides it skip one
@@ -121,10 +144,9 @@ impl PackageManager {
             .flatten()
             .collect()
     }
-}
 
-impl fmt::Display for PackageManager {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({})", self.get().full_name())
+    /// The full name of the package manager.
+    pub fn full_name(self) -> &'static str {
+        self.get().full_name()
     }
 }

@@ -1,6 +1,6 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use log::info;
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std::{
     fs::{self, File},
     io::Read,

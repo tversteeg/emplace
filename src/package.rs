@@ -1,14 +1,17 @@
 use crate::package_manager::PackageManager;
+use colored::Colorize;
 use itertools::Itertools;
-use std::{iter, ops::Deref, string::String};
+use serde::{Deserialize, Serialize};
+use std::{cmp::Ordering, iter, ops::Deref, string::String};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Package {
     /// The package manager this package belongs to.
     source: PackageManager,
     /// Name of this package.
     name: String,
     /// A list of command line flags this package should be installed with.
+    #[serde(default)]
     flags: Vec<String>,
 }
 
@@ -31,12 +34,52 @@ impl Package {
     pub fn full_command(&self) -> String {
         self.flags.iter().chain(iter::once(&self.name)).join(" ")
     }
+
+    /// The full name in fancy colors.
+    pub fn color_full_name(&self) -> String {
+        if self.flags.is_empty() {
+            format!(
+                "{} ({})",
+                self.name.yellow(),
+                self.source.full_name().green()
+            )
+        } else {
+            format!(
+                "{} ({} {})",
+                self.name.yellow(),
+                self.source.full_name().green(),
+                self.flags.iter().join(" ").dimmed()
+            )
+        }
+    }
+
+    /// The command line flags.
+    pub fn flags(&self) -> &Vec<String> {
+        &self.flags
+    }
 }
 
-#[derive(Debug, Clone)]
+impl Ord for Package {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.full_command().cmp(&other.full_command())
+    }
+}
+
+impl PartialOrd for Package {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Packages(Vec<Package>);
 
 impl Packages {
+    /// An empty list.
+    pub fn empty() -> Self {
+        Self(vec![])
+    }
+
     /// Parse a line into a list of packages.
     pub fn from_line(line: &str) -> Self {
         // First we split the line into separating characters
@@ -65,6 +108,36 @@ impl Packages {
             .collect();
 
         Self(lines)
+    }
+
+    /// Get the union of this and another list of packages.
+    pub fn merge(&mut self, other: &mut Packages) {
+        // Add the other packages
+        self.0.append(&mut other.0);
+
+        // Sort them so we can remove deduplicates
+        self.0.sort();
+        // Remove the duplicates
+        self.0.dedup();
+    }
+
+    /// Remove all packages that have been saved already.
+    pub fn filter_saved_packages(&mut self, old: &Packages) {
+        self.0 = self
+            .0
+            .iter()
+            .filter(|package| !old.iter().any(|old_package| *package == old_package))
+            .cloned()
+            .collect();
+    }
+
+    /// Construct a commit message depending on the amount of packages that need to be committed.
+    pub fn commit_message(&self) -> String {
+        match self.0.len() {
+            0 => panic!("Can't create a commit message for empty changes"),
+            1 => format!("Emplace - mirror package \"{}\"", self.0[0].full_command()),
+            n => format!("Emplace - mirror {} packages", n),
+        }
     }
 }
 

@@ -32,8 +32,8 @@ impl PackageManagerTrait for Apt {
         vec!["-c", "--config-file", "-o", "--option", "-q", "--quiet"]
     }
 
-    fn capture_flags(self) -> Vec<&'static str> {
-        vec!["-t experimental"]
+    fn capture_flags(self) -> Vec<(&'static str, Option<&'static str>)> {
+        vec![("-t", Some("experimental"))]
     }
 }
 
@@ -62,10 +62,13 @@ mod tests {
         // Ignore
         catch!(PackageManager::Apt, "sudo apt test test2" => ());
 
-        // With flags
+        // Flags with another regular argument
         catch!(PackageManager::Apt, "sudo apt -qq install test" => "test");
         catch!(PackageManager::Apt, "sudo apt install -f" => ());
         catch!(PackageManager::Apt, "sudo apt install test -f" => "test");
         catch!(PackageManager::Apt, "sudo apt install -c file test" => "test");
+
+        // Flags that should be captured
+        catch!(PackageManager::Apt, "sudo apt install -t experimental test" => "test" ["-t experimental"]);
     }
 }
