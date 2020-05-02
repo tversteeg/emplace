@@ -1,50 +1,26 @@
-mod apt;
-
 #[macro_use]
 pub mod test_macro;
 
+mod apt;
+
+use apt::Apt;
+
 use serde::{Deserialize, Serialize};
-use std::{fmt, path::PathBuf};
+use std::path::PathBuf;
 use strum_macros::EnumIter;
 
 /// Enum containing all package managers.
 ///
 /// The actual functions are implemented in `src/package_manager_impl.rs`.
+#[enum_dispatch::enum_dispatch]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, EnumIter, Serialize, Deserialize)]
 pub enum PackageManager {
     Apt,
-    Cargo,
-    RustupComponent,
-    Pacman,
-    Rua,
-    Snap,
-    Chocolatey,
-    Scoop,
-    Pip,
-    Pip3,
-    Npm,
-    Yay,
-    Nix,
-
-    // Deprecated
-    PipUser,
-    Pip3User,
-}
-
-impl PackageManager {
-    /// Return the package manager trait object depending on the enum variant.
-    pub fn get(self) -> impl PackageManagerTrait {
-        match self {
-            PackageManager::Apt => apt::Apt,
-            _ => todo!("package manager is not implemented yet"),
-        }
-    }
 }
 
 /// Trait that needs to be implemented for a new package manager.
-pub trait PackageManagerTrait:
-    fmt::Debug + Default + Copy + Clone + Eq + PartialEq + Sized
-{
+#[enum_dispatch::enum_dispatch(PackageManager)]
+pub trait PackageManagerTrait {
     /// A descriptive name.
     fn full_name(self) -> &'static str;
 
@@ -81,9 +57,7 @@ pub trait PackageManagerTrait:
     /// }
     /// # }
     /// ```
-    fn capture_flags(self) -> Vec<(&'static str, Option<&'static str>)> {
-        vec![]
-    }
+    fn capture_flags(self) -> Vec<(&'static str, Option<&'static str>)>;
 }
 
 /// The way a package is checked if it's installed.
@@ -92,4 +66,17 @@ pub enum PackageInstalledMethod {
     Script(String),
     /// A file or directory on the filesystem is checked for existence.
     Path(PathBuf),
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        catch,
+        package_manager::{apt::Apt, PackageManager},
+    };
+
+    #[test]
+    fn test_empty() {
+        catch!(PackageManager::from(Apt), "no match" => ());
+    }
 }

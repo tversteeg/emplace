@@ -4,7 +4,6 @@ use crate::{
 };
 use anyhow::{Context, Result};
 use run_script::ScriptOptions;
-use std::{cmp::Ordering, fmt};
 use strum::IntoEnumIterator;
 
 impl PackageManager {
@@ -19,7 +18,6 @@ impl PackageManager {
         Self::iter().find(|manager| {
             // Iterate over all commands
             manager
-                .get()
                 .commands()
                 .into_iter()
                 // Find the command that's in the file
@@ -29,8 +27,8 @@ impl PackageManager {
     }
 
     /// Check whether a package is already installed.
-    pub fn is_installed(self, package: &Package) -> Result<bool> {
-        match self.get().is_installed(package.name()) {
+    pub fn package_is_installed(self, package: &Package) -> Result<bool> {
+        match self.is_installed(package.name()) {
             PackageInstalledMethod::Script(script) => {
                 // Run the installation script
                 let mut options = ScriptOptions::new();
@@ -52,11 +50,8 @@ impl PackageManager {
 
     /// Extract the packages from the line.
     pub fn catch(self, line: &str) -> Vec<Package> {
-        let manager = self.get();
-
         // Try all different commands
-        manager
-            .commands()
+        self.commands()
             .iter()
             .map(|command| {
                 // Get the part right of the package manager invocation
@@ -79,7 +74,7 @@ impl PackageManager {
                         // Loop over the arguments handling flags in a special way
                         while let Some(arg) = args_iter.next() {
                             // Ignore the sub command
-                            if !has_sub_command && manager.sub_commands().contains(&arg) {
+                            if !has_sub_command && self.sub_commands().contains(&arg) {
                                 has_sub_command = true;
                                 continue;
                             }
@@ -88,7 +83,7 @@ impl PackageManager {
                             if arg.chars().nth(0) == Some('-') {
                                 // If it's a flag we need to capture keep track of it
                                 let next_arg = args_iter.peek();
-                                if let Some((flag_first, flag_second)) = manager
+                                if let Some((flag_first, flag_second)) = self
                                     .capture_flags()
                                     .iter()
                                     // Compare the first and optionally the second flags to the
@@ -115,7 +110,7 @@ impl PackageManager {
                                 }
 
                                 // If it's a flag containing an extra arguments besides it skip one
-                                if manager.known_flags_with_values().contains(&arg) {
+                                if self.known_flags_with_values().contains(&arg) {
                                     // Skip the next item
                                     args_iter.next();
                                     continue;
@@ -144,9 +139,15 @@ impl PackageManager {
             .flatten()
             .collect()
     }
+}
 
-    /// The full name of the package manager.
-    pub fn full_name(self) -> &'static str {
-        self.get().full_name()
+#[cfg(test)]
+mod tests {
+    use crate::package_manager::PackageManager;
+
+    #[test]
+    fn test_detect() {
+        assert!(PackageManager::detects_line("apt install test"));
+        assert!(!PackageManager::detects_line("something"));
     }
 }

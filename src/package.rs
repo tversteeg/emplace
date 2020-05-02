@@ -1,4 +1,4 @@
-use crate::package_manager::PackageManager;
+use crate::package_manager::{PackageManager, PackageManagerTrait};
 use colored::Colorize;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
