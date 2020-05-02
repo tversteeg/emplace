@@ -221,9 +221,12 @@ dependencies = [
  "itertools",
  "log",
  "run_script",
+ "serde",
+ "serde_derive",
  "simplelog",
  "strum",
  "strum_macros",
+ "toml",
  "toml_edit",
 ]
 
@@ -461,6 +464,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde"
+version = "1.0.106"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36df6ac6412072f67cf767ebbde4133a5b2e88e76dc6187fa7104cd16f783399"
+
+[[package]]
+name = "serde_derive"
+version = "1.0.106"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e549e3abf4fb8621bd1609f11dfc9f5e50320802273b12f3811a67e6716ea6c"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "simplelog"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -566,6 +586,15 @@ checksum = "ca8a50ef2360fbd1eeb0ecd46795a87a19024eb4b53c5dc916ca1fd95fe62438"
 dependencies = [
  "libc",
  "winapi",
+]
+
+[[package]]
+name = "toml"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ffc92d160b1eef40665be3a05630d003936a3bc7da7421277846c2613e92c71a"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
