@@ -1,19 +1,18 @@
+use anyhow::{anyhow, Result};
 use log::info;
-use serde::{Deserialize, Serialize};
 use std::{
-    error::Error,
     fs::{self, File},
     io::Read,
     path::{Path, PathBuf},
     string::String,
 };
+use toml_edit::{Document, Item, Table, Value};
 
-#[derive(Debug, Serialize, Deserialize)]
+/// Repository specific configuration.
+#[derive(Debug)]
 pub struct RepoConfig {
     pub url: String,
-    #[serde(default = "RepoConfig::default_branch")]
     pub branch: String,
-    #[serde(default = "RepoConfig::default_file")]
     pub file: String,
 }
 
@@ -24,6 +23,42 @@ impl RepoConfig {
             branch: RepoConfig::default_branch(),
             file: RepoConfig::default_file(),
         }
+    }
+
+    /// Construct the config from a TOML table, use default values if they are missing.
+    fn from_toml(table: &Table) -> Result<Option<Self>> {
+        // Get the section
+        let section = match table.get("repo") {
+            Some(section) => section,
+            None => return Ok(None),
+        }
+        .as_table()
+        .ok_or_else(|| anyhow!("repo is not a section"))?;
+
+        let url = section
+            .get("url")
+            .ok_or_else(|| anyhow!("repo.url value is missing"))?
+            .as_str()
+            .ok_or_else(|| anyhow!("repo.url value is not a string"))?
+            .to_string();
+
+        let branch = section
+            .get("branch")
+            // If we couldn't get the value create a new TOML value
+            .unwrap_or(&Item::Value(Value::from(Self::default_branch())))
+            .as_str()
+            .ok_or_else(|| anyhow!("repo.branch value is not a string"))?
+            .to_string();
+
+        let file = section
+            .get("file")
+            // If we couldn't get the value create a new TOML value
+            .unwrap_or(&Item::Value(Value::from(Self::default_branch())))
+            .as_str()
+            .ok_or_else(|| anyhow!("repo.file value is not a string"))?
+            .to_string();
+
+        Ok(Some(Self { url, branch, file }))
     }
 
     fn default_branch() -> String {
@@ -39,15 +74,16 @@ impl RepoConfig {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+/// Emplace configuration.
+#[derive(Debug)]
 pub struct Config {
-    #[serde(default = "Config::default_mirror_dir_string")]
     pub repo_directory: String,
     pub repo: RepoConfig,
 }
 
 impl Config {
-    pub fn new() -> Result<Self, Box<dyn Error>> {
+    /// Create a new config and save it on disk.
+    pub fn new() -> Result<Self> {
         info!("No configuration file found.");
         let repo_url = dialoguer::Input::<String>::new()
             .with_prompt("The URL of the git repository you (want to) store the mirrors in")
@@ -64,11 +100,21 @@ impl Config {
         Ok(config)
     }
 
-    pub fn from_default_file() -> Result<Option<Self>, Box<dyn Error>> {
+    /// Try to open the default config or create a new one.
+    pub fn from_default_file_or_new() -> Result<Self> {
+        match Config::from_default_file()? {
+            Some(config) => Ok(config),
+            None => Config::new(),
+        }
+    }
+
+    /// Try to open the default.
+    pub fn from_default_file() -> Result<Option<Self>> {
         Config::from_path(&Config::default_path())
     }
 
-    pub fn from_path<P: AsRef<Path>>(file_path: &P) -> Result<Option<Self>, Box<dyn Error>> {
+    /// Load the config from a file.
+    pub fn from_path<P: AsRef<Path>>(file_path: &P) -> Result<Option<Self>> {
         if !file_path.as_ref().exists() {
             return Ok(None);
         }
@@ -81,21 +127,46 @@ impl Config {
         file.read_to_string(&mut contents)?;
 
         // Deserialize the file into the struct
-        let cfg: Config = toml::from_str(&*contents)?;
+        let document = contents.parse::<Document>()?;
+        let table = document.as_table();
 
-        Ok(Some(cfg))
+        // Get the repo directory or use the default one
+        let repo_directory = table
+            .get("repo_directory")
+            // If we couldn't get the value create a new TOML value
+            .unwrap_or(&Item::Value(Value::from(Self::default_mirror_dir_string())))
+            .as_str()
+            .ok_or_else(|| anyhow!("repo_directory value is not a string"))?
+            .to_string();
+
+        let repo = match RepoConfig::from_toml(&table)? {
+            Some(repo) => repo,
+            // Section with URL is missing, we need this for a config
+            None => return Ok(None),
+        };
+
+        Ok(Some(Config {
+            repo_directory,
+            repo,
+        }))
     }
 
-    pub fn save_to_default_path(&self) -> Result<(), Box<dyn Error>> {
-        let toml_string = toml::to_string(self)?;
-
-        fs::write(Config::default_path(), toml_string)?;
+    /// Persist the config on disk.
+    pub fn save_to_default_path(&self) -> Result<()> {
+        fs::write(
+            Config::default_path(),
+            // Hardcode the default TOML config
+            config_toml(
+                &self.repo_directory,
+                &self.repo.url,
+                &self.repo.branch,
+                &self.repo.file,
+            ),
+        )?;
 
         info!(
             "Config saved to: \"{}\".",
-            Config::default_path()
-                .to_str()
-                .expect("Could not unwrap path to string")
+            Config::default_path().to_str().unwrap()
         );
         info!("You can edit the git repository URL and other settings here later.");
 
@@ -127,4 +198,21 @@ impl Config {
             .expect("Could not get directory")
             .to_string()
     }
+}
+
+fn config_toml(repo_directory: &str, url: &str, branch: &str, file: &str) -> String {
+    format!(
+        r#"
+repo_directory = "{repo_directory}"
+
+[repo]
+url = "{url}"
+branch = "{branch}"
+file = "{file}"
+    "#,
+        repo_directory = repo_directory,
+        url = url,
+        branch = branch,
+        file = file
+    )
 }

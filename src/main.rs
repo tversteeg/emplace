@@ -1,5 +1,5 @@
 mod command;
-//mod config;
+mod config;
 //mod git;
 mod init;
 //mod install;

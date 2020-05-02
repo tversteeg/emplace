@@ -1,6 +1,6 @@
 use crate::package_manager::PackageManager;
 use itertools::Itertools;
-use std::{iter, string::String};
+use std::{iter, ops::Deref, string::String};
 
 #[derive(Debug, Clone)]
 pub struct Package {
@@ -65,6 +65,14 @@ impl Packages {
             .collect();
 
         Self(lines)
+    }
+}
+
+impl Deref for Packages {
+    type Target = Vec<Package>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
