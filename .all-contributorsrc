@@ -24,7 +24,8 @@
         "platform",
         "code",
         "bug",
-        "maintenance"
+        "maintenance",
+        "review"
       ]
     },
     {
