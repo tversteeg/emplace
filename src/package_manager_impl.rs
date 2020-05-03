@@ -23,8 +23,7 @@ impl PackageManager {
                 .into_iter()
                 // Find the command that's in the file, use an extra space to only match full
                 // package names
-                .find(|command| line.contains(&format!("{} ", command)))
-                .is_some()
+                .any(|command| line.contains(&format!("{} ", command)))
         })
     }
 
@@ -53,16 +52,13 @@ impl PackageManager {
     /// Check if this package manager is available.
     pub fn is_available(self) -> bool {
         // TODO check for the command in the path instead of executing it
-        self.commands()
-            .into_iter()
-            .find(|command| {
-                Command::new(command)
-                    .stdout(Stdio::null())
-                    .stderr(Stdio::null())
-                    .spawn()
-                    .is_ok()
-            })
-            .is_some()
+        self.commands().into_iter().any(|command| {
+            Command::new(command)
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .spawn()
+                .is_ok()
+        })
     }
 
     /// Extract the packages from the line.
@@ -74,7 +70,7 @@ impl PackageManager {
                 // Get the part right of the package manager invocation
                 // The command has another space so lengthened versions of itself don't collide,
                 // for example 'apt' & 'apt-get'
-                match line.split(&format!("{} ", command)).skip(1).next() {
+                match line.split(&format!("{} ", command)).nth(1) {
                     Some(rest_of_line) => {
                         // Split all arguments
                         let mut args_iter = rest_of_line.split_ascii_whitespace().peekable();
@@ -97,7 +93,7 @@ impl PackageManager {
                             }
 
                             // Check if the argument is a flag
-                            if arg.chars().nth(0) == Some('-') {
+                            if arg.starts_with('-') {
                                 // If it's a flag we need to capture keep track of it
                                 let next_arg = args_iter.peek();
                                 if let Some((flag_first, flag_second)) = self
@@ -118,7 +114,7 @@ impl PackageManager {
                                             args_iter.next();
                                             format!("{} {}", flag_first, flag_second)
                                         }
-                                        None => format!("{}", flag_first),
+                                        None => (*flag_first).to_string(),
                                     });
 
                                     // Continue since we captured the flag, don't need to do
