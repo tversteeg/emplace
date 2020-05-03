@@ -86,10 +86,7 @@ pub fn history(path: &Path) -> Result<()> {
         println!("- {}", catch.color_full_name());
     }
 
-    if !dialoguer::Confirm::new()
-        .interact()
-        .expect("Could not create dialogue")
-    {
+    if !dialoguer::Confirm::new().interact()? {
         // Exit, we don't need to do anything
         return Ok(());
     }
