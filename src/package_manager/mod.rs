@@ -97,6 +97,7 @@ pub trait PackageManagerTrait {
 }
 
 /// Different ways in which a set of flags can be captured.
+#[derive(Debug, Copy, Clone)]
 pub enum CaptureFlag {
     /// A single flag argument without a value.
     Single(&'static str),

@@ -59,8 +59,7 @@ mod tests {
 
         catch!(PackageManager::from(Nix), "nix-env -iA nixpkgs.test" => "nixpkgs.test");
 
-        // TODO support catching channels
-        // catch!(PackageManager::from(Nix), "sudo nix-env -f 'stable-2.0' -iA nixos.test" => "nixos.test" ["'stable-2.0'"]);
+        catch!(PackageManager::from(Nix), "sudo nix-env -f 'stable-2.0' -iA nixos.test" => "nixos.test" ["-f 'stable-2.0'"]);
 
         // Ignore
         catch!(PackageManager::from(Nix), "sudo nix-env -q test" => ());

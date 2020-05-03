@@ -132,7 +132,7 @@ impl PackageManager {
 
     /// Handle the iterator's flags using the different options as defined in the package managers.
     fn handle_capture_flags<'a, I>(
-        &self,
+        self,
         arg: &str,
         args_iter: &mut Peekable<I>,
         catched_flags: &mut Vec<String>,
@@ -175,7 +175,8 @@ impl PackageManager {
 }
 
 impl CaptureFlag {
-    pub fn flag(&self) -> &'static str {
+    /// Extract the flag which is always there.
+    pub fn flag(self) -> &'static str {
         match self {
             CaptureFlag::Single(flag) => flag,
             CaptureFlag::SetValue(flag, _) => flag,
