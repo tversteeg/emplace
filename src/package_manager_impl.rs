@@ -1,10 +1,13 @@
 use crate::{
     package::Package,
-    package_manager::{PackageInstalledMethod, PackageManager, PackageManagerTrait},
+    package_manager::{CaptureFlag, PackageInstalledMethod, PackageManager, PackageManagerTrait},
 };
 use anyhow::{Context, Result};
 use run_script::ScriptOptions;
-use std::process::{Command, Stdio};
+use std::{
+    iter::Peekable,
+    process::{Command, Stdio},
+};
 use strum::IntoEnumIterator;
 
 impl PackageManager {
@@ -94,33 +97,7 @@ impl PackageManager {
 
                             // Check if the argument is a flag
                             if arg.starts_with('-') {
-                                // If it's a flag we need to capture keep track of it
-                                let next_arg = args_iter.peek();
-                                if let Some((flag_first, flag_second)) = self
-                                    .capture_flags()
-                                    .iter()
-                                    // Compare the first and optionally the second flags to the
-                                    // current and the next arguments
-                                    .find(|(flag_first, flag_second)| {
-                                        &arg == flag_first
-                                            && (flag_second.is_none()
-                                                || *next_arg.unwrap_or(&"")
-                                                    == flag_second.unwrap_or(""))
-                                    })
-                                {
-                                    catched_flags.push(match flag_second {
-                                        Some(flag_second) => {
-                                            // Skip the next item since it's the second flag
-                                            args_iter.next();
-                                            format!("{} {}", flag_first, flag_second)
-                                        }
-                                        None => (*flag_first).to_string(),
-                                    });
-
-                                    // Continue since we captured the flag, don't need to do
-                                    // anything with it after that
-                                    continue;
-                                }
+                                self.handle_capture_flags(&arg, &mut args_iter, &mut catched_flags);
 
                                 // If it's a flag containing an extra arguments besides it skip one
                                 if self.known_flags_with_values().contains(&arg) {
@@ -151,6 +128,59 @@ impl PackageManager {
             })
             .flatten()
             .collect()
+    }
+
+    /// Handle the iterator's flags using the different options as defined in the package managers.
+    fn handle_capture_flags<'a, I>(
+        &self,
+        arg: &str,
+        args_iter: &mut Peekable<I>,
+        catched_flags: &mut Vec<String>,
+    ) where
+        I: Iterator<Item = &'a str>,
+    {
+        // Find the matching flags from the capture_flags function
+        let capture = match self
+            .capture_flags()
+            .into_iter()
+            .find(|capture| capture.flag() == arg)
+        {
+            Some(capture) => capture,
+            None => return,
+        };
+
+        match capture {
+            CaptureFlag::Single(flag) => {
+                // Just a single flag, add it to the list
+                catched_flags.push(flag.to_string());
+            }
+            CaptureFlag::SetValue(flag, value) => {
+                // The value is set and must match
+                if let Some(next_arg) = args_iter.peek() {
+                    if &value == next_arg {
+                        catched_flags.push(format!("{} {}", flag, value));
+                        // We've looked at the next item so we should also skip it
+                        args_iter.next();
+                    }
+                }
+            }
+            CaptureFlag::DynamicValue(flag) => {
+                // The flag matches and the next value is dynamic so just take that
+                if let Some(next_arg) = args_iter.next() {
+                    catched_flags.push(format!("{} {}", flag, next_arg))
+                }
+            }
+        }
+    }
+}
+
+impl CaptureFlag {
+    pub fn flag(&self) -> &'static str {
+        match self {
+            CaptureFlag::Single(flag) => flag,
+            CaptureFlag::SetValue(flag, _) => flag,
+            CaptureFlag::DynamicValue(flag) => flag,
+        }
     }
 }
 

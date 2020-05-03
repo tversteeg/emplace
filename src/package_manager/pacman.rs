@@ -1,4 +1,4 @@
-use super::{PackageInstalledMethod, PackageManagerTrait};
+use super::{CaptureFlag, PackageInstalledMethod, PackageManagerTrait};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -34,7 +34,7 @@ impl PackageManagerTrait for Pacman {
         vec![]
     }
 
-    fn capture_flags(self) -> Vec<(&'static str, Option<&'static str>)> {
+    fn capture_flags(self) -> Vec<CaptureFlag> {
         vec![]
     }
 }

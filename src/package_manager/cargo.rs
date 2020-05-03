@@ -1,4 +1,4 @@
-use super::{PackageInstalledMethod, PackageManagerTrait};
+use super::{CaptureFlag, PackageInstalledMethod, PackageManagerTrait};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -41,8 +41,8 @@ impl PackageManagerTrait for Cargo {
         vec!["-Z", "--version", "-j", "--jobs"]
     }
 
-    fn capture_flags(self) -> Vec<(&'static str, Option<&'static str>)> {
-        vec![("--git", None)]
+    fn capture_flags(self) -> Vec<CaptureFlag> {
+        vec![CaptureFlag::Single("--git")]
     }
 }
 

@@ -93,7 +93,17 @@ pub trait PackageManagerTrait {
     /// }
     /// # }
     /// ```
-    fn capture_flags(self) -> Vec<(&'static str, Option<&'static str>)>;
+    fn capture_flags(self) -> Vec<CaptureFlag>;
+}
+
+/// Different ways in which a set of flags can be captured.
+pub enum CaptureFlag {
+    /// A single flag argument without a value.
+    Single(&'static str),
+    /// A flag argument with a set value.
+    SetValue(&'static str, &'static str),
+    /// A flag argument with a single dynamic value.
+    DynamicValue(&'static str),
 }
 
 /// The way a package is checked if it's installed.

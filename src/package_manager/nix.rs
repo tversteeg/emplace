@@ -1,4 +1,4 @@
-use super::{PackageInstalledMethod, PackageManagerTrait};
+use super::{CaptureFlag, PackageInstalledMethod, PackageManagerTrait};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -34,9 +34,8 @@ impl PackageManagerTrait for Nix {
         vec![]
     }
 
-    fn capture_flags(self) -> Vec<(&'static str, Option<&'static str>)> {
-        // TODO support capturing non-determined flag options
-        vec![("-f", Some(""))]
+    fn capture_flags(self) -> Vec<CaptureFlag> {
+        vec![CaptureFlag::DynamicValue("-f")]
     }
 }
 
@@ -59,9 +58,6 @@ mod tests {
         catch!(PackageManager::from(Nix), "nix-env --install nixos.test" => "nixos.test");
 
         catch!(PackageManager::from(Nix), "nix-env -iA nixpkgs.test" => "nixpkgs.test");
-
-        // TODO implement prefix for commands
-        // catch!(PackageManager::from(Nix), "sudo nix-env -iA test" => ());
 
         // TODO support catching channels
         // catch!(PackageManager::from(Nix), "sudo nix-env -f 'stable-2.0' -iA nixos.test" => "nixos.test" ["'stable-2.0'"]);
