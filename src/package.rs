@@ -3,7 +3,12 @@ use anyhow::Result;
 use colored::Colorize;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use std::{cmp::Ordering, iter, ops::Deref, string::String};
+use std::{
+    cmp::Ordering,
+    iter::{self, IntoIterator},
+    ops::Deref,
+    string::String,
+};
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Package {
@@ -60,6 +65,9 @@ impl Package {
     }
 
     /// The command line flags.
+    ///
+    /// Used by the test_macro.
+    #[allow(unused)]
     pub fn flags(&self) -> &Vec<String> {
         &self.flags
     }
@@ -154,6 +162,15 @@ impl Packages {
             1 => format!("Emplace - mirror package \"{}\"", self.0[0].full_command()),
             n => format!("Emplace - mirror {} packages", n),
         }
+    }
+}
+
+impl IntoIterator for Packages {
+    type Item = Package;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
     }
 }
 

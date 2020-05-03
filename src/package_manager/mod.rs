@@ -100,6 +100,9 @@ pub trait PackageManagerTrait {
 pub enum PackageInstalledMethod {
     /// A simple command line script will check if the package is installed.
     Script(String),
+
+    // TODO use this
+    #[allow(unused)]
     /// A file or directory on the filesystem is checked for existence.
     Path(PathBuf),
 }

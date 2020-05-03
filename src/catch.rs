@@ -1,6 +1,7 @@
 use crate::{config::Config, package::Packages, package_manager::PackageManager, repo::Repo};
 use anyhow::Result;
 use colored::Colorize;
+use dialoguer::Confirm;
 
 pub fn catch(line: &str) -> Result<()> {
     // Do a quick check so it won't stall the terminal
@@ -41,7 +42,7 @@ pub fn catch(line: &str) -> Result<()> {
     }
 
     // Ask if it needs to be mirrored
-    if !dialoguer::Confirm::new().interact()? {
+    if !Confirm::new().interact()? {
         // Exit, we don't need to do anything
         return Ok(());
     }

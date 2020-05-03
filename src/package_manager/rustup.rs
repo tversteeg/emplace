@@ -47,7 +47,7 @@ impl PackageManagerTrait for Rustup {
 #[cfg(test)]
 mod tests {
     use super::Rustup;
-    use crate::{catch, package_manager::PackageManager};
+    use crate::package_manager::PackageManager;
 
     #[test]
     fn test_package_manager() {
