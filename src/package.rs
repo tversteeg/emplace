@@ -8,7 +8,6 @@ use std::{cmp::Ordering, iter, ops::Deref, string::String};
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Package {
     /// The package manager this package belongs to.
-    #[serde(flatten)]
     source: PackageManager,
     /// Name of this package.
     name: String,
@@ -52,10 +51,10 @@ impl Package {
             )
         } else {
             format!(
-                "{} ({} {})",
+                "{} {} ({})",
+                self.flags.iter().join(" ").dimmed(),
                 self.name.yellow(),
                 self.source.full_name().green(),
-                self.flags.iter().join(" ").dimmed()
             )
         }
     }

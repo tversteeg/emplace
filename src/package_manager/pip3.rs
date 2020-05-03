@@ -6,7 +6,7 @@ pub struct Pip3;
 
 impl PackageManagerTrait for Pip3 {
     fn full_name(self) -> &'static str {
-        "Python Pip3 3"
+        "Python 3 Pip"
     }
 
     fn commands(self) -> Vec<&'static str> {

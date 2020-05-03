@@ -1,4 +1,5 @@
 mod catch;
+mod clean;
 mod config;
 mod git;
 mod init;
@@ -82,30 +83,8 @@ fn safe_main() -> Result<()> {
             catch::catch(line).context("catching a command")
         }
         ("install", Some(_)) => install::install().context("installing packages"),
+        ("clean", Some(_)) => clean::clean().context("cleaning packages"),
         /*
-        ("clean", Some(_)) => {
-            // Get the config
-            let config = match Config::from_default_file().expect("Retrieving config went wrong") {
-                Some(config) => config,
-                None => Config::new().expect("Initializing new config failed"),
-            };
-
-            let repo = Repo::new(config).expect("Could not initialize git repository");
-
-            match repo.read() {
-                Ok(mut packages) => {
-                    // Set all the package names, this is not done in catch for performance reasons
-                    packages
-                        .iter_mut()
-                        .for_each(|package| package.set_package_name());
-                    match crate::install::clean(packages) {
-                        Ok(packages) => repo.clean(packages).expect("Could not clean repo."),
-                        Err(err) => error!("Could not remove from repository: {}.", err),
-                    }
-                }
-                Err(err) => error!("{}", err),
-            };
-        }
         ("history", Some(path)) => history_processing(path)?,
         */
         (&_, _) => Ok(()),

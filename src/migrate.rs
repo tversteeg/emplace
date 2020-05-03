@@ -52,6 +52,7 @@ pub mod zero_two {
                 .0
                 .into_iter()
                 .map(|old_package| {
+                    // Map PipUser to Pip
                     if old_package.source == OldPackageManager::PipUser {
                         return Package::new(
                             PackageManager::from(Pip),
@@ -59,6 +60,7 @@ pub mod zero_two {
                             vec!["--user".into()],
                         );
                     }
+                    // Map Pip3User to Pip3
                     if old_package.source == OldPackageManager::Pip3User {
                         return Package::new(
                             PackageManager::from(Pip3),
@@ -80,9 +82,19 @@ pub mod zero_two {
                         OldPackageManager::Pip3 => PackageManager::from(Pip3),
                         OldPackageManager::Npm => PackageManager::from(Npm),
                         OldPackageManager::Nix => PackageManager::from(Nix),
+                        // Rename RustupComponent to Rustup
                         OldPackageManager::RustupComponent => PackageManager::from(Rustup),
                         _ => unreachable!(),
                     };
+
+                    if old_package.name.starts_with("--git") {
+                        // Convert --git names to flags
+                        return Package::new(
+                            source,
+                            old_package.name.split_ascii_whitespace().skip(1).collect(),
+                            vec!["--git".into()],
+                        );
+                    }
 
                     Package::new(source, old_package.name, vec![])
                 })
