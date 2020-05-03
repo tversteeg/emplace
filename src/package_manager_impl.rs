@@ -20,8 +20,9 @@ impl PackageManager {
             manager
                 .commands()
                 .into_iter()
-                // Find the command that's in the file
-                .find(|command| line.contains(command))
+                // Find the command that's in the file, use an extra space to only match full
+                // package names
+                .find(|command| line.contains(&format!("{} ", command)))
                 .is_some()
         })
     }
@@ -90,7 +91,7 @@ impl PackageManager {
                                     // current and the next arguments
                                     .find(|(flag_first, flag_second)| {
                                         &arg == flag_first
-                                            && (next_arg.is_none()
+                                            && (flag_second.is_none()
                                                 || *next_arg.unwrap_or(&"")
                                                     == flag_second.unwrap_or(""))
                                     })

@@ -1,4 +1,3 @@
-mod command;
 mod config;
 mod git;
 mod init;

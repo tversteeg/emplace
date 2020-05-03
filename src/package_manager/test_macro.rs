@@ -27,8 +27,8 @@ macro_rules! catch {
             // Create an iterator for the catches
             let mut packages = manager.catch($line).into_iter();
             $(
-                let package = packages.next().expect("Expected package not catched");
-                assert_eq!($package, package.name(), "Package \"{}\" should be matched, but it's not", package.full_command());
+                let package = packages.next().expect("expected package not catched");
+                assert_eq!($package, package.name(), "package \"{}\" should be matched, but it's not", package.full_command());
 
                 catch!(package, $flags);
             )*
@@ -42,8 +42,8 @@ macro_rules! catch {
             // Create an iterator for the flags
             let mut flags = $package.flags().into_iter();
             $(
-                let flag = flags.next().unwrap();
-                assert_eq!($flag, flag, "Flag \"{}\" is missing from package \"{}\"", $flag, $package.full_command());
+                let flag = flags.next().expect(&format!("flag \"{}\" is missing from package \"{}\"", $flag, $package.full_command()));
+                assert_eq!($flag, flag);
             )*
             assert!(flags.next().is_none());
         }

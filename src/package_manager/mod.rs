@@ -3,9 +3,29 @@ pub mod test_macro;
 
 mod apt;
 mod cargo;
+mod chocolatey;
+mod nix;
+mod npm;
+mod pacman;
+mod pip;
+mod pip3;
+mod rua;
+mod scoop;
+mod snap;
+mod yay;
 
 use apt::Apt;
 use cargo::Cargo;
+use chocolatey::Chocolatey;
+use nix::Nix;
+use npm::Npm;
+use pacman::Pacman;
+use pip::Pip;
+use pip3::Pip3;
+use rua::Rua;
+use scoop::Scoop;
+use snap::Snap;
+use yay::Yay;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -19,6 +39,16 @@ use strum_macros::EnumIter;
 pub enum PackageManager {
     Apt,
     Cargo,
+    Pacman,
+    Yay,
+    Rua,
+    Snap,
+    Chocolatey,
+    Scoop,
+    Pip,
+    Pip3,
+    Npm,
+    Nix,
 }
 
 /// Trait that needs to be implemented for a new package manager.
