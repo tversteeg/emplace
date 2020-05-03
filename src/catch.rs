@@ -1,5 +1,5 @@
 use crate::{config::Config, package::Packages, package_manager::PackageManager, repo::Repo};
-use anyhow::{Context, Result};
+use anyhow::Result;
 use colored::Colorize;
 
 pub fn catch(line: &str) -> Result<()> {
@@ -21,8 +21,6 @@ pub fn catch(line: &str) -> Result<()> {
 
     // Get the repository from the config
     let repo = Repo::new(config)?;
-
-    dbg!(&repo.read());
 
     // Only keep the packages that haven't been saved already
     catches.filter_saved_packages(&repo.read()?);

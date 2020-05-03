@@ -1,8 +1,9 @@
+mod catch;
 mod config;
 mod git;
 mod init;
-//mod install;
-mod catch;
+mod install;
+mod migrate;
 mod package;
 mod package_manager;
 mod package_manager_impl;
@@ -10,6 +11,7 @@ mod repo;
 
 use anyhow::{Context, Result};
 use clap::{App, AppSettings, Arg, SubCommand};
+use log::error;
 use simplelog::{LevelFilter, TermLogger, TerminalMode};
 
 fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
@@ -25,13 +27,13 @@ fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
         .subcommand(SubCommand::with_name("clean").about("Remove package synching"))
 }
 
-fn main() -> Result<()> {
+fn safe_main() -> Result<()> {
     TermLogger::init(
         LevelFilter::Info,
         simplelog::Config::default(),
         TerminalMode::Mixed,
     )
-    .context("No interactive terminal")?;
+    .context("no interactive terminal")?;
 
     let matches = public_clap_app()
 		.subcommand(
@@ -70,39 +72,17 @@ fn main() -> Result<()> {
 
     match matches.subcommand() {
         ("init", Some(sub_m)) => {
-            let shell_name = sub_m.value_of("shell").context("Shell name is missing.")?;
+            let shell_name = sub_m.value_of("shell").context("shell name is missing")?;
 
             init::init_main(shell_name)
         }
         ("catch", Some(sub_m)) => {
-            let line = sub_m.value_of("line").context("Line is missing")?;
+            let line = sub_m.value_of("line").context("line is missing")?;
 
-            catch::catch(line)
+            catch::catch(line).context("catching a command")
         }
+        ("install", Some(_)) => install::install().context("installing packages"),
         /*
-        ("install", Some(_)) => {
-            // Get the config
-            let config = match Config::from_default_file().expect("Retrieving config went wrong") {
-                Some(config) => config,
-                None => Config::new().expect("Initializing new config failed"),
-            };
-
-            let repo = Repo::new(config).expect("Could not initialize git repository");
-
-            match repo.read() {
-                Ok(mut packages) => {
-                    // Set all the package names, this is not done in catch for performance reasons
-                    packages
-                        .iter_mut()
-                        .for_each(|package| package.set_package_name());
-
-                    if let Err(err) = crate::install::install(packages) {
-                        error!("Could not install new changes: {}.", err);
-                    }
-                }
-                Err(err) => error!("{}", err),
-            };
-        }
         ("clean", Some(_)) => {
             // Get the config
             let config = match Config::from_default_file().expect("Retrieving config went wrong") {
@@ -262,3 +242,9 @@ fn catch_processing(mut catches: Packages) -> Result<()> {
     Ok(())
 }
 */
+
+fn main() {
+    if let Err(err) = safe_main() {
+        error!("Critical Emplace error while {:?}", err);
+    }
+}

@@ -4,6 +4,7 @@ use crate::{
 };
 use anyhow::{Context, Result};
 use run_script::ScriptOptions;
+use std::process::{Command, Stdio};
 use strum::IntoEnumIterator;
 
 impl PackageManager {
@@ -47,6 +48,21 @@ impl PackageManager {
                 Ok(path.exists())
             }
         }
+    }
+
+    /// Check if this package manager is available.
+    pub fn is_available(self) -> bool {
+        // TODO check for the command in the path instead of executing it
+        self.commands()
+            .into_iter()
+            .find(|command| {
+                Command::new(command)
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .spawn()
+                    .is_ok()
+            })
+            .is_some()
     }
 
     /// Extract the packages from the line.

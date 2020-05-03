@@ -1,4 +1,5 @@
 use crate::package_manager::{PackageManager, PackageManagerTrait};
+use anyhow::Result;
 use colored::Colorize;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -7,6 +8,7 @@ use std::{cmp::Ordering, iter, ops::Deref, string::String};
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Package {
     /// The package manager this package belongs to.
+    #[serde(flatten)]
     source: PackageManager,
     /// Name of this package.
     name: String,
@@ -35,6 +37,11 @@ impl Package {
         self.flags.iter().chain(iter::once(&self.name)).join(" ")
     }
 
+    /// The full command needed to install this package.
+    pub fn install_command(&self) -> String {
+        format!("{} {}", self.source.install_command(), self.full_command())
+    }
+
     /// The full name in fancy colors.
     pub fn color_full_name(&self) -> String {
         if self.flags.is_empty() {
@@ -56,6 +63,16 @@ impl Package {
     /// The command line flags.
     pub fn flags(&self) -> &Vec<String> {
         &self.flags
+    }
+
+    /// Check if this package is already installed.
+    pub fn is_installed(&self) -> Result<bool> {
+        self.source.package_is_installed(&self)
+    }
+
+    /// Check if the package manager can be found.
+    pub fn is_available(&self) -> bool {
+        self.source.is_available()
     }
 }
 

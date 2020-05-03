@@ -10,22 +10,24 @@ mod pacman;
 mod pip;
 mod pip3;
 mod rua;
+mod rustup;
 mod scoop;
 mod snap;
 mod yay;
 
-use apt::Apt;
-use cargo::Cargo;
-use chocolatey::Chocolatey;
-use nix::Nix;
-use npm::Npm;
-use pacman::Pacman;
-use pip::Pip;
-use pip3::Pip3;
-use rua::Rua;
-use scoop::Scoop;
-use snap::Snap;
-use yay::Yay;
+pub use apt::Apt;
+pub use cargo::Cargo;
+pub use chocolatey::Chocolatey;
+pub use nix::Nix;
+pub use npm::Npm;
+pub use pacman::Pacman;
+pub use pip::Pip;
+pub use pip3::Pip3;
+pub use rua::Rua;
+pub use rustup::Rustup;
+pub use scoop::Scoop;
+pub use snap::Snap;
+pub use yay::Yay;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -39,6 +41,7 @@ use strum_macros::EnumIter;
 pub enum PackageManager {
     Apt,
     Cargo,
+    Rustup,
     Pacman,
     Yay,
     Rua,

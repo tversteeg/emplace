@@ -1,8 +1,8 @@
-use crate::{config::Config, git, package::Packages};
+use crate::{config::Config, git, migrate::zero_two, package::Packages};
 use anyhow::{Context, Result};
 use log::debug;
 use ron::{
-    de::from_str,
+    de,
     ser::{to_string_pretty, PrettyConfig},
 };
 use std::{
@@ -33,12 +33,13 @@ impl Repo {
         if repo_exists {
             println!("Opening Emplace repo: \"{}\".", path_str);
 
-            git::pull(&path, &repo_branch)?;
+            git::pull(&path, &repo_branch).context("pulling existing repo from config")?;
         } else {
             println!("Cloning Emplace repo \"{}\" to \"{}\".", repo_url, path_str);
 
-            fs::create_dir_all(path)?;
-            git::clone_single_branch(&path, &*repo_url, &*repo_branch)?;
+            fs::create_dir_all(path).context("creating new directory for repo")?;
+            git::clone_single_branch(&path, &*repo_url, &*repo_branch)
+                .context("cloning new repo")?;
 
             // Create the emplace file if it doesn't exist
             let emplace_file = config.full_file_path();
@@ -63,10 +64,22 @@ impl Repo {
         // Read the contents
         let mut contents = String::new();
         file.read_to_string(&mut contents)
-            .context("reading packages from repository")?;
+            .context("reading packages string from repository")?;
 
         // Deserialize the file into the struct
-        Ok(from_str(&*contents).context("reading packages from repository")?)
+        match de::from_str(&contents) {
+            Ok(packages) => Ok(packages),
+            // Deserializing failed, try to migrate from a previous version
+            Err(err) => {
+                // Try to migrate from emplace version <= 0.2
+                if let Some(packages) = zero_two::try_migrate(&contents) {
+                    return Ok(packages);
+                }
+
+                // Return the original error if migration failed
+                Err(err).context("deserializing packages from repository")
+            }
+        }
     }
 
     pub fn mirror(&self, mut commands: Packages) -> Result<()> {
