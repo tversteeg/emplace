@@ -64,7 +64,10 @@ mod tests {
         // Ignore
         catch!(PackageManager::from(Apt), "sudo apt test test2" => ());
         catch!(PackageManager::from(Apt), "sudo apt install -f" => ());
+    }
 
+    #[test]
+    fn test_catch_flags() {
         // Flags with another regular argument
         catch!(PackageManager::from(Apt), "sudo apt -qq install test" => "test");
         catch!(PackageManager::from(Apt), "sudo apt install test -f" => "test");
