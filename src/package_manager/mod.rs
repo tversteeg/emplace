@@ -1,0 +1,132 @@
+#[macro_use]
+pub mod test_macro;
+
+mod apt;
+mod cargo;
+mod chocolatey;
+mod nix;
+mod npm;
+mod pacman;
+mod pip;
+mod pip3;
+mod rua;
+mod rustup;
+mod scoop;
+mod snap;
+mod yay;
+
+pub use apt::Apt;
+pub use cargo::Cargo;
+pub use chocolatey::Chocolatey;
+pub use nix::Nix;
+pub use npm::Npm;
+pub use pacman::Pacman;
+pub use pip::Pip;
+pub use pip3::Pip3;
+pub use rua::Rua;
+pub use rustup::Rustup;
+pub use scoop::Scoop;
+pub use snap::Snap;
+pub use yay::Yay;
+
+use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
+use strum_macros::EnumIter;
+
+/// Enum containing all package managers.
+///
+/// The actual functions are implemented in `src/package_manager_impl.rs`.
+#[enum_dispatch::enum_dispatch]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, EnumIter, Serialize, Deserialize)]
+pub enum PackageManager {
+    Apt,
+    Cargo,
+    Rustup,
+    Pacman,
+    Yay,
+    Rua,
+    Snap,
+    Chocolatey,
+    Scoop,
+    Pip,
+    Pip3,
+    Npm,
+    Nix,
+}
+
+/// Trait that needs to be implemented for a new package manager.
+#[enum_dispatch::enum_dispatch(PackageManager)]
+pub trait PackageManagerTrait {
+    /// A descriptive name.
+    fn full_name(self) -> &'static str;
+
+    /// The command-line word(s) to invoke the package manager.
+    fn commands(self) -> Vec<&'static str>;
+
+    /// The command-line subcommand(s) that's used to catch installing new packages.
+    fn sub_commands(self) -> Vec<&'static str>;
+
+    /// Command that's used to install new packages.
+    fn install_command(self) -> &'static str;
+
+    /// Does installing a new command need administrative permissions?
+    fn needs_root(self) -> bool;
+
+    /// Check whether a package is already installed.
+    fn is_installed(self, package: &str) -> PackageInstalledMethod;
+
+    /// A list of known command line flags that accept an extra argument which could be the name of
+    /// the package.
+    fn known_flags_with_values(self) -> Vec<&'static str>;
+
+    /// A list of command line flags that should be caught as well.
+    ///
+    /// This usually stays empty.
+    /// A list of tuples is returned where the tuple contains the flag arguments.
+    /// For example `-t experimental` is supplied like this:
+    ///
+    /// ```rust
+    /// # struct Something;
+    /// # impl Something {
+    /// fn capture_flags(self) -> Vec<(&'static str, Option<&'static str>)> {
+    ///     vec![("-t", Some("experimental"))]
+    /// }
+    /// # }
+    /// ```
+    fn capture_flags(self) -> Vec<CaptureFlag>;
+}
+
+/// Different ways in which a set of flags can be captured.
+#[derive(Debug, Copy, Clone)]
+pub enum CaptureFlag {
+    /// A single flag argument without a value.
+    Single(&'static str),
+    /// A flag argument with a set value.
+    SetValue(&'static str, &'static str),
+    /// A flag argument with a single dynamic value.
+    DynamicValue(&'static str),
+}
+
+/// The way a package is checked if it's installed.
+pub enum PackageInstalledMethod {
+    /// A simple command line script will check if the package is installed.
+    Script(String),
+
+    // TODO use this
+    #[allow(unused)]
+    /// A file or directory on the filesystem is checked for existence.
+    Path(PathBuf),
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        catch,
+        package_manager::{apt::Apt, PackageManager},
+    };
+
+    #[test]
+    fn test_empty() {
+        catch!(PackageManager::from(Apt), "no match" => ());
+    }
+}

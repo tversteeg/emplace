@@ -1,13 +1,14 @@
+use anyhow::Result;
 use log::info;
 use serde::{Deserialize, Serialize};
 use std::{
-    error::Error,
     fs::{self, File},
     io::Read,
     path::{Path, PathBuf},
     string::String,
 };
 
+/// Repository specific configuration.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RepoConfig {
     pub url: String,
@@ -39,6 +40,7 @@ impl RepoConfig {
     }
 }
 
+/// Emplace configuration.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     #[serde(default = "Config::default_mirror_dir_string")]
@@ -47,7 +49,8 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new() -> Result<Self, Box<dyn Error>> {
+    /// Create a new config and save it on disk.
+    pub fn new() -> Result<Self> {
         info!("No configuration file found.");
         let repo_url = dialoguer::Input::<String>::new()
             .with_prompt("The URL of the git repository you (want to) store the mirrors in")
@@ -64,11 +67,21 @@ impl Config {
         Ok(config)
     }
 
-    pub fn from_default_file() -> Result<Option<Self>, Box<dyn Error>> {
+    /// Try to open the default config or create a new one.
+    pub fn from_default_file_or_new() -> Result<Self> {
+        match Config::from_default_file()? {
+            Some(config) => Ok(config),
+            None => Config::new(),
+        }
+    }
+
+    /// Try to open the default.
+    pub fn from_default_file() -> Result<Option<Self>> {
         Config::from_path(&Config::default_path())
     }
 
-    pub fn from_path<P: AsRef<Path>>(file_path: &P) -> Result<Option<Self>, Box<dyn Error>> {
+    /// Load the config from a file.
+    pub fn from_path<P: AsRef<Path>>(file_path: &P) -> Result<Option<Self>> {
         if !file_path.as_ref().exists() {
             return Ok(None);
         }
@@ -80,22 +93,20 @@ impl Config {
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
-        // Deserialize the file into the struct
-        let cfg: Config = toml::from_str(&*contents)?;
-
-        Ok(Some(cfg))
+        Ok(Some(toml::from_str(&contents)?))
     }
 
-    pub fn save_to_default_path(&self) -> Result<(), Box<dyn Error>> {
-        let toml_string = toml::to_string(self)?;
-
-        fs::write(Config::default_path(), toml_string)?;
+    /// Persist the config on disk.
+    pub fn save_to_default_path(&self) -> Result<()> {
+        fs::write(
+            Config::default_path(),
+            // Hardcode the default TOML config
+            toml::to_string(self)?,
+        )?;
 
         info!(
             "Config saved to: \"{}\".",
-            Config::default_path()
-                .to_str()
-                .expect("Could not unwrap path to string")
+            Config::default_path().to_str().unwrap()
         );
         info!("You can edit the git repository URL and other settings here later.");
 

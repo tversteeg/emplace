@@ -1,17 +1,12 @@
 use anyhow::{Context, Result};
-use log::error;
+use itertools::Itertools;
+use log::{debug, error};
 use std::{
     path::Path,
     process::{Command, Stdio},
 };
 
-fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P, dry_run: bool) -> Result<bool> {
-    if dry_run {
-        println!("cd {}", path.as_ref().display());
-        println!("{}", command.join(" "));
-        return Ok(true);
-    }
-
+fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P) -> Result<bool> {
     let mut iter = command.iter();
     let cmd_name = iter.next().unwrap();
 
@@ -19,6 +14,12 @@ fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P, dry_run: bool) -> 
     cmd.stdout(Stdio::null());
     cmd.stderr(Stdio::null());
     cmd.current_dir(path);
+
+    debug!(
+        "Calling \"{}\" on path {:?}",
+        command.iter().join(" "),
+        path.as_ref()
+    );
 
     for arg in iter {
         if !arg.is_empty() {
@@ -32,29 +33,51 @@ fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P, dry_run: bool) -> 
     Ok(result.success())
 }
 
-pub fn commit_all<P: AsRef<Path>>(dir: &P, msg: &str, sign: bool, dry_run: bool) -> Result<bool> {
+pub fn commit_all<P: AsRef<Path>>(dir: &P, msg: &str, sign: bool) -> Result<bool> {
     call_on_path(
         vec!["git", "commit", if sign { "-S" } else { "" }, "-am", msg],
         dir,
-        dry_run,
     )
     .context("failed commiting everything in git")
 }
 
-pub fn push<P: AsRef<Path>>(dir: &P, dry_run: bool) -> Result<bool> {
-    call_on_path(vec!["git", "push"], dir, dry_run).context("failed pushing in git")
+pub fn push<P: AsRef<Path>>(dir: &P) -> Result<bool> {
+    call_on_path(vec!["git", "push"], dir).context("failed pushing in git")
 }
 
-pub fn pull<P: AsRef<Path>>(dir: &P, dry_run: bool) -> Result<bool> {
-    call_on_path(vec!["git", "pull"], dir, dry_run).context("failed pulling in git")
+/// Perform a pull on the git repo by fetching & merging.
+pub fn pull<P: AsRef<Path>>(dir: &P, branch: &str) -> Result<bool> {
+    // First fetch the remote changes
+    call_on_path(
+        vec![
+            "git",
+            "fetch",
+            // We don't care about tags
+            "--no-tags",
+            // We don't care about submodules
+            "--no-recurse-submodules",
+            "origin",
+            branch,
+        ],
+        dir,
+    )
+    .context("failed pulling in git: fetch")?;
+    // Then merge them into this branch
+    call_on_path(
+        vec![
+            "git",
+            "merge",
+            "--strategy-option",
+            "theirs",
+            "origin",
+            branch,
+        ],
+        dir,
+    )
+    .context("failed pulling in git: merge")
 }
 
-pub fn clone_single_branch<P: AsRef<Path>>(
-    dir: &P,
-    url: &str,
-    branch: &str,
-    dry_run: bool,
-) -> Result<bool> {
+pub fn clone_single_branch<P: AsRef<Path>>(dir: &P, url: &str, branch: &str) -> Result<bool> {
     let success = call_on_path(
         vec![
             "git",
@@ -66,7 +89,6 @@ pub fn clone_single_branch<P: AsRef<Path>>(
             ".",
         ],
         dir,
-        dry_run,
     )
     .context("failed cloning branch in git")?;
 
@@ -78,6 +100,6 @@ pub fn clone_single_branch<P: AsRef<Path>>(
     Ok(success)
 }
 
-pub fn add_file<P: AsRef<Path>>(dir: &P, file: &str, dry_run: bool) -> Result<bool> {
-    call_on_path(vec!["git", "add", file], dir, dry_run).context("failed adding file in git")
+pub fn add_file<P: AsRef<Path>>(dir: &P, file: &str) -> Result<bool> {
+    call_on_path(vec!["git", "add", file], dir).context("failed adding file in git")
 }

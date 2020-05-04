@@ -1,325 +1,91 @@
-use anyhow::Context;
-use colored::*;
+use crate::package_manager::{PackageManager, PackageManagerTrait};
+use anyhow::Result;
+use colored::Colorize;
 use itertools::Itertools;
-use run_script::ScriptOptions;
 use serde::{Deserialize, Serialize};
 use std::{
     cmp::Ordering,
-    error::Error,
-    fmt,
-    slice::{Iter, IterMut},
+    iter::{self, IntoIterator},
+    ops::Deref,
     string::String,
 };
 
-#[derive(Debug, Serialize, Deserialize, Copy, Clone, EnumIter)]
-pub enum PackageSource {
-    /// Rust cargo
-    Cargo,
-    /// Rust rustup component
-    RustupComponent,
-    /// Debian apt-get
-    Apt,
-    /// Arch Pacman
-    Pacman,
-    /// Arch RUA
-    Rua,
-    /// Linux Snap
-    Snap,
-    /// Windows chocolatey
-    Chocolatey,
-    /// Windows scoop
-    Scoop,
-    /// Python Pip
-    Pip,
-    /// Python Pip --user
-    PipUser,
-    /// Python Pip 3
-    Pip3,
-    /// Python Pip 3 --user
-    Pip3User,
-    /// Node Package Manager
-    Npm,
-    ///AUR Helper written in go
-    Yay,
-    /// NixOS Nix
-    Nix,
-}
-
-impl PackageSource {
-    pub fn full_name(&self) -> &str {
-        match self {
-            PackageSource::Cargo => "Cargo Rust",
-            PackageSource::RustupComponent => "Rustup Component",
-            PackageSource::Apt => "Advanced Package Tool",
-            PackageSource::Pacman => "Pacman",
-            PackageSource::Rua => "RUA",
-            PackageSource::Snap => "Snap",
-            PackageSource::Chocolatey => "Chocolatey",
-            PackageSource::Scoop => "Scoop",
-            PackageSource::Pip => "Python Pip",
-            PackageSource::PipUser => "Python Pip --user",
-            PackageSource::Pip3 => "Python Pip 3",
-            PackageSource::Pip3User => "Python Pip 3 --user",
-            PackageSource::Npm => "Node Package Manager",
-            PackageSource::Yay => "AUR Helper written in go",
-            PackageSource::Nix => "Nix",
-        }
-    }
-
-    pub fn colour_full_name(self) -> String {
-        format!("({})", self.full_name())
-            .cyan()
-            .italic()
-            .to_string()
-    }
-
-    #[cfg(not(target_os = "windows"))]
-    pub fn command<'a>(self) -> &'a str {
-        match self {
-            PackageSource::Cargo => "cargo",
-            PackageSource::RustupComponent => "rustup",
-            PackageSource::Apt => "apt",
-            PackageSource::Pacman => "pacman",
-            PackageSource::Rua => "rua",
-            PackageSource::Snap => "snap",
-            PackageSource::Pip => "pip",
-            PackageSource::PipUser => "pip",
-            PackageSource::Pip3 => "pip3",
-            PackageSource::Pip3User => "pip3",
-            PackageSource::Npm => "npm",
-            PackageSource::Yay => "yay",
-            PackageSource::Nix => "nix-env",
-            _ => "",
-        }
-    }
-    #[cfg(target_os = "windows")]
-    pub fn command<'a>(self) -> &'a str {
-        match self {
-            PackageSource::Cargo => "cargo",
-            PackageSource::RustupComponent => "rustup",
-            PackageSource::Chocolatey => "choco",
-            PackageSource::Scoop => "scoop",
-            PackageSource::Pip => "pip",
-            PackageSource::PipUser => "pip",
-            PackageSource::Pip3 => "pip3",
-            PackageSource::Pip3User => "pip3",
-            PackageSource::Npm => "npm",
-            _ => "",
-        }
-    }
-
-    #[cfg(not(target_os = "windows"))]
-    pub fn install_command<'a>(self) -> Vec<&'a str> {
-        match self {
-            PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
-            PackageSource::RustupComponent => vec!["rustup", "component", "add"],
-            PackageSource::Apt => vec!["apt-get", "install", "-y"],
-            PackageSource::Pacman => vec!["pacman", "-S", "--noconfirm", "--quiet"],
-            PackageSource::Yay => vec!["pacman", "-S", "--noconfirm", "--quiet"],
-            PackageSource::Rua => vec!["rua", "install"],
-            PackageSource::Snap => vec!["snap", "install"],
-            PackageSource::Pip => vec!["pip", "install", "-q"],
-            PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
-            PackageSource::Pip3 => vec!["pip3", "install", "-q"],
-            PackageSource::Pip3User => vec!["pip3", "install", "-q", "--user"],
-            PackageSource::Npm => vec!["npm", "install", "-g"],
-            PackageSource::Nix => vec!["nix-env", "-iA", "-g"],
-            _ => vec![],
-        }
-    }
-    #[cfg(target_os = "windows")]
-    pub fn install_command<'a>(self) -> Vec<&'a str> {
-        match self {
-            PackageSource::Cargo => vec!["cargo", "install", "--quiet"],
-            PackageSource::RustupComponent => vec!["rustup", "component", "add"],
-            PackageSource::Chocolatey => vec!["choco", "install", "-y"],
-            PackageSource::Scoop => vec!["scoop", "install"],
-            PackageSource::Pip => vec!["pip", "install", "-q"],
-            PackageSource::PipUser => vec!["pip", "install", "-q", "--user"],
-            PackageSource::Pip3 => vec!["pip3", "install", "-q"],
-            PackageSource::Pip3User => vec!["pip3", "install", "-q", "--user"],
-            PackageSource::Npm => vec!["npm", "install", "-g"],
-            _ => vec![],
-        }
-    }
-
-    #[cfg(not(target_os = "windows"))]
-    pub fn is_installed_script<'a>(self) -> Option<&'a str> {
-        match self {
-            PackageSource::Cargo => Some("cargo install --list | grep 'v[0-9]' | grep -q"),
-            PackageSource::RustupComponent => Some("rustup component list | grep -q"),
-            PackageSource::Apt => Some("dpkg -s"),
-            PackageSource::Pacman => Some("pacman -Q"),
-            PackageSource::Yay => Some("pacman -Q"),
-            PackageSource::Rua => Some("rua search"),
-            PackageSource::Snap => Some("snap | grep -Eo '^[^ ]+' | grep -q"),
-            PackageSource::Pip => Some("pip show -q"),
-            PackageSource::PipUser => Some("pip show -q"),
-            PackageSource::Pip3 => Some("pip3 show -q"),
-            PackageSource::Pip3User => Some("pip3 show -q"),
-            PackageSource::Npm => Some("npm list --depth=0 -g | grep -q"),
-            PackageSource::Nix => Some("nix-env -q | grep -q"),
-            _ => None,
-        }
-    }
-    #[cfg(target_os = "windows")]
-    pub fn is_installed_script<'a>(self) -> Option<&'a str> {
-        match self {
-			PackageSource::Cargo => Some("cargo install --list | findstr"),
-			PackageSource::RustupComponent => Some("rustup component list | findstr"),
-			PackageSource::Chocolatey => Some("choco feature enable --name=\"'useEnhancedExitCodes'\" && choco search -le --no-color"),
-			PackageSource::Scoop => Some("scoop list | findstr"),
-			PackageSource::Pip => Some("pip show -q"),
-			PackageSource::PipUser => Some("pip show -q"),
-			PackageSource::Pip3 => Some("pip3 show -q"),
-			PackageSource::Pip3User => Some("pip3 show -q"),
-			PackageSource::Npm => Some("npm list --depth=0 -g | findstr"),
-			_ => None
-		}
-    }
-
-    pub fn needs_root(self) -> bool {
-        match self {
-            PackageSource::Cargo => false,
-            PackageSource::RustupComponent => false,
-            PackageSource::Apt => true,
-            PackageSource::Pacman => true,
-            PackageSource::Rua => false,
-            PackageSource::Snap => true,
-            PackageSource::Chocolatey => true,
-            PackageSource::Scoop => true,
-            PackageSource::Pip => true,
-            PackageSource::PipUser => false,
-            PackageSource::Pip3 => true,
-            PackageSource::Pip3User => false,
-            PackageSource::Npm => false,
-            PackageSource::Yay => false,
-            PackageSource::Nix => false,
-        }
-    }
-}
-
-impl fmt::Display for PackageSource {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({})", self.full_name())
-    }
-}
-
-impl PartialEq for PackageSource {
-    fn eq(&self, other: &Self) -> bool {
-        self.full_name() == other.full_name()
-    }
-}
-
-impl Eq for PackageSource {}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Package {
-    /// The package manager's name.
-    pub source: PackageSource,
-    /// A list of packages that are going to be installed.
-    pub name: String,
-    /// The name without the flags.
-    #[serde(skip)]
-    pub(crate) package_name: Option<String>,
+    /// The package manager this package belongs to.
+    source: PackageManager,
+    /// Name of this package.
+    name: String,
+    /// A list of command line flags this package should be installed with.
+    #[serde(default)]
+    flags: Vec<String>,
 }
 
 impl Package {
-    pub fn new(source: PackageSource, name: String) -> Self {
-        let mut package = Self {
+    /// Instantiate.
+    pub fn new(source: PackageManager, name: String, flags: Vec<String>) -> Self {
+        Self {
             source,
             name,
-            package_name: None,
-        };
-
-        package.set_package_name();
-
-        package
-    }
-
-    pub fn full_name(&self) -> String {
-        format!("{} {}", self.name, self.source.full_name())
-    }
-
-    pub fn colour_full_name(&self) -> String {
-        format!("{} {}", self.name.yellow(), self.source.colour_full_name())
-    }
-
-    pub fn command(&self) -> &str {
-        self.source.command()
-    }
-
-    pub fn install_command(&self) -> Vec<&str> {
-        let mut commands = self.source.install_command();
-        if self.source.needs_root() {
-            commands.insert(0, "sudo");
-        }
-        commands.push(&*self.name);
-
-        commands
-    }
-
-    pub fn is_installed(&self) -> Result<bool, Box<dyn Error>> {
-        let mut options = ScriptOptions::new();
-        options.exit_on_error = true;
-        options.print_commands = false;
-
-        let install_script = match self.is_installed_script() {
-            Some(install_script) => install_script,
-            // Return that it's installed when this package is not available on this OS
-            None => return Ok(true),
-        };
-
-        let (code, _output, _error) = run_script::run(&*install_script, &vec![], &options)
-            .context("could not run is installed script")?;
-
-        Ok(code == 0)
-    }
-
-    pub fn set_package_name(&mut self) {
-        let package_name = self
-            .name
-            .split(' ')
-            // If the string starts with - ignore it, so all the flags
-            .filter(|s| !s.starts_with('-'))
-            // If the string starts with http get the last part which is a gamble but most of the
-            // times it matches the package name
-            .map(|s| {
-                if s.starts_with("http") {
-                    s.split('/').last().unwrap()
-                } else {
-                    s
-                }
-            })
-            .join(" ");
-
-        self.package_name = Some(package_name);
-    }
-
-    fn is_installed_script(&self) -> Option<String> {
-        let package_name = match &self.package_name {
-            Some(package_name) => package_name,
-            None => {
-                panic!("Could not get package name, function `set_package_name` not called yet")
-            }
-        };
-
-        match self.source.is_installed_script() {
-            Some(script) => Some(format!("{} {}", script, package_name)),
-            None => None,
+            flags,
         }
     }
-}
 
-impl fmt::Display for Package {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.full_name())
+    /// Only the package name.
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// The name including the flags.
+    pub fn full_command(&self) -> String {
+        self.flags.iter().chain(iter::once(&self.name)).join(" ")
+    }
+
+    /// The full command needed to install this package.
+    pub fn install_command(&self) -> String {
+        format!("{} {}", self.source.install_command(), self.full_command())
+    }
+
+    /// The full name in fancy colors.
+    pub fn color_full_name(&self) -> String {
+        if self.flags.is_empty() {
+            format!(
+                "{} ({})",
+                self.name.yellow(),
+                self.source.full_name().green()
+            )
+        } else {
+            format!(
+                "{} {} ({})",
+                self.flags.iter().join(" ").dimmed(),
+                self.name.yellow(),
+                self.source.full_name().green(),
+            )
+        }
+    }
+
+    /// The command line flags.
+    ///
+    /// Used by the test_macro.
+    #[allow(unused)]
+    pub fn flags(&self) -> &Vec<String> {
+        &self.flags
+    }
+
+    /// Check if this package is already installed.
+    pub fn is_installed(&self) -> Result<bool> {
+        self.source.package_is_installed(&self)
+    }
+
+    /// Check if the package manager can be found.
+    pub fn is_available(&self) -> bool {
+        self.source.is_available()
     }
 }
 
 impl Ord for Package {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.full_name().cmp(&other.full_name())
+        self.full_command().cmp(&other.full_command())
     }
 }
 
@@ -329,32 +95,46 @@ impl PartialOrd for Package {
     }
 }
 
-impl PartialEq for Package {
-    fn eq(&self, other: &Self) -> bool {
-        self.full_name() == other.full_name() && self.source == other.source
-    }
-}
-
-impl Eq for Package {}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Packages(pub Vec<Package>);
-
-impl From<Vec<Package>> for Packages {
-    fn from(x: Vec<Package>) -> Self {
-        Packages(x)
-    }
-}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Packages(Vec<Package>);
 
 impl Packages {
-    pub fn iter(&self) -> Iter<Package> {
-        self.0.iter()
+    /// An empty list.
+    pub fn empty() -> Self {
+        Self(vec![])
     }
 
-    pub fn iter_mut(&mut self) -> IterMut<Package> {
-        self.0.iter_mut()
+    /// Parse a line into a list of packages.
+    pub fn from_line(line: &str) -> Self {
+        // First we split the line into separating characters
+        let lines = line
+            .split(|c| c == ';' || c == '|' || c == '&')
+            // Then try to find the proper package manager for each line, this also filters out
+            // lines that are not related to the package manager
+            .filter_map(|line| {
+                // Filter out matches with less than 4 characters, it's impossible to install a
+                // package that we can catch like that
+                if line.len() < 4 {
+                    return None;
+                }
+
+                // Attempt to find a matching package manager with the line
+                match PackageManager::from_line(line) {
+                    // Pass the line along
+                    Some(manager) => Some((line, manager)),
+                    None => None,
+                }
+            })
+            // Parse the packages in the line with the package manager supplied
+            .map(|(line, package_manager)| package_manager.catch(line))
+            // Create a long list of the list of lists
+            .flatten()
+            .collect();
+
+        Self(lines)
     }
 
+    /// Get the union of this and another list of packages.
     pub fn merge(&mut self, other: &mut Packages) {
         // Add the other packages
         self.0.append(&mut other.0);
@@ -365,6 +145,7 @@ impl Packages {
         self.0.dedup();
     }
 
+    /// Remove all packages that have been saved already.
     pub fn filter_saved_packages(&mut self, old: &Packages) {
         self.0 = self
             .0
@@ -374,31 +155,35 @@ impl Packages {
             .collect();
     }
 
+    /// Construct a commit message depending on the amount of packages that need to be committed.
     pub fn commit_message(&self) -> String {
         match self.0.len() {
             0 => panic!("Can't create a commit message for empty changes"),
-            1 => format!("Emplace - mirror package \"{}\"", self.0[0]),
+            1 => format!("Emplace - mirror package \"{}\"", self.0[0].full_command()),
             n => format!("Emplace - mirror {} packages", n),
         }
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl IntoIterator for Packages {
+    type Item = Package;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
 
-    #[test]
-    fn test_packages_deduplication() {
-        let package = Package::new(PackageSource::Cargo, "test".to_string());
-        let duplicate_package = Package::new(PackageSource::Cargo, "test".to_string());
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
 
-        let packages_vec = vec![package];
-        let duplicate_packages_vec = vec![duplicate_package];
+impl Deref for Packages {
+    type Target = Vec<Package>;
 
-        let mut packages = Packages(packages_vec);
-        let mut duplicate_packages = Packages(duplicate_packages_vec);
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
-        packages.merge(&mut duplicate_packages);
-        assert_eq!(1, packages.0.len());
+impl From<Vec<Package>> for Packages {
+    fn from(x: Vec<Package>) -> Self {
+        Packages(x)
     }
 }
