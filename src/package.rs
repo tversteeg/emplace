@@ -43,7 +43,15 @@ impl Package {
 
     /// The full command needed to install this package.
     pub fn install_command(&self) -> String {
-        format!("{} {}", self.source.install_command(), self.full_command())
+        if self.source.needs_root() {
+            format!(
+                "sudo {} {}",
+                self.source.install_command(),
+                self.full_command()
+            )
+        } else {
+            format!("{} {}", self.source.install_command(), self.full_command())
+        }
     }
 
     /// The full name in fancy colors.
