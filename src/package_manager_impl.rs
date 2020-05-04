@@ -3,6 +3,7 @@ use crate::{
     package_manager::{CaptureFlag, PackageInstalledMethod, PackageManager, PackageManagerTrait},
 };
 use anyhow::{Context, Result};
+use itertools::Itertools;
 use run_script::ScriptOptions;
 use std::{
     iter::Peekable,
@@ -75,27 +76,33 @@ impl PackageManager {
                 // for example 'apt' & 'apt-get'
                 match line.split(&format!("{} ", command)).nth(1) {
                     Some(rest_of_line) => {
-                        // Split all arguments
-                        let mut args_iter = rest_of_line.split_ascii_whitespace().peekable();
-
                         // The resulting packages strings
                         let mut package_strings = vec![];
 
                         // A list of flags that we caught that we should keep track of
                         let mut catched_flags = vec![];
 
-                        // Keep track of whether the installation subcommand is present
-                        let mut has_sub_command = false;
+                        // Get which sub command is used
+                        let sub_command = self
+                            .sub_commands()
+                            .clone()
+                            .into_iter()
+                            .find(|command| rest_of_line.contains(&format!("{} ", command)));
+
+                        // Remove the sub command from the line
+                        let line_without_subcommand = match sub_command {
+                            Some(command) => rest_of_line.split(command).join(""),
+                            // No installation subcommand means no packages
+                            None => return vec![],
+                        };
+
+                        // Convert the line into an iterator over all arguments delimited by
+                        // whitespace
+                        let mut args_iter =
+                            line_without_subcommand.split_ascii_whitespace().peekable();
 
                         // Loop over the arguments handling flags in a special way
                         while let Some(arg) = args_iter.next() {
-                            // Ignore the sub command
-                            if !has_sub_command && self.sub_commands().contains(&arg) {
-                                has_sub_command = true;
-                                continue;
-                            }
-
-                            // Check if the argument is a flag
                             if arg.starts_with('-') {
                                 self.handle_capture_flags(&arg, &mut args_iter, &mut catched_flags);
 
@@ -109,11 +116,6 @@ impl PackageManager {
                                 // We've found a package
                                 package_strings.push(arg.to_string());
                             }
-                        }
-
-                        // No installation subcommand means no packages
-                        if !has_sub_command {
-                            return vec![];
                         }
 
                         // Now convert it into actual packages

@@ -14,7 +14,6 @@ impl PackageManagerTrait for Rustup {
     }
 
     fn sub_commands(self) -> Vec<&'static str> {
-        // TODO support this construction
         vec!["component add"]
     }
 
@@ -58,9 +57,9 @@ mod tests {
     #[test]
     fn test_catch() {
         // Regular invocation
-        //catch!(PackageManager::from(Rustup), "rustup component add clippy test" => "test");
+        catch!(PackageManager::from(Rustup), "rustup component add test" => "test");
 
         // Multiple
-        //catch!(PackageManager::from(Rustup), "rustup component add test test2" => "test", "test2");
+        catch!(PackageManager::from(Rustup), "rustup component add test test2" => "test", "test2");
     }
 }
