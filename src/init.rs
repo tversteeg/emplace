@@ -42,7 +42,9 @@ emplace_precmd() {
     # quit when the previous command failed
     [ -z "$!" ] && exit
 
-    local this_command=`HISTTIMEFORMAT= echo `history -1` | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
+    local hist=`history -1`
+
+    local this_command=`HISTTIMEFORMAT= echo $hist | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
     ## EMPLACE ## catch "$this_command"
 }
 # Don't hook them double in nested shells
