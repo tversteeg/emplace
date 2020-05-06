@@ -31,7 +31,9 @@ emplace_postexec_invoke_exec () {
     # quit when the previous command failed
     [ -z "$!" ] && exit $?
 
-    local this_command=`HISTTIMEFORMAT= echo `history 1` | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
+    local hist=`history 1`
+
+    local this_command=`HISTTIMEFORMAT= echo $hist | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
     ## EMPLACE ## catch "$this_command"
 }
 PROMPT_COMMAND="emplace_postexec_invoke_exec;$PROMPT_COMMAND"
