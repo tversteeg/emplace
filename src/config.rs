@@ -8,8 +8,24 @@ use std::{
     string::String,
 };
 
+/// A symbolic link that will be created by the install command.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Symlink {
+    /// The relative path in the repository.
+    pub source: String,
+    /// The absolute path on disk.
+    pub destination: String,
+}
+
+impl Symlink {
+    /// Expanded destination path.
+    pub fn expanded_destination(&self) -> PathBuf {
+        PathBuf::from(shellexpand::tilde(&self.destination).into_owned())
+    }
+}
+
 /// Repository specific configuration.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RepoConfig {
     pub url: String,
     #[serde(default = "RepoConfig::default_branch")]
@@ -41,11 +57,13 @@ impl RepoConfig {
 }
 
 /// Emplace configuration.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
     #[serde(default = "Config::default_mirror_dir_string")]
     pub repo_directory: String,
     pub repo: RepoConfig,
+    #[serde(default = "Vec::new", rename = "symlink")]
+    pub symlinks: Vec<Symlink>,
 }
 
 impl Config {
@@ -59,6 +77,7 @@ impl Config {
         let config = Config {
             repo_directory: Config::default_mirror_dir_string(),
             repo: RepoConfig::new(repo_url),
+            symlinks: Vec::new(),
         };
 
         // Save the config
@@ -113,8 +132,14 @@ impl Config {
         Ok(())
     }
 
+    /// The repository path.
+    pub fn folder_path(&self) -> PathBuf {
+        PathBuf::from(&self.repo_directory)
+    }
+
+    /// The path of the .emplace file.
     pub fn full_file_path(&self) -> PathBuf {
-        let mut base = PathBuf::from(self.repo_directory.clone());
+        let mut base = PathBuf::from(&self.repo_directory);
         base.push(self.repo.path());
 
         base

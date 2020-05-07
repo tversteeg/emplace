@@ -1,14 +1,18 @@
 use crate::{config::Config, package::Package, repo::Repo};
 use anyhow::{anyhow, Context, Result};
 use log::{debug, error};
-use std::process::Command;
+#[cfg(unix)]
+use std::os::unix::fs::symlink;
+#[cfg(not(unix))]
+use std::os::windows::fs::symlink_read as symlink;
+use std::{io::ErrorKind, process::Command};
 
 pub fn install() -> Result<()> {
     // Get the config
     let config = Config::from_default_file_or_new()?;
 
     // Get the repository from the config
-    let repo = Repo::new(config)?;
+    let repo = Repo::new(config.clone())?;
 
     // Read the packages from the repository
     let packages = repo.read().context("reading packages to install")?;
@@ -62,6 +66,61 @@ pub fn install() -> Result<()> {
             Err(err) => error!("\"{}\": {:?}", package.install_command(), err),
         };
     }
+
+    // Create the symbolic links if applicable
+    config
+        .symlinks
+        .iter()
+        // Only create symbolic references when there's no file
+        .filter(|symlink| match symlink.expanded_destination().metadata() {
+            // The file exists, do nothing
+            Ok(_) => false,
+            Err(err) => {
+                if err.kind() == ErrorKind::NotFound {
+                    // The file doesn't exist, create a symlink
+                    true
+                } else {
+                    // Something is wrong with the path
+                    error!(
+                        "Symlink destination path \"{}\" has error: {}",
+                        symlink.destination, err
+                    );
+
+                    // Do nothing for this path
+                    false
+                }
+            }
+        })
+        // Create the full path for source and return it together with the destination
+        .map(|symlink| {
+            (
+                config.folder_path().join(&symlink.source),
+                &symlink.source,
+                symlink.expanded_destination(),
+            )
+        })
+        .for_each(|(full_source, short_source, destination)| {
+            // Return an error when the file doesn't exist in the repository
+            if !full_source.exists() {
+                error!(
+                    "Could not create symbolic reference for \"{}\", file does not exist.",
+                    full_source.to_str().unwrap_or("invalid_path")
+                );
+                return;
+            }
+
+            println!("Creating symbolic reference for \"{}\".", short_source);
+
+            // Create the symbolic reference
+            if let Err(err) = symlink(&full_source, &destination) {
+                error!(
+                    "Could not create symbolic reference to \"{}\": {}",
+                    destination.to_str().unwrap_or("invalid_path"),
+                    err
+                );
+                return;
+            }
+        });
 
     Ok(())
 }
