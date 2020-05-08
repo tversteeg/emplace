@@ -5,7 +5,7 @@ use log::{debug, error, warn};
 #[cfg(unix)]
 use std::os::unix::fs::symlink;
 #[cfg(not(unix))]
-use std::os::windows::fs::symlink_read as symlink;
+use std::os::windows::fs::symlink_file as symlink;
 use std::{fs, io::ErrorKind, process::Command};
 
 pub fn install() -> Result<()> {
