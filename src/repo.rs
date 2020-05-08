@@ -5,6 +5,10 @@ use ron::{
     de,
     ser::{to_string_pretty, PrettyConfig},
 };
+#[cfg(unix)]
+use std::os::unix::fs::symlink;
+#[cfg(not(unix))]
+use std::os::windows::fs::symlink_file as symlink;
 use std::{
     fs::{self, File},
     io::Read,
@@ -44,9 +48,18 @@ impl Repo {
             // Create the emplace file if it doesn't exist
             let emplace_file = config.full_file_path();
             if !emplace_file.exists() {
-                let empty_packages = Packages::empty();
-                let toml_string = to_string_pretty(&empty_packages, Repo::pretty_config())?;
-                fs::write(&emplace_file, toml_string)?;
+                // If the repo contains a configuration file create a symbolic link to that,
+                // otherwise create a new configuration file
+                let repo_config_file = path.join("emplace.toml");
+                if repo_config_file.exists() {
+                    // Create a symbolic link
+                    symlink(repo_config_file, &emplace_file)?;
+                } else {
+                    // Create a new configuration file
+                    let empty_packages = Packages::empty();
+                    let toml_string = to_string_pretty(&empty_packages, Repo::pretty_config())?;
+                    fs::write(&emplace_file, toml_string)?;
+                }
             }
         }
 
