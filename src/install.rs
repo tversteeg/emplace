@@ -87,7 +87,7 @@ pub fn install() -> Result<()> {
                     // If it already is a symbolic link follow it
                     if metadata.file_type().is_symlink() {
                         // Follow the link and check if it's already the correct one
-                        if &fs::read_link(destination).unwrap_or("".into()) == source {
+                        if &fs::read_link(destination).unwrap_or_else(|_| "".into()) == source {
                             // It's already correct, no need to do anything
                             return false;
                         } else {
