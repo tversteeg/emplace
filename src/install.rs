@@ -1,11 +1,12 @@
 use crate::{config::Config, package::Package, repo::Repo};
 use anyhow::{anyhow, Context, Result};
-use log::{debug, error};
+use dialoguer::{Confirm, MultiSelect};
+use log::{debug, error, warn};
 #[cfg(unix)]
 use std::os::unix::fs::symlink;
 #[cfg(not(unix))]
 use std::os::windows::fs::symlink_read as symlink;
-use std::{io::ErrorKind, process::Command};
+use std::{fs, io::ErrorKind, process::Command};
 
 pub fn install() -> Result<()> {
     // Get the config
@@ -47,7 +48,7 @@ pub fn install() -> Result<()> {
     }
 
     // Prompt the user for which package to install
-    let selections = dialoguer::MultiSelect::new()
+    let selections = MultiSelect::new()
         .with_prompt("Select the packages you want to install (space to add)")
         .items(&package_names[..])
         .interact()
@@ -71,26 +72,6 @@ pub fn install() -> Result<()> {
     config
         .symlinks
         .iter()
-        // Only create symbolic references when there's no file
-        .filter(|symlink| match symlink.expanded_destination().metadata() {
-            // The file exists, do nothing
-            Ok(_) => false,
-            Err(err) => {
-                if err.kind() == ErrorKind::NotFound {
-                    // The file doesn't exist, create a symlink
-                    true
-                } else {
-                    // Something is wrong with the path
-                    error!(
-                        "Symlink destination path \"{}\" has error: {}",
-                        symlink.destination, err
-                    );
-
-                    // Do nothing for this path
-                    false
-                }
-            }
-        })
         // Create the full path for source and return it together with the destination
         .map(|symlink| {
             (
@@ -99,6 +80,86 @@ pub fn install() -> Result<()> {
                 symlink.expanded_destination(),
             )
         })
+        // Only create symbolic references when there's no file
+        .filter(
+            |(source, short_source, destination)| match destination.symlink_metadata() {
+                Ok(metadata) => {
+                    // If it already is a symbolic link follow it
+                    if metadata.file_type().is_symlink() {
+                        // Follow the link and check if it's already the correct one
+                        if &fs::read_link(destination).unwrap_or("".into()) == source {
+                            // It's already correct, no need to do anything
+                            return false;
+                        } else {
+                            warn!(
+                                "Symlink already exists for \"{}\" to \"{}\".",
+                                short_source,
+                                destination.to_str().unwrap_or("invalid path")
+                            );
+                        }
+                    } else if metadata.is_dir() {
+                        // It's a directory, print the error and do nothing
+                        error!(
+                            "Symlink destination \"{}\" is a directory, please remove it manually.",
+                            destination.to_str().unwrap_or("invalid path")
+                        );
+                        return false;
+                    } else {
+                        // It's a file
+                        warn!(
+                            "Symlink destination \"{}\" seems to be a file.",
+                            destination.to_str().unwrap_or("invalid path")
+                        );
+                    }
+
+                    // Ask the user if they want to remove the old file
+                    match Confirm::new()
+                        .with_prompt(&format!(
+                        "Do you want to remove \"{}\" and replace it with a symbolic reference?",
+                            destination.to_str().unwrap_or("invalid path")
+                            ))
+                        .interact()
+                    {
+                        Ok(ok) => {
+                            if ok {
+                                // Attempt to remove the file
+                                if let Err(err) = fs::remove_file(destination) {
+                                    error!("Removing file failed: {}", err);
+                                    false
+                                } else {
+                                    // The file was removed successfully, create the symlink
+                                    true
+                                }
+                            } else {
+                                // The user doesn't want to remove the file
+                                false
+                            }
+                        }
+                        Err(err) => {
+                            // Something went wrong with the dialogue
+                            error!("Dialoguer error: {}", err);
+                            false
+                        }
+                    }
+                }
+                Err(err) => {
+                    if err.kind() == ErrorKind::NotFound {
+                        // The file doesn't exist, create a symlink
+                        true
+                    } else {
+                        // Something is wrong with the path
+                        error!(
+                            "Symlink destination path \"{}\" has error: {}",
+                            destination.to_str().unwrap_or("invalid path"),
+                            err
+                        );
+
+                        // Do nothing for this path
+                        false
+                    }
+                }
+            },
+        )
         .for_each(|(full_source, short_source, destination)| {
             // Return an error when the file doesn't exist in the repository
             if !full_source.exists() {
