@@ -209,6 +209,7 @@ dependencies = [
  "dialoguer",
  "dirs",
  "enum_dispatch",
+ "is_executable",
  "itertools",
  "log",
  "ron",
@@ -276,6 +277,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "61565ff7aaace3525556587bd2dc31d4a07071957be715e63ce7b1eccf51a8f4"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "is_executable"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "302d553b8abc8187beb7d663e34c065ac4570b273bc9511a50e940e99409c577"
+dependencies = [
+ "winapi",
 ]
 
 [[package]]
