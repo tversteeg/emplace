@@ -3,12 +3,13 @@ use crate::{
     package_manager::{CaptureFlag, PackageInstalledMethod, PackageManager, PackageManagerTrait},
 };
 use anyhow::{Context, Result};
-use itertools::Itertools;
+#[macro_use]
+use itertools::{Itertools, iproduct};
+use is_executable::is_executable;
 use run_script::ScriptOptions;
-use std::{
-    iter::Peekable,
-    process::{Command, Stdio},
-};
+use std::env::split_paths;
+use std::iter::Peekable;
+use std::path::PathBuf;
 use strum::IntoEnumIterator;
 
 impl PackageManager {
@@ -55,14 +56,16 @@ impl PackageManager {
 
     /// Check if this package manager is available.
     pub fn is_available(self) -> bool {
-        // TODO check for the command in the path instead of executing it
-        self.commands().into_iter().any(|command| {
-            Command::new(command)
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .spawn()
-                .is_ok()
-        })
+        let path = std::env::var_os("PATH").expect("PATH env is not set");
+        //taking all paths, merging them with executable name and checking, that executable exists.
+
+        let paths: Vec<PathBuf> = split_paths(&path).collect();
+        //creating cartesian product  of (Path, executable_name) and checking
+        // if any of pairs exists
+        iproduct!(paths, self.commands())
+            .map(|(path, exec): (PathBuf, &str)| path.join(PathBuf::from(exec)))
+            .map(is_executable)
+            .any(|x| x)
     }
 
     /// Extract the packages from the line.
