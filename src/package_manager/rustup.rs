@@ -39,7 +39,10 @@ impl PackageManagerTrait for Rustup {
     }
 
     fn capture_flags(self) -> Vec<CaptureFlag> {
-        vec![]
+        vec![
+            CaptureFlag::DynamicValue("--target"),
+            CaptureFlag::DynamicValue("--toolchain"),
+        ]
     }
 }
 
