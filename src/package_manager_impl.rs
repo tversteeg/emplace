@@ -3,13 +3,10 @@ use crate::{
     package_manager::{CaptureFlag, PackageInstalledMethod, PackageManager, PackageManagerTrait},
 };
 use anyhow::{Context, Result};
-#[macro_use]
-use itertools::{Itertools, iproduct};
 use is_executable::is_executable;
+use itertools::{iproduct, Itertools};
 use run_script::ScriptOptions;
-use std::env::split_paths;
-use std::iter::Peekable;
-use std::path::PathBuf;
+use std::{env::split_paths, iter::Peekable, path::PathBuf};
 use strum::IntoEnumIterator;
 
 impl PackageManager {

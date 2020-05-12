@@ -11,7 +11,7 @@ pub fn clean() -> Result<()> {
     let config = Config::from_default_file_or_new()?;
 
     // Get the repository from the config
-    let repo = Repo::new(config)?;
+    let repo = Repo::new(config, true)?;
 
     // Read the packages from the repository
     let packages = repo.read().context("reading packages to clean")?;

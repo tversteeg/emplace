@@ -45,7 +45,7 @@ pub fn history(path: &Path) -> Result<()> {
     let config = Config::from_default_file_or_new()?;
 
     // Get the repository from the config
-    let repo = Repo::new(config)?;
+    let repo = Repo::new(config, true)?;
 
     let mut catches = Packages::from(catches);
     catches.filter_saved_packages(&repo.read()?);

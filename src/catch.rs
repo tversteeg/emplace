@@ -21,11 +21,19 @@ pub fn catch(line: &str) -> Result<()> {
     let config = Config::from_default_file_or_new()?;
 
     // Get the repository from the config
-    let repo = Repo::new(config)?;
+    let repo = Repo::new(config, false)?;
 
     // Only keep the packages that haven't been saved already
     catches.filter_saved_packages(&repo.read()?);
+    if catches.is_empty() {
+        // Nothing found after filtering
+        return Ok(());
+    }
 
+    // Now pull the repository and try it again
+    repo.pull()?;
+
+    catches.filter_saved_packages(&repo.read()?);
     let len = catches.len();
     if len == 0 {
         // Nothing found after filtering

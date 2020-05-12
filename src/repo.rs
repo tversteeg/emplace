@@ -23,7 +23,7 @@ pub struct Repo {
 }
 
 impl Repo {
-    pub fn new(config: Config) -> Result<Self> {
+    pub fn new(config: Config, pull_if_exists: bool) -> Result<Self> {
         debug!("Retrieving repository");
 
         let repo_directory = config.repo_directory.clone();
@@ -37,7 +37,9 @@ impl Repo {
         if repo_exists {
             println!("Opening Emplace repo: \"{}\".", path_str);
 
-            git::pull(&path, &repo_branch).context("pulling existing repo from config")?;
+            if pull_if_exists {
+                git::pull(&path, &repo_branch).context("pulling existing repo from config")?;
+            }
         } else {
             println!("Cloning Emplace repo \"{}\" to \"{}\".", repo_url, path_str);
 
@@ -67,6 +69,14 @@ impl Repo {
             config,
             path: path.to_path_buf(),
         })
+    }
+
+    /// Perform a git pull on the repository.
+    pub fn pull(&self) -> Result<()> {
+        let repo_branch = self.config.repo.branch.clone();
+        git::pull(&self.path, &repo_branch).context("pulling repository")?;
+
+        Ok(())
     }
 
     pub fn read(&self) -> Result<Packages> {
