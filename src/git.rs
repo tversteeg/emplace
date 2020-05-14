@@ -1,17 +1,19 @@
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use itertools::Itertools;
 use log::{debug, error};
 use std::{
     path::Path,
     process::{Command, Stdio},
+    str,
 };
 
-fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P) -> Result<bool> {
+fn build_command<P: AsRef<Path>>(command: Vec<&str>, path: &P) -> Result<Command> {
     let mut iter = command.iter();
-    let cmd_name = iter.next().unwrap();
+    let cmd_name = iter
+        .next()
+        .ok_or_else(|| anyhow!("Malformed git command"))?;
 
     let mut cmd = Command::new(cmd_name);
-    cmd.stdout(Stdio::null());
     cmd.stderr(Stdio::null());
     cmd.current_dir(path);
 
@@ -27,10 +29,23 @@ fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P) -> Result<bool> {
         }
     }
 
+    Ok(cmd)
+}
+
+fn call_on_path<P: AsRef<Path>>(command: Vec<&str>, path: &P) -> Result<bool> {
+    let mut cmd = build_command(command, path)?;
+    cmd.stdout(Stdio::null());
+
     let mut child = cmd.spawn().context("failed spawning process")?;
     let result = child.wait().context("failed waiting for result")?;
 
     Ok(result.success())
+}
+
+fn call_on_path_has_output<P: AsRef<Path>>(command: Vec<&str>, path: &P) -> Result<bool> {
+    let mut cmd = build_command(command, path)?;
+
+    Ok(str::from_utf8(&cmd.output()?.stdout)?.trim() != "")
 }
 
 pub fn commit_all<P: AsRef<Path>>(dir: &P, msg: &str, sign: bool) -> Result<bool> {
@@ -100,6 +115,21 @@ pub fn clone_single_branch<P: AsRef<Path>>(dir: &P, url: &str, branch: &str) -> 
     Ok(success)
 }
 
+/// Stage a specific file for commiting.
 pub fn add_file<P: AsRef<Path>>(dir: &P, file: &str) -> Result<bool> {
     call_on_path(vec!["git", "add", file], dir).context("failed adding file in git")
+}
+
+/// Stage all files for commiting.
+pub fn add_all_files<P: AsRef<Path>>(dir: &P) -> Result<bool> {
+    call_on_path(vec!["git", "add", "-A"], dir).context("failed adding all files in git")
+}
+
+/// Do a git status to verify if there are local changes.
+pub fn has_changes<P: AsRef<Path>>(dir: &P) -> Result<bool> {
+    Ok(!call_on_path_has_output(
+        vec!["git", "ls-files", "--others", "--exclude-standard"],
+        dir,
+    )
+    .context("failed checking if there are git changes")?)
 }

@@ -107,7 +107,7 @@ impl Repo {
 
     pub fn mirror(&self, mut commands: Packages) -> Result<()> {
         // Get the message first before the old stuff is added
-        let commit_msg = commands.commit_message();
+        let mut commit_msg = commands.commit_message();
 
         let full_path = self.config.full_file_path();
         if full_path.exists() {
@@ -123,8 +123,16 @@ impl Repo {
 
         fs::write(&full_path, toml_string)?;
 
-        println!("Commiting with message \"{}\".", commit_msg);
+        // Add the file to git
         git::add_file(&self.path, &*self.config.repo.file)?;
+
+        // Check if there are other changes
+        if git::has_changes(&self.path)? {
+            commit_msg.push_str("\nIncluding changes of other files in the repository.");
+            git::add_all_files(&self.path)?;
+        }
+
+        println!("Commiting with message \"{}\".", commit_msg);
         git::commit_all(&self.path, &*commit_msg, false)?;
 
         println!("Pushing to remote.");
