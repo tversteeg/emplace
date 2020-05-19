@@ -18,7 +18,7 @@ is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
 anyhow = "1.0.31"
 clap = "2.33.1"
 colored = "1.9.3"
-console = "0.11.2"
+console = "0.11.3"
 dialoguer = "0.6.2"
 dirs = "2.0.2"
 enum_dispatch = "0.3.0"
