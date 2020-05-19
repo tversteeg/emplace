@@ -42,7 +42,10 @@ impl PackageManagerTrait for Cargo {
     }
 
     fn capture_flags(self) -> Vec<CaptureFlag> {
-        vec![CaptureFlag::Single("--git")]
+        vec![
+            CaptureFlag::Single("--git"),
+            CaptureFlag::DynamicValue("--branch"),
+        ]
     }
 }
 
@@ -67,5 +70,6 @@ mod tests {
 
         // Flags that should be captured
         catch!(PackageManager::from(Cargo), "cargo install --git https://test.com/test.git" => "https://test.com/test.git" ["--git"]);
+        catch!(PackageManager::from(Cargo), "cargo install --git https://test.com/test.git --branch 3.x" => "https://test.com/test.git" ["--git", "--branch 3.x"]);
     }
 }
