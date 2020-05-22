@@ -10,10 +10,10 @@ use std::{fs, io::ErrorKind, process::Command};
 
 pub fn install() -> Result<()> {
     // Get the config
-    let config = Config::from_default_file_or_new()?;
+    let config = Config::from_default_file_or_new().context("retrieving config")?;
 
     // Get the repository from the config
-    let repo = Repo::new(config.clone(), true)?;
+    let repo = Repo::new(config.clone(), true).context("opening repository")?;
 
     // Read the packages from the repository
     let packages = repo.read().context("reading packages to install")?;
