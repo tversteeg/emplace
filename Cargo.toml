@@ -33,3 +33,20 @@ strum = "0.18.0"
 strum_macros = "0.18.0"
 toml = "0.5.6"
 is_executable = "0.1.2"
+
+[package.metadata.deb]
+maintainer = "Thomas Versteeg <thomasversteeg@gmx.com>"
+copyright = "2019, Thomas Versteeg <thomasversteeg@gmx.com>"
+license-file = ["LICENSE", "4"]
+extended-description = """\
+A command-line tool to mirror installed software on multiple machines. \
+Hooks into your shell to keep track of what you are installing. \
+Can also be used to sync configuration files. \
+"""
+depends = "$auto"
+section = "utility"
+priority = "optional"
+assets = [
+	["target/release/emplace", "usr/bin/", "755"],
+	["README.md", "usr/share/doc/emplace/README", "644"],
+]
