@@ -93,12 +93,20 @@ impl Config {
             None => Config::new(),
         }
     }
+    /// Ask the user if he wants to change the repo path, clone it or create locally, or abort
     pub fn clone_repo_ask(&mut self) -> Result<bool> {
         let prompt = String::from("Choose what to do with the repository");
-        let choices = &["Change repository path before cloning it","Clone the repo or create the repository locally", "Do nothing for now"];
-        let chosen = dialoguer::MultiSelect::new().with_prompt(prompt).items(choices).interact()?;
+        let choices = &[
+            "Change repository path before cloning it",
+            "Clone the repo or create the repository locally",
+            "Do nothing for now",
+        ];
+        let chosen = dialoguer::MultiSelect::new()
+            .with_prompt(prompt)
+            .items(choices)
+            .interact()?;
         if chosen.contains(&2) {
-            return Ok(false)
+            return Ok(false);
         }
         if chosen.contains(&0) {
             let repo_path = dialoguer::Input::<String>::new()
@@ -108,20 +116,23 @@ impl Config {
             self.save_to_default_path()?;
         }
         if chosen.contains(&1) {
-            let choices_in = &["Clone the repo","Create it locally"];
+            let choices_in = &["Clone the repo", "Create it locally"];
             let chosen_in = dialoguer::Select::new().items(choices_in).interact()?;
             if chosen_in == 0 {
-                return super::git::clone_single_branch(&self.repo_directory,&self.repo.url,&self.repo.branch)
-            }
-            else {
-                fs::DirBuilder::new().recursive(true).create(&self.repo_directory)?;
-                return super::git::set_remote(&self.repo_directory, &self.repo.url)
+                return super::git::clone_single_branch(
+                    &self.repo_directory,
+                    &self.repo.url,
+                    &self.repo.branch,
+                );
+            } else {
+                fs::DirBuilder::new()
+                    .recursive(true)
+                    .create(&self.repo_directory)?;
+                return super::git::set_remote(&self.repo_directory, &self.repo.url);
             }
         }
         Ok(true)
-
     }
-
 
     /// Try to open the default.
     pub fn from_default_file() -> Result<Option<Self>> {
@@ -179,6 +190,7 @@ impl Config {
         base
     }
 
+    // Modified it to pub to be able to retrieve the config path from main
     pub fn default_path() -> PathBuf {
         dirs::config_dir()
             .expect("Could not find config dir")
