@@ -114,6 +114,10 @@ pub fn clone_single_branch<P: AsRef<Path>>(dir: &P, url: &str, branch: &str) -> 
 
     Ok(success)
 }
+/// Set remote origin
+pub fn set_remote<P: AsRef<Path>>(dir: &P, remote: &str) -> Result<bool> {
+    call_on_path(vec!["git", "remote", "add", "origin", remote], dir).context("failed setting remote origin")
+}
 
 /// Stage a specific file for commiting.
 pub fn add_file<P: AsRef<Path>>(dir: &P, file: &str) -> Result<bool> {
