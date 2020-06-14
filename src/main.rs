@@ -71,6 +71,26 @@ fn safe_main() -> Result<()> {
 						.takes_value(true)
 				),
 		)
+                .subcommand(
+                    SubCommand::with_name("config")
+                    .about("Provides options for managing configuration")
+                    .arg(
+                        Arg::with_name("new")
+                        .short("n")
+                        .long("new")
+                        .help("Create a new config")
+                        .required_unless("path")
+                        .takes_value(false)
+                    )
+                    .arg(
+                        Arg::with_name("path")
+                        .short("p")
+                        .long("path")
+                        .help("Print out path to config")
+                        .required_unless("new")
+                        .takes_value(false)
+                    ),
+                )
 		.get_matches();
 
     match matches.subcommand() {
@@ -94,6 +114,22 @@ fn safe_main() -> Result<()> {
             );
 
             history::history(&hist_path).context("capturing history")
+        }
+        // Config subcommand, if path is present and new is not
+        // it will just print the default path for the config file
+        // else it will create a new config and ask what to do about the repository
+        ("config", Some(subm)) => {
+            if subm.is_present("path") && !subm.is_present("new") {
+                println!(
+                    "Your config path is {}",
+                    config::Config::default_path().to_str().unwrap()
+                );
+                Ok(())
+            } else {
+                let mut config = config::Config::new()?;
+                config.clone_repo_ask()?;
+                Ok(())
+            }
         }
         (&_, _) => Ok(()),
     }
