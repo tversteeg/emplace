@@ -150,6 +150,9 @@ It will parse your history and prompt to select, which packages you want to sync
 
 Run `emplace clean` and select the packages you want to be cleaned, they won't be removed from your system.
 
+
+### Creating and modifying config files
+Run `emplace config --new` to create a new config and configure the repository or `emplace config --path` to retrieve the path to the configuration file
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
