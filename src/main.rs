@@ -116,18 +116,20 @@ fn safe_main() -> Result<()> {
             history::history(&hist_path).context("capturing history")
         }
         // Config subcommand, if path is present and new is not
-        // it will just print the default path for the config file
-        // else it will create a new config and ask what to do about the repository
+        // it will just print the default path for the config file,
+        // otherwise it will create a new config and ask what to do about the repository
         ("config", Some(subm)) => {
             if subm.is_present("path") && !subm.is_present("new") {
                 println!(
                     "Your config path is {}",
                     config::Config::default_path().to_str().unwrap()
                 );
+
                 Ok(())
             } else {
                 let mut config = config::Config::new()?;
                 config.clone_repo_ask()?;
+
                 Ok(())
             }
         }

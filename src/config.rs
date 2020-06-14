@@ -93,7 +93,8 @@ impl Config {
             None => Config::new(),
         }
     }
-    /// Ask the user if he wants to change the repo path, clone it or create locally, or abort
+
+    /// Ask the user if he wants to change the repo path, clone it or create locally, or abort.
     pub fn clone_repo_ask(&mut self) -> Result<bool> {
         let prompt = String::from("Choose what to do with the repository");
         let choices = &[
@@ -190,7 +191,7 @@ impl Config {
         base
     }
 
-    // Modified it to pub to be able to retrieve the config path from main
+    /// Get the default path where the 'emplace.toml' file lives.
     pub fn default_path() -> PathBuf {
         dirs::config_dir()
             .expect("Could not find config dir")
