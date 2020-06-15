@@ -1,3 +1,4 @@
+use crate::git;
 use anyhow::Result;
 use log::info;
 use serde::{Deserialize, Serialize};
@@ -94,15 +95,21 @@ impl Config {
         }
     }
 
-    /// Ask the user if he wants to change the repo path, clone it or create locally, or abort.
+    /// Ask the user if they want to change the repo path, clone it or create locally, or abort.
     pub fn clone_repo_ask(&mut self) -> Result<bool> {
+        let term = console::Term::stdout();
+        let theme: Box<dyn dialoguer::theme::Theme> = if term.features().colors_supported() {
+            Box::new(dialoguer::theme::ColorfulTheme::default())
+        } else {
+            Box::new(dialoguer::theme::SimpleTheme)
+        };
         let prompt = String::from("Choose what to do with the repository");
         let choices = &[
             "Change repository path before cloning it",
             "Clone the repo or create the repository locally",
             "Do nothing for now",
         ];
-        let chosen = dialoguer::MultiSelect::new()
+        let chosen = dialoguer::MultiSelect::with_theme(&*theme)
             .with_prompt(prompt)
             .items(choices)
             .interact()?;
@@ -110,26 +117,30 @@ impl Config {
             return Ok(false);
         }
         if chosen.contains(&0) {
-            let repo_path = dialoguer::Input::<String>::new()
+            let repo_path = dialoguer::Input::<String>::with_theme(&*theme)
                 .with_prompt("Where do you want your repository to be located")
                 .interact()?;
             self.repo_directory = repo_path;
             self.save_to_default_path()?;
         }
         if chosen.contains(&1) {
+            // Prompt is to stop it from blending with previous terminal output
+            let prompt = "What do you want to do?";
             let choices_in = &["Clone the repo", "Create it locally"];
-            let chosen_in = dialoguer::Select::new().items(choices_in).interact()?;
+            let chosen_in = dialoguer::Select::with_theme(&*theme)
+                .with_prompt(prompt)
+                .items(choices_in)
+                .paged(true)
+                .clear(true)
+                .interact_on(&term)?;
             if chosen_in == 0 {
-                return super::git::clone_single_branch(
-                    &self.repo_directory,
-                    &self.repo.url,
-                    &self.repo.branch,
-                );
+                return git::clone_full(&self.repo_directory, &self.repo.url);
             } else {
                 fs::DirBuilder::new()
                     .recursive(true)
                     .create(&self.repo_directory)?;
-                return super::git::set_remote(&self.repo_directory, &self.repo.url);
+                git::init_repo(&self.repo_directory)?;
+                return git::set_remote(&self.repo_directory, &self.repo.url);
             }
         }
         Ok(true)
