@@ -1,3 +1,4 @@
+use crate::git;
 use anyhow::Result;
 use log::info;
 use serde::{Deserialize, Serialize};
@@ -7,7 +8,6 @@ use std::{
     path::{Path, PathBuf},
     string::String,
 };
-use crate::git;
 
 /// A symbolic link that will be created by the install command.
 #[derive(Debug, Clone, Serialize, Deserialize)]
