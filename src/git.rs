@@ -2,7 +2,7 @@ use anyhow::{anyhow, Context, Result};
 use itertools::Itertools;
 use log::{debug, error};
 use std::{
-    path::Path,
+    path::{Path,PathBuf},
     process::{Command, Stdio},
     str,
 };
@@ -91,10 +91,11 @@ pub fn pull<P: AsRef<Path>>(dir: &P, branch: &str) -> Result<bool> {
     )
     .context("failed pulling in git: merge")
 }
+
 /// Clone a full repository
 pub fn clone_full(dir: &str, url: &str) -> Result<bool> {
     // Create a dummy path since we specify absolute path for cloning
-    let dummy_path = std::path::PathBuf::from("./");
+    let dummy_path = PathBuf::from("./");
     call_on_path(vec!["git", "clone", url, dir], &dummy_path)
 }
 

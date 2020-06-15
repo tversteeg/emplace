@@ -7,6 +7,7 @@ use std::{
     path::{Path, PathBuf},
     string::String,
 };
+use crate::git;
 
 /// A symbolic link that will be created by the install command.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -133,14 +134,14 @@ impl Config {
                 .clear(true)
                 .interact_on(&term)?;
             if chosen_in == 0 {
-                return crate::git::clone_full(&self.repo_directory, &self.repo.url);
+                return git::clone_full(&self.repo_directory, &self.repo.url);
             } else {
                 fs::DirBuilder::new()
                     .recursive(true)
                     .create(&self.repo_directory)?;
                 // I obviously forgot that the repo needs to be initialized
-                crate::git::init_repo(&self.repo_directory)?;
-                return crate::git::set_remote(&self.repo_directory, &self.repo.url);
+                git::init_repo(&self.repo_directory)?;
+                return git::set_remote(&self.repo_directory, &self.repo.url);
             }
         }
         Ok(true)
