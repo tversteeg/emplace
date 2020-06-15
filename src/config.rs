@@ -108,7 +108,7 @@ impl Config {
             "Clone the repo or create the repository locally",
             "Do nothing for now",
         ];
-        let chosen = dialoguer::MultiSelect::new()
+        let chosen = dialoguer::MultiSelect::with_theme(&*theme)
             .with_prompt(prompt)
             .items(choices)
             .interact()?;
@@ -116,7 +116,7 @@ impl Config {
             return Ok(false);
         }
         if chosen.contains(&0) {
-            let repo_path = dialoguer::Input::<String>::new()
+            let repo_path = dialoguer::Input::<String>::with_theme(&*theme)
                 .with_prompt("Where do you want your repository to be located")
                 .interact()?;
             self.repo_directory = repo_path;
