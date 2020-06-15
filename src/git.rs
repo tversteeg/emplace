@@ -92,7 +92,7 @@ pub fn pull<P: AsRef<Path>>(dir: &P, branch: &str) -> Result<bool> {
     .context("failed pulling in git: merge")
 }
 
-/// Clone a full repository
+/// Clone a full repository.
 pub fn clone_full(dir: &str, url: &str) -> Result<bool> {
     // Create a dummy path since we specify absolute path for cloning
     let dummy_path = PathBuf::from("./");
