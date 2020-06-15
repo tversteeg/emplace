@@ -98,7 +98,7 @@ impl Config {
     pub fn clone_repo_ask(&mut self) -> Result<bool> {
         let term = console::Term::stdout();
         let theme: Box<dyn dialoguer::theme::Theme>;
-        if term.features().wants_emoji() {
+        if term.features().colors_supported() {
             theme = Box::new(dialoguer::theme::ColorfulTheme::default());
         } else {
             theme = Box::new(dialoguer::theme::SimpleTheme);

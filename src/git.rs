@@ -91,8 +91,9 @@ pub fn pull<P: AsRef<Path>>(dir: &P, branch: &str) -> Result<bool> {
     )
     .context("failed pulling in git: merge")
 }
-
+/// Clone a full repository
 pub fn clone_full(dir: &str, url: &str) -> Result<bool> {
+    // Create a dummy path since we specify absolute path for cloning
     let dummy_path = std::path::PathBuf::from("./");
     call_on_path(vec!["git", "clone", url, dir], &dummy_path)
 }
@@ -144,6 +145,7 @@ pub fn has_changes<P: AsRef<Path>>(dir: &P) -> Result<bool> {
     .context("failed checking if there are git changes")?)
 }
 
+/// Initialize an empty repository
 pub fn init_repo<P: AsRef<Path>>(dir: &P) -> Result<bool> {
     Ok(call_on_path(vec!["git", "init"], dir).context("Failed initializing the repository")?)
 }
