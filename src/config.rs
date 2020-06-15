@@ -139,7 +139,6 @@ impl Config {
                 fs::DirBuilder::new()
                     .recursive(true)
                     .create(&self.repo_directory)?;
-                // I obviously forgot that the repo needs to be initialized
                 git::init_repo(&self.repo_directory)?;
                 return git::set_remote(&self.repo_directory, &self.repo.url);
             }
