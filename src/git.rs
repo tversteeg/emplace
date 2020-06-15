@@ -92,6 +92,11 @@ pub fn pull<P: AsRef<Path>>(dir: &P, branch: &str) -> Result<bool> {
     .context("failed pulling in git: merge")
 }
 
+pub fn clone_full(dir: &str, url: &str) -> Result<bool> {
+    let dummy_path = std::path::PathBuf::from("./");
+    call_on_path(vec!["git", "clone", url, dir], &dummy_path)
+}
+
 pub fn clone_single_branch<P: AsRef<Path>>(dir: &P, url: &str, branch: &str) -> Result<bool> {
     let success = call_on_path(
         vec![
@@ -137,4 +142,8 @@ pub fn has_changes<P: AsRef<Path>>(dir: &P) -> Result<bool> {
         dir,
     )
     .context("failed checking if there are git changes")?)
+}
+
+pub fn init_repo<P: AsRef<Path>>(dir: &P) -> Result<bool> {
+    Ok(call_on_path(vec!["git", "init"], dir).context("Failed initializing the repository")?)
 }

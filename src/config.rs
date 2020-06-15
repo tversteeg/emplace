@@ -96,6 +96,13 @@ impl Config {
 
     /// Ask the user if he wants to change the repo path, clone it or create locally, or abort.
     pub fn clone_repo_ask(&mut self) -> Result<bool> {
+        let term = console::Term::stdout();
+        let theme: Box<dyn dialoguer::theme::Theme>;
+        if term.features().wants_emoji() {
+            theme = Box::new(dialoguer::theme::ColorfulTheme::default());
+        } else {
+            theme = Box::new(dialoguer::theme::SimpleTheme);
+        }
         let prompt = String::from("Choose what to do with the repository");
         let choices = &[
             "Change repository path before cloning it",
@@ -117,19 +124,24 @@ impl Config {
             self.save_to_default_path()?;
         }
         if chosen.contains(&1) {
+            // Prompt is to stop it from blending with previous terminal output
+            let prompt = "What do you want to do?";
             let choices_in = &["Clone the repo", "Create it locally"];
-            let chosen_in = dialoguer::Select::new().items(choices_in).interact()?;
+            let chosen_in = dialoguer::Select::with_theme(&*theme)
+                .with_prompt(prompt)
+                .items(choices_in)
+                .paged(true)
+                .clear(true)
+                .interact_on(&term)?;
             if chosen_in == 0 {
-                return super::git::clone_single_branch(
-                    &self.repo_directory,
-                    &self.repo.url,
-                    &self.repo.branch,
-                );
+                return crate::git::clone_full(&self.repo_directory, &self.repo.url);
             } else {
                 fs::DirBuilder::new()
                     .recursive(true)
                     .create(&self.repo_directory)?;
-                return super::git::set_remote(&self.repo_directory, &self.repo.url);
+                // I obviously forgot that the repo needs to be initialized
+                crate::git::init_repo(&self.repo_directory)?;
+                return crate::git::set_remote(&self.repo_directory, &self.repo.url);
             }
         }
         Ok(true)
