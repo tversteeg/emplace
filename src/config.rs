@@ -97,12 +97,11 @@ impl Config {
     /// Ask the user if he wants to change the repo path, clone it or create locally, or abort.
     pub fn clone_repo_ask(&mut self) -> Result<bool> {
         let term = console::Term::stdout();
-        let theme: Box<dyn dialoguer::theme::Theme>;
-        if term.features().colors_supported() {
-            theme = Box::new(dialoguer::theme::ColorfulTheme::default());
+        let theme: Box<dyn dialoguer::theme::Theme> = if term.features().colors_supported() {
+            Box::new(dialoguer::theme::ColorfulTheme::default())
         } else {
-            theme = Box::new(dialoguer::theme::SimpleTheme);
-        }
+            Box::new(dialoguer::theme::SimpleTheme)
+        };
         let prompt = String::from("Choose what to do with the repository");
         let choices = &[
             "Change repository path before cloning it",
