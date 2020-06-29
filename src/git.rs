@@ -139,7 +139,7 @@ pub fn add_all_files<P: AsRef<Path>>(dir: &P) -> Result<bool> {
 
 /// Do a git status to verify if there are local changes.
 pub fn has_changes<P: AsRef<Path>>(dir: &P) -> Result<bool> {
-    Ok(!call_on_path_has_output(
+    Ok(call_on_path_has_output(
         vec!["git", "ls-files", "--others", "--exclude-standard"],
         dir,
     )
