@@ -9,6 +9,7 @@ readme = "README.md"
 license = "AGPL-3.0-or-later"
 keywords = ["shell", "cli", "mirror", "sync"]
 categories = ["command-line-utilities"]
+include = ["src/**/*", "LICENSE", "README.md"]
 
 [badges]
 is-it-maintained-issue-resolution = { repository = "tversteeg/emplace" }
