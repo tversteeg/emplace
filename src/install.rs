@@ -1,6 +1,7 @@
 use crate::{config::Config, package::Package, repo::Repo};
 use anyhow::{anyhow, Context, Result};
 use dialoguer::{Confirm, MultiSelect};
+use glob::glob;
 use log::{debug, error, warn};
 #[cfg(unix)]
 use std::os::unix::fs::symlink;
@@ -44,28 +45,27 @@ pub fn install() -> Result<()> {
     // If there's nothing to install just return
     if package_names.is_empty() {
         println!("Nothing to install.");
-        return Ok(());
-    }
+    } else {
+        // Prompt the user for which package to install
+        let selections = MultiSelect::new()
+            .with_prompt("Select the packages you want to install (space to add)")
+            .items(&package_names[..])
+            .interact()
+            .context("failed constructing checkboxes")?;
 
-    // Prompt the user for which package to install
-    let selections = MultiSelect::new()
-        .with_prompt("Select the packages you want to install (space to add)")
-        .items(&package_names[..])
-        .interact()
-        .context("failed constructing checkboxes")?;
+        // Install the selected packages
+        for selection in selections {
+            let package = packages_to_install[selection];
+            println!("Installing: {}.", package.color_full_name());
 
-    // Install the selected packages
-    for selection in selections {
-        let package = packages_to_install[selection];
-        println!("Installing: {}.", package.color_full_name());
+            let install_command = package.install_command();
+            debug!("Installing: {}.", install_command);
 
-        let install_command = package.install_command();
-        debug!("Installing: {}.", install_command);
-
-        match call(install_command.split_ascii_whitespace().collect()) {
-            Ok(_) => println!("{} installed successfully.", package.color_full_name()),
-            Err(err) => error!("\"{}\": {:?}", package.install_command(), err),
-        };
+            match call(install_command.split_ascii_whitespace().collect()) {
+                Ok(_) => println!("{} installed successfully.", package.color_full_name()),
+                Err(err) => error!("\"{}\": {:?}", package.install_command(), err),
+            };
+        }
     }
 
     // Create the symbolic links if applicable
@@ -80,9 +80,29 @@ pub fn install() -> Result<()> {
                 symlink.expanded_destination(),
             )
         })
+        // Expand the globs of the destination
+        .flat_map(
+            |(source, short_source, destination)| match glob(&destination) {
+                Ok(destination) => destination
+                    .filter_map(move |destination| match destination {
+                        Ok(destination) => {
+                            Some((source.clone(), short_source.clone(), destination))
+                        }
+                        Err(err) => {
+                            error!("Error handling glob: {}", err);
+                            None
+                        }
+                    })
+                    .collect(),
+                Err(err) => {
+                    error!("Error handling glob: {}", err);
+                    vec![]
+                }
+            },
+        )
         // Only create symbolic references when there's no file
-        .filter(
-            |(source, short_source, destination)| match destination.symlink_metadata() {
+        .filter(|(source, short_source, destination)| {
+            match destination.symlink_metadata() {
                 Ok(metadata) => {
                     // If it already is a symbolic link follow it
                     if metadata.file_type().is_symlink() {
@@ -158,8 +178,8 @@ pub fn install() -> Result<()> {
                         false
                     }
                 }
-            },
-        )
+            }
+        })
         .for_each(|(full_source, short_source, destination)| {
             // Return an error when the file doesn't exist in the repository
             if !full_source.exists() {

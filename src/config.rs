@@ -20,8 +20,8 @@ pub struct Symlink {
 
 impl Symlink {
     /// Expanded destination path.
-    pub fn expanded_destination(&self) -> PathBuf {
-        PathBuf::from(shellexpand::tilde(&self.destination).into_owned())
+    pub fn expanded_destination(&self) -> String {
+        shellexpand::tilde(&self.destination).into_owned()
     }
 }
 
