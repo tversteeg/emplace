@@ -173,11 +173,10 @@ dependencies = [
 
 [[package]]
 name = "dirs"
-version = "3.0.0"
+version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fddc3610d8f9552384e06ebc87f714e1d0b2b64a99194d2faf36d7ae5f48549"
+checksum = "142995ed02755914747cc6ca76fc7e4583cd18578746716d0508ea6ed558b9ff"
 dependencies = [
- "cfg-if",
  "dirs-sys",
 ]
 
@@ -207,7 +206,7 @@ dependencies = [
  "colored",
  "console",
  "dialoguer",
- "dirs 3.0.0",
+ "dirs 3.0.1",
  "enum_dispatch",
  "is_executable",
  "itertools",
