@@ -1,13 +1,21 @@
 use crate::{config::Config, repo::Repo};
 use anyhow::{anyhow, Context, Result};
-use std::path::Path;
+#[cfg(unix)]
+use std::os::unix::fs::symlink;
+#[cfg(not(unix))]
+use std::os::windows::fs::symlink_file as symlink;
+use std::{fs, path::Path};
 
 pub fn link<T, R>(target_path: T, repository_path: R) -> Result<()>
 where
     T: AsRef<Path>,
     R: AsRef<Path>,
 {
-    println!("Converting {:?} to symbolic link {:?} in emplace repository\n", target_path.as_ref(), repository_path.as_ref());
+    println!(
+        "Converting {:?} to symbolic link {:?} in emplace repository.\n",
+        target_path.as_ref(),
+        repository_path.as_ref()
+    );
 
     // Throw an error if the target path doesn't exist
     if !target_path.as_ref().exists() {
@@ -33,17 +41,25 @@ where
     // Get the repository from the config
     let repo = Repo::new(config.clone(), true).context("opening repository")?;
 
-    todo!("Creating backup of target file");
+    println!("Adding link information to configuration file");
 
-    todo!("Copying target file to emplace repository");
+    println!("Copying target file to emplace repository.");
 
-    todo!("Removing original target file");
+    fs::copy(target_path.as_ref(), full_repository_path.as_ref()).context("copying target file to repository")?;
 
-    todo!("Creating symbolic link from emplace repository to target file location");
+    println!("Removing original target file");
 
-    todo!("Adding link information to configuration file");
+    fs::remove_file(target_path.as_ref()).context("removing original target file")?;
 
-    todo!("Pushing configuration file");
+    println!("Creating symbolic link from emplace repository to target file location");
+
+    if let Err(err) = symlink(full_repository_path, target_path) {
+        fs::copy(full_repository_path, target_path).context("recovering from failed creating symbolic link")?;
+
+        return Err(anyhow!("could not create symbolic link"));
+    }
+
+    println!("Pushing changes");
 
     Ok(())
 }
