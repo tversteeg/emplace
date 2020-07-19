@@ -169,24 +169,47 @@ impl Config {
 
     /// Persist the config on disk.
     pub fn save_to_default_path(&self) -> Result<()> {
+        let result = self.save(Config::default_path());
+
+        info!("You can edit the git repository URL and other settings here later.");
+
+        result
+    }
+
+    /// Persist the config to a certain file.
+    pub fn save<P>(&self, path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
         // Workaround to Issue #71
         // As suggested in issue #142 on toml-rs github repository
         // First convert the Config instance to a toml Value,
         // then serialize it to toml
         let value = toml::Value::try_from(self)?;
         fs::write(
-            Config::default_path(),
+            path.as_ref(),
             // Hardcode the default TOML config
             toml::to_string(&value)?,
         )?;
-
-        info!(
-            "Config saved to: \"{}\".",
-            Config::default_path().to_str().unwrap()
-        );
-        info!("You can edit the git repository URL and other settings here later.");
+        info!("Config saved to: \"{}\".", path.as_ref().to_str().unwrap());
 
         Ok(())
+    }
+
+    /// Add a symbolic link line.
+    pub fn add_symlink<S, D>(&mut self, source: S, destination: D)
+    where
+        S: AsRef<Path>,
+        D: AsRef<Path>,
+    {
+        self.symlinks.push(Symlink {
+            source: source.as_ref().to_str().expect("path is invalid").into(),
+            destination: destination
+                .as_ref()
+                .to_str()
+                .expect("path is invalid")
+                .into(),
+        });
     }
 
     /// The repository path.
