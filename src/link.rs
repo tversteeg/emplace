@@ -40,7 +40,7 @@ where
 
     println!("Adding link information to configuration file.");
 
-    config.add_symlink(&target_path, &repository_path);
+    config.add_symlink(&repository_path, &target_path);
     config
         .save_to_default_path()
         .context("saving config with symlink")?;
