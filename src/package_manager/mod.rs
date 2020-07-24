@@ -2,6 +2,7 @@
 pub mod test_macro;
 
 mod apt;
+mod brew;
 mod cargo;
 mod chocolatey;
 mod nix;
@@ -16,6 +17,7 @@ mod snap;
 mod yay;
 
 pub use apt::Apt;
+pub use brew::Brew;
 pub use cargo::Cargo;
 pub use chocolatey::Chocolatey;
 pub use nix::Nix;
@@ -40,6 +42,7 @@ use strum_macros::EnumIter;
 #[derive(Debug, Copy, Clone, Eq, PartialEq, EnumIter, Serialize, Deserialize)]
 pub enum PackageManager {
     Apt,
+    Brew,
     Cargo,
     Rustup,
     Pacman,
