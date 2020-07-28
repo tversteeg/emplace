@@ -53,7 +53,7 @@ pub fn commit_all<P: AsRef<Path>>(dir: &P, msg: &str, sign: bool) -> Result<bool
         vec!["git", "commit", if sign { "-S" } else { "" }, "-am", msg],
         dir,
     )
-    .context("failed commiting everything in git")
+    .context("failed committing everything in git")
 }
 
 pub fn push<P: AsRef<Path>>(dir: &P) -> Result<bool> {
@@ -127,12 +127,12 @@ pub fn set_remote<P: AsRef<Path>>(dir: &P, remote: &str) -> Result<bool> {
         .context("failed setting remote origin")
 }
 
-/// Stage a specific file for commiting.
+/// Stage a specific file for committing.
 pub fn add_file<P: AsRef<Path>>(dir: &P, file: &str) -> Result<bool> {
     call_on_path(vec!["git", "add", file], dir).context("failed adding file in git")
 }
 
-/// Stage all files for commiting.
+/// Stage all files for committing.
 pub fn add_all_files<P: AsRef<Path>>(dir: &P) -> Result<bool> {
     call_on_path(vec!["git", "add", "-A"], dir).context("failed adding all files in git")
 }

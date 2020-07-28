@@ -132,7 +132,7 @@ impl Repo {
             git::add_all_files(&self.path)?;
         }
 
-        println!("Commiting with message \"{}\".", commit_msg);
+        println!("Committing with message \"{}\".", commit_msg);
         git::commit_all(&self.path, &*commit_msg, false)?;
 
         println!("Pushing to remote.");
@@ -149,7 +149,7 @@ impl Repo {
         fs::write(&full_path, toml_string)?;
 
         let commit_msg = "Emplace - clean packages";
-        println!("Commiting with message \"{}\".", commit_msg);
+        println!("Committing with message \"{}\".", commit_msg);
         git::add_file(&self.path, &*self.config.repo.file)?;
         git::commit_all(&self.path, &*commit_msg, false)?;
 
