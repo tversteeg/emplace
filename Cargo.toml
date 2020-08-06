@@ -32,7 +32,7 @@ run_script = "0.6.3"
 serde = { version = "1.0.114", features = ["derive"] }
 shellexpand = "2.0.0"
 simplelog = "0.8.0"
-strum = "0.19.1"
+strum = "0.19.2"
 strum_macros = "0.19.2"
 toml = "0.5.6"
 
