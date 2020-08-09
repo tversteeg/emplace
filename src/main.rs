@@ -29,6 +29,13 @@ fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
                 .about("Install the packages that have been mirrored from other machines"),
         )
         .subcommand(SubCommand::with_name("clean").about("Remove package synching"))
+        .arg(
+            Arg::with_name("config-path")
+                .short("c")
+                .help("The location of the configuration file")
+                .required(false)
+                .env("EMPLACE_CONFIG"),
+        )
 }
 
 fn safe_main() -> Result<()> {
