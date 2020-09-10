@@ -172,6 +172,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://blog.brightone.space"><img src="https://avatars1.githubusercontent.com/u/12615679?v=4" width="100px;" alt=""/><br /><sub><b>Oleksii Filonenko</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/commits?author=filalex77" title="Code">💻</a> <a href="#platform-filalex77" title="Packaging/porting to new platform">📦</a> <a href="https://github.com/tversteeg/emplace/pulls?q=is%3Apr+reviewed-by%3Afilalex77" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/x0f5c3"><img src="https://avatars0.githubusercontent.com/u/62678514?v=4" width="100px;" alt=""/><br /><sub><b>x0f5c3</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/commits?author=x0f5c3" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/bensleveritt"><img src="https://avatars0.githubusercontent.com/u/390779?v=4" width="100px;" alt=""/><br /><sub><b>Benjamin S. Leveritt</b></sub></a><br /><a href="#ideas-bensleveritt" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-bensleveritt" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/mborejdo"><img src="https://avatars3.githubusercontent.com/u/52340?v=4" width="100px;" alt=""/><br /><sub><b>Michael Borejdo</b></sub></a><br /><a href="#ideas-mborejdo" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
