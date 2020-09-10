@@ -66,6 +66,15 @@
         "ideas",
         "maintenance"
       ]
+    },
+    {
+      "login": "mborejdo",
+      "name": "Michael Borejdo",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/52340?v=4",
+      "profile": "https://github.com/mborejdo",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
