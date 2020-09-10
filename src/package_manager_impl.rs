@@ -131,12 +131,18 @@ impl PackageManager {
             .collect()
     }
 
-    /// Get OS specific commands, add .exe on Windows.
+    /// Get OS specific commands, add .exe & .cmd on Windows.
     #[cfg(target_os = "windows")]
     fn os_commands(&self) -> Vec<String> {
         self.commands()
             .into_iter()
-            .map(|command| vec![command.to_string(), format!("{}.exe", command)])
+            .map(|command| {
+                vec![
+                    command.to_string(),
+                    format!("{}.exe", command),
+                    format!("{}.cmd", command),
+                ]
+            })
             .flatten()
             .collect()
     }
@@ -216,5 +222,6 @@ mod tests {
     #[test]
     fn test_detect_windows() {
         assert!(PackageManager::detects_line("scoop.exe -h"));
+        assert!(PackageManager::detects_line("scoop.cmd -h"));
     }
 }
