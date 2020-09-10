@@ -3,7 +3,6 @@ use crate::{
     package_manager::{CaptureFlag, PackageInstalledMethod, PackageManager, PackageManagerTrait},
 };
 use anyhow::{Context, Result};
-use is_executable::is_executable;
 use itertools::{iproduct, Itertools};
 use run_script::ScriptOptions;
 use std::{env::split_paths, iter::Peekable, path::PathBuf};
@@ -59,8 +58,7 @@ impl PackageManager {
 
         // Create a cartesian product of (Path, executable_name) and checking if any of pairs exists
         iproduct!(paths, self.os_commands())
-            .map(|(path, exec)| path.join(PathBuf::from(exec)))
-            .map(is_executable)
+            .map(|(path, exec)| path.join(PathBuf::from(exec)).exists())
             .any(|x| x)
     }
 
