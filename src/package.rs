@@ -42,6 +42,7 @@ impl Package {
     }
 
     /// The full command needed to install this package.
+    #[cfg(not(target_os = "windows"))]
     pub fn install_command(&self) -> String {
         if self.source.needs_root() {
             format!(
@@ -52,6 +53,12 @@ impl Package {
         } else {
             format!("{} {}", self.source.install_command(), self.full_command())
         }
+    }
+
+    /// The full command needed to install this package.
+    #[cfg(target_os = "windows")]
+    pub fn install_command(&self) -> String {
+        format!("{} {}", self.source.install_command(), self.full_command())
     }
 
     /// The full name in fancy colors.
