@@ -21,7 +21,7 @@ impl PackageManager {
         Self::iter().find(|manager| {
             // Iterate over all commands
             manager
-                .commands()
+                .os_commands()
                 .into_iter()
                 // Find the command that's in the file, use an extra space to only match full
                 // package names
@@ -54,13 +54,12 @@ impl PackageManager {
     /// Check if this package manager is available.
     pub fn is_available(self) -> bool {
         let path = std::env::var_os("PATH").expect("PATH env is not set");
-        //taking all paths, merging them with executable name and checking, that executable exists.
-
+        // Taking all paths, merging them with executable name and checking, that executable exists.
         let paths: Vec<PathBuf> = split_paths(&path).collect();
-        //creating cartesian product  of (Path, executable_name) and checking
-        // if any of pairs exists
-        iproduct!(paths, self.commands())
-            .map(|(path, exec): (PathBuf, &str)| path.join(PathBuf::from(exec)))
+
+        // Create a cartesian product of (Path, executable_name) and checking if any of pairs exists
+        iproduct!(paths, self.os_commands())
+            .map(|(path, exec)| path.join(PathBuf::from(exec)))
             .map(is_executable)
             .any(|x| x)
     }
@@ -68,7 +67,7 @@ impl PackageManager {
     /// Extract the packages from the line.
     pub fn catch(self, line: &str) -> Vec<Package> {
         // Try all different commands
-        self.commands()
+        self.os_commands()
             .iter()
             .map(|command| {
                 // Get the part right of the package manager invocation
@@ -130,6 +129,22 @@ impl PackageManager {
             })
             .flatten()
             .collect()
+    }
+
+    /// Get OS specific commands, add .exe on Windows.
+    #[cfg(target_os = "windows")]
+    fn os_commands(&self) -> Vec<String> {
+        self.commands()
+            .into_iter()
+            .map(|command| vec![command.to_string(), format!("{}.exe", command)])
+            .flatten()
+            .collect()
+    }
+
+    /// Get OS specific commands.
+    #[cfg(not(target_os = "windows"))]
+    fn os_commands(&self) -> Vec<&str> {
+        self.commands()
     }
 
     /// Handle the iterator's flags using the different options as defined in the package managers.
@@ -195,5 +210,11 @@ mod tests {
     fn test_detect() {
         assert!(PackageManager::detects_line("apt install test"));
         assert!(!PackageManager::detects_line("something"));
+    }
+
+    #[cfg(target_os = "windows")]
+    #[test]
+    fn test_detect_windows() {
+        assert!(PackageManager::detects_line("scoop.exe -h"));
     }
 }

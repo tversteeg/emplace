@@ -61,4 +61,9 @@ mod tests {
         // Ignore
         catch!(PackageManager::from(Scoop), "scoop test test2" => ());
     }
+
+    #[cfg(target_os = "windows")]
+    fn test_catch_windows() {
+        catch!(PackageManager::from(Scoop), "scoop.exe install test" => "test");
+    }
 }
