@@ -18,7 +18,7 @@ impl PackageManagerTrait for Scoop {
     }
 
     fn install_command(self) -> &'static str {
-        "scoop install"
+        "cmd /c scoop install"
     }
 
     fn needs_root(self) -> bool {
