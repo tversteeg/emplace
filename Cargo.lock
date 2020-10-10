@@ -130,6 +130,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "console"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0b1aacfaffdbff75be81c15a399b4bedf78aaefe840e8af1d299ac2ade885d2"
+dependencies = [
+ "encode_unicode",
+ "lazy_static",
+ "libc",
+ "regex",
+ "terminal_size",
+ "termios",
+ "unicode-width",
+ "winapi",
+ "winapi-util",
+]
+
+[[package]]
 name = "constant_time_eq"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -152,7 +169,7 @@ version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f4aa86af7b19b40ef9cbef761ed411a49f0afa06b7b6dcd3dfe2f96a3c546138"
 dependencies = [
- "console",
+ "console 0.11.3",
  "lazy_static",
  "tempfile",
 ]
@@ -200,7 +217,7 @@ dependencies = [
  "anyhow",
  "clap",
  "colored",
- "console",
+ "console 0.12.0",
  "dialoguer",
  "dirs 3.0.1",
  "enum_dispatch",
