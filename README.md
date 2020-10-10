@@ -47,6 +47,7 @@
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/gnubash.svg" width="18" height="18" /> | [Bash](#bash) |
     | <img src="https://cdn.rawgit.com/feathericons/feather/master/icons/dollar-sign.svg" width="18" height="18" /> | [Zsh](#zsh) |
     | <img src="https://cdn.rawgit.com/feathericons/feather/master/icons/terminal.svg" width="18" height="18" /> | [Fish](#fish) |
+    | <img src="https://cdn.rawgit.com/feathericons/feather/master/icons/chevron-right.svg" width="18" height="18" /> | [Nu](#nu) |
 
 ## Installation
 
@@ -100,6 +101,14 @@
 	# ~/.config/fish/config.fish
 
 	emplace init fish | source
+	```
+
+   #### Nu
+
+   Run the following in your shell:
+
+	```sh
+	emplace init nu | config set_into prompt
 	```
    
 ## Usage

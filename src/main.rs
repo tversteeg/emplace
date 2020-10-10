@@ -54,7 +54,7 @@ fn safe_main() -> Result<()> {
 					Arg::with_name("shell")
 						.value_name("SHELL")
 						.help(
-							"The name of the currently running shell\nCurrently supported options: bash & zsh",
+							"The name of the currently running shell\nCurrently supported options: bash, nu, fish & zsh",
 						)
 						.required(true)
 				)

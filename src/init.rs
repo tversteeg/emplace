@@ -9,9 +9,10 @@ pub fn init_main(shell_name: &str) -> Result<()> {
         .expect("Could not convert path to string");
 
     let (setup_script, shell) = match shell_name {
-        "bash" => (BASH_INIT, clap::Shell::Bash),
-        "zsh" => (ZSH_INIT, clap::Shell::Zsh),
-        "fish" => (FISH_INIT, clap::Shell::Fish),
+        "bash" => (BASH_INIT, Some(clap::Shell::Bash)),
+        "zsh" => (ZSH_INIT, Some(clap::Shell::Zsh)),
+        "fish" => (FISH_INIT, Some(clap::Shell::Fish)),
+        "nu" => (NU_INIT, None),
         _ => panic!("Shell \"{}\" is not supported at the moment", shell_name),
     };
 
@@ -21,7 +22,9 @@ pub fn init_main(shell_name: &str) -> Result<()> {
     );
 
     // Print the completions
-    public_clap_app().gen_completions_to("emplace", shell, &mut io::stdout());
+    if let Some(shell) = shell {
+        public_clap_app().gen_completions_to("emplace", shell, &mut io::stdout());
+    }
 
     Ok(())
 }
@@ -64,4 +67,8 @@ function emplace_postcmd --on-event fish_postexec
 
     ## EMPLACE ## catch "$argv"
 end
+"##;
+
+const NU_INIT: &str = r##"
+## EMPLACE ## catch $(history | last); echo >
 "##;
