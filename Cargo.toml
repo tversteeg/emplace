@@ -28,7 +28,7 @@ itertools = "0.9.0"
 log = "0.4.11"
 ron = "0.6.2"
 run_script = "0.6.3"
-serde = { version = "1.0.116", features = ["derive"] }
+serde = { version = "1.0.117", features = ["derive"] }
 shellexpand = "2.0.0"
 simplelog = "0.8.0"
 strum = "0.19.5"
