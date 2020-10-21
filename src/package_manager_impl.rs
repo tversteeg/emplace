@@ -80,11 +80,10 @@ impl PackageManager {
                         let mut catched_flags = vec![];
 
                         // Get which sub command is used
-                        let sub_command = self
-                            .sub_commands()
-                            .clone()
-                            .into_iter()
-                            .find(|command| rest_of_line.contains(&format!("{} ", command)));
+                        let sub_command = self.sub_commands().clone().into_iter().find(|command| {
+                            rest_of_line.starts_with(&format!("{} ", command))
+                                || rest_of_line.contains(&format!(" {} ", command))
+                        });
 
                         // Remove the sub command from the line
                         let line_without_subcommand = match sub_command {
