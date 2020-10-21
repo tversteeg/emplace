@@ -49,7 +49,7 @@
     | <img src="https://cdn.rawgit.com/feathericons/feather/master/icons/terminal.svg" width="18" height="18" /> | [Fish](#fish) |
     | <img src="https://cdn.rawgit.com/feathericons/feather/master/icons/chevron-right.svg" width="18" height="18" /> | [Nu](#nu) |
 
-## Installation
+## Installation <a href="https://repology.org/project/emplace/versions"><img src="https://repology.org/badge/vertical-allrepos/emplace.svg" alt="Packaging status" align="right"></a>
 
 ### Getting Started
 
