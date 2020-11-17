@@ -5,6 +5,7 @@ mod apt;
 mod brew;
 mod cargo;
 mod chocolatey;
+mod dnf;
 mod nix;
 mod npm;
 mod pacman;
@@ -20,6 +21,7 @@ pub use apt::Apt;
 pub use brew::Brew;
 pub use cargo::Cargo;
 pub use chocolatey::Chocolatey;
+pub use dnf::Dnf;
 pub use nix::Nix;
 pub use npm::Npm;
 pub use pacman::Pacman;
@@ -44,17 +46,18 @@ pub enum PackageManager {
     Apt,
     Brew,
     Cargo,
-    Rustup,
-    Pacman,
-    Yay,
-    Rua,
-    Snap,
     Chocolatey,
-    Scoop,
+    Dnf,
+    Nix,
+    Npm,
+    Pacman,
     Pip,
     Pip3,
-    Npm,
-    Nix,
+    Rua,
+    Rustup,
+    Scoop,
+    Snap,
+    Yay,
 }
 
 /// Trait that needs to be implemented for a new package manager.
