@@ -186,6 +186,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/bensleveritt"><img src="https://avatars0.githubusercontent.com/u/390779?v=4" width="100px;" alt=""/><br /><sub><b>Benjamin S. Leveritt</b></sub></a><br /><a href="#ideas-bensleveritt" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-bensleveritt" title="Maintenance">🚧</a></td>
     <td align="center"><a href="https://github.com/mborejdo"><img src="https://avatars3.githubusercontent.com/u/52340?v=4" width="100px;" alt=""/><br /><sub><b>Michael Borejdo</b></sub></a><br /><a href="#ideas-mborejdo" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/l1a"><img src="https://avatars3.githubusercontent.com/u/634380?v=4" width="100px;" alt=""/><br /><sub><b>Ken Tobias</b></sub></a><br /><a href="#platform-l1a" title="Packaging/porting to new platform">📦</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-enable -->
