@@ -75,6 +75,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "l1a",
+      "name": "Ken Tobias",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/634380?v=4",
+      "profile": "https://github.com/l1a",
+      "contributions": [
+        "platform"
+      ]
     }
   ],
   "contributorsPerLine": 7,
