@@ -1,6 +1,6 @@
 [package]
 name = "emplace"
-version = "0.3.9-alpha.0"
+version = "0.3.9"
 authors = ["Thomas Versteeg <thomasversteeg@gmx.com>"]
 description = "Command-line tool to mirror installed software on multiple machines."
 edition = "2018"
