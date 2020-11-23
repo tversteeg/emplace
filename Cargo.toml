@@ -32,7 +32,7 @@ serde = { version = "1.0.117", features = ["derive"] }
 shellexpand = "2.0.0"
 simplelog = "0.8.0"
 strum = "0.20.0"
-strum_macros = "0.19.4"
+strum_macros = "0.20.1"
 toml = "0.5.7"
 
 [package.metadata.deb]
