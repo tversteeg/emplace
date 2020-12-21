@@ -33,7 +33,7 @@ shellexpand = "2.0.0"
 simplelog = "0.8.0"
 strum = "0.20.0"
 strum_macros = "0.20.1"
-toml = "0.5.7"
+toml = "0.5.8"
 
 [package.metadata.deb]
 maintainer = "Thomas Versteeg <thomasversteeg@gmx.com>"
