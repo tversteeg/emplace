@@ -30,7 +30,7 @@ ron = "0.6.2"
 run_script = "0.6.3"
 serde = { version = "1.0.118", features = ["derive"] }
 shellexpand = "2.0.0"
-simplelog = "0.8.0"
+simplelog = "0.9.0"
 strum = "0.20.0"
 strum_macros = "0.20.1"
 toml = "0.5.8"
