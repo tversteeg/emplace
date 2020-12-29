@@ -16,7 +16,7 @@ is-it-maintained-issue-resolution = { repository = "tversteeg/emplace" }
 is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
 
 [dependencies]
-anyhow = "1.0.36"
+anyhow = "1.0.37"
 clap = "2.33.3"
 colored = "2.0.0"
 console = "0.13.0"
