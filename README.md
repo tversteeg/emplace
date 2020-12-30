@@ -64,6 +64,12 @@
    scoop install emplace
    ```
    
+   ### NixOS
+   
+   ```sh
+   nix-env -iA nixos.emplace
+   ```
+   
    ### Source
 
    #### Rust
