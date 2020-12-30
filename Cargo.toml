@@ -44,7 +44,7 @@ A command-line tool to mirror installed software on multiple machines. \
 Hooks into your shell to keep track of what you are installing. \
 Can also be used to sync configuration files. \
 """
-depends = "$auto"
+depends = "$auto, git"
 section = "utility"
 priority = "optional"
 assets = [
