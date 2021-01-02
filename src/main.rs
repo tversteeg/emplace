@@ -5,18 +5,17 @@ mod git;
 mod history;
 mod init;
 mod install;
-mod link;
 mod migrate;
 mod package;
 mod package_manager;
 mod package_manager_impl;
 mod repo;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 use clap::{App, AppSettings, Arg, SubCommand};
 use log::error;
 use simplelog::{LevelFilter, TermLogger, TerminalMode};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
     App::new("emplace")
@@ -99,23 +98,6 @@ fn safe_main() -> Result<()> {
                 .takes_value(false)
             ),
         )
-		.subcommand(
-			SubCommand::with_name("link")
-				.about("Automatically replace the file with a symbolic link in the repository, the link will be stored in the emplace configuration file")
-				.arg(
-					Arg::with_name("target_path")
-						.help("Path of the file to replace with a symlink in the repository")
-                        .required(true)
-						.takes_value(true)
-				)
-                .arg(
-                    Arg::with_name("repository_path")
-                        .help("Relative path of the file in the repository")
-                        .short("r")
-                        .long("repository-path")
-                        .takes_value(true)
-                )
-		)
 		.get_matches();
 
     match matches.subcommand() {
@@ -139,27 +121,6 @@ fn safe_main() -> Result<()> {
             );
 
             history::history(&hist_path).context("capturing history")
-        }
-        ("link", Some(sub_m)) => {
-            let target_path = Path::new(
-                sub_m
-                    .value_of("target_path")
-                    .context("target path is missing")?,
-            );
-            // Get the path of the target file in the repository or use the target path filename as a default
-            let repository_path = sub_m
-                .value_of("repository_path")
-                .map(|path| Path::new(path))
-                .unwrap_or({
-                    Path::new(target_path.file_name().ok_or_else(|| {
-                        anyhow!(
-                            "target path {:?} doesn't contain a proper file",
-                            target_path
-                        )
-                    })?)
-                });
-
-            link::link(target_path, repository_path).context("linking file")
         }
         // Config subcommand, if path is present and new is not
         // it will just print the default path for the config file,

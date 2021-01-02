@@ -111,8 +111,6 @@ impl PackageManager {
                                 }
                             });
 
-                        dbg!("===", line, &line_without_subcommand);
-
                         // Return an empty array when no subcommand found
                         let line_without_subcommand = match line_without_subcommand {
                             Some(line_without_subcommand) => line_without_subcommand,
