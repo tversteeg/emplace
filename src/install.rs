@@ -9,7 +9,7 @@ pub fn install() -> Result<()> {
     let config = Config::from_default_file_or_new().context("retrieving config")?;
 
     // Get the repository from the config
-    let repo = Repo::new(config.clone(), true).context("opening repository")?;
+    let repo = Repo::new(config, true).context("opening repository")?;
 
     // Read the packages from the repository
     let packages = repo.read().context("reading packages to install")?;
