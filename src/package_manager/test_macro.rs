@@ -13,7 +13,7 @@ macro_rules! catch {
             let mut packages = manager.catch($line).into_iter();
             $(
                 let package = packages.next().expect("Expected package not catched");
-                assert_eq!($package, package.name(), "Package \"{}\" should be matched, but it's not", package.full_command());
+                assert!(package.name() == $package, "Package \"{}\" should be matched, but it's not, \"{}\" found instead", $package, package.name());
             )*
             assert!(packages.next().is_none());
         }

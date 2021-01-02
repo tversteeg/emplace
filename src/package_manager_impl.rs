@@ -3,7 +3,7 @@ use crate::{
     package_manager::{CaptureFlag, PackageInstalledMethod, PackageManager, PackageManagerTrait},
 };
 use anyhow::{Context, Result};
-use itertools::{iproduct, Itertools};
+use itertools::iproduct;
 use run_script::ScriptOptions;
 use std::{env::split_paths, iter::Peekable, path::PathBuf};
 use strum::IntoEnumIterator;
@@ -79,16 +79,43 @@ impl PackageManager {
                         // A list of flags that we caught that we should keep track of
                         let mut catched_flags = vec![];
 
-                        // Get which sub command is used
-                        let sub_command = self.sub_commands().clone().into_iter().find(|command| {
-                            rest_of_line.starts_with(&format!("{} ", command))
-                                || rest_of_line.contains(&format!(" {} ", command))
-                        });
+                        // Get the line with the subcommand removed
+                        let line_without_subcommand = self
+                            .sub_commands()
+                            .clone()
+                            .into_iter()
+                            .find_map(|sub_command| {
+                                // Use a space terminated command to ensure that only exactly the
+                                // subcommand is removed
+                                let sub_command_with_space_postfix = format!("{} ", sub_command);
+                                if rest_of_line.starts_with(&sub_command_with_space_postfix) {
+                                    Some(
+                                        rest_of_line[sub_command_with_space_postfix.len()..]
+                                            .to_string(),
+                                    )
+                                } else {
+                                    let sub_command_with_spaces =
+                                        format!(" {}", sub_command_with_space_postfix);
+                                    // Remove the full subcommand from the list
+                                    let split_vec: Vec<_> =
+                                        rest_of_line.split(&sub_command_with_spaces).collect();
+                                    if split_vec.len() == 1 {
+                                        // If nothing is split it means that the sub command is not
+                                        // found in the string
+                                        None
+                                    } else {
+                                        // Rejoin the string with a space where the full subcommand
+                                        // with spaces was
+                                        Some(split_vec.join(" "))
+                                    }
+                                }
+                            });
 
-                        // Remove the sub command from the line
-                        let line_without_subcommand = match sub_command {
-                            Some(command) => rest_of_line.split(command).join(""),
-                            // No installation subcommand means no packages
+                        dbg!("===", line, &line_without_subcommand);
+
+                        // Return an empty array when no subcommand found
+                        let line_without_subcommand = match line_without_subcommand {
+                            Some(line_without_subcommand) => line_without_subcommand,
                             None => return vec![],
                         };
 

@@ -88,17 +88,6 @@ pub trait PackageManagerTrait {
     /// A list of command line flags that should be caught as well.
     ///
     /// This usually stays empty.
-    /// A list of tuples is returned where the tuple contains the flag arguments.
-    /// For example `-t experimental` is supplied like this:
-    ///
-    /// ```rust
-    /// # struct Something;
-    /// # impl Something {
-    /// fn capture_flags(self) -> Vec<(&'static str, Option<&'static str>)> {
-    ///     vec![("-t", Some("experimental"))]
-    /// }
-    /// # }
-    /// ```
     fn capture_flags(self) -> Vec<CaptureFlag>;
 }
 
