@@ -30,7 +30,12 @@ fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
         .version(clap::crate_version!())
         .author(clap::crate_authors!())
         .after_help("https://github.com/tversteeg/emplace")
+        // Use the order specified for the subcommands, not alphabetically
+        .setting(AppSettings::DeriveDisplayOrder)
         .setting(AppSettings::SubcommandRequiredElseHelp)
+        // Print the help in colors if the terminal allows it
+        .global_setting(AppSettings::ColorAuto)
+        .global_setting(AppSettings::ColoredHelp)
         .subcommand(
             SubCommand::with_name("install")
                 .about("Install the packages that have been mirrored from other machines"),
