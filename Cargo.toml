@@ -17,6 +17,7 @@ is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
 
 [dependencies]
 anyhow = "1.0.37"
+bugreport = "0.3.0"
 clap = "2.33.3"
 colored = "2.0.0"
 console = "0.13.0"

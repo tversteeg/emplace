@@ -12,6 +12,14 @@ mod package_manager_impl;
 mod repo;
 
 use anyhow::{Context, Result};
+use bugreport::{
+    bugreport,
+    collector::{
+        CommandLine, CommandOutput, CompileTimeInformation, EnvironmentVariables, OperatingSystem,
+        SoftwareVersion,
+    },
+    format::Markdown,
+};
 use clap::{App, AppSettings, Arg, SubCommand};
 use log::error;
 use simplelog::{LevelFilter, TermLogger, TerminalMode};
@@ -98,6 +106,10 @@ fn safe_main() -> Result<()> {
                 .takes_value(false)
             ),
         )
+        .subcommand(
+            SubCommand::with_name("bugreport")
+            .about("Collect and print information that can be send along with a bug report")
+        )
 		.get_matches();
 
     match matches.subcommand() {
@@ -139,6 +151,19 @@ fn safe_main() -> Result<()> {
 
                 Ok(())
             }
+        }
+        // Print information that can be used in bug report tickets
+        ("bugreport", _) => {
+            bugreport!()
+                .info(SoftwareVersion::default())
+                .info(OperatingSystem::default())
+                .info(CommandLine::default())
+                .info(EnvironmentVariables::list(&["SHELL"]))
+                .info(CommandOutput::new("Git version", "git", &["--version"]))
+                .info(CompileTimeInformation::default())
+                .print::<Markdown>();
+
+            Ok(())
         }
         (&_, _) => Ok(()),
     }
