@@ -85,10 +85,10 @@ fn safe_main() -> Result<()> {
 			SubCommand::with_name("history")
 				.about("Parses your history file and retrieves installations")
 				.arg(
-					Arg::with_name("history_parse")
-						.help("Parses history. Just place `$HISTFILE` as input, and it will do all work;")
-						.required(false)
-						.takes_value(true)
+					Arg::with_name("history_file")
+                        .value_name("PATH")
+						.help("Path to shell history file")
+						.required(true)
 				),
 		)
         .subcommand(
@@ -130,10 +130,10 @@ fn safe_main() -> Result<()> {
         }
         ("install", Some(_)) => install::install().context("installing packages"),
         ("clean", Some(_)) => clean::clean().context("cleaning packages"),
-        ("history", Some(_)) => {
+        ("history", Some(sub_m)) => {
             let hist_path = PathBuf::from(
-                &matches
-                    .value_of("history_parse")
+                &sub_m
+                    .value_of("history_file")
                     .context("path to history file is not provided")?,
             );
 

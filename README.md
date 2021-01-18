@@ -164,8 +164,19 @@ emplace install
 
 ### History Analysis
 
-Invoke `emplace history $HISTFILE` or `emplace history /path/to/history/file`.   
-It will parse your history and prompt to select, which packages you want to synchronize. 
+You can also parse history files, this will try to extract installation commands from each line.
+
+#### Bash & Zsh
+
+```sh
+emplace history $HISTFILE
+```
+
+#### Fish
+
+```sh
+emplace history ~/.local/share/fish/fish_history
+```
 
 ### Removing Synchronized Packages
 
