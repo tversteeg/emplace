@@ -2,11 +2,14 @@ use crate::{config::Config, package::Package, repo::Repo};
 use anyhow::{anyhow, Context, Result};
 use dialoguer::MultiSelect;
 use log::{debug, error};
-use std::process::Command;
+use std::{path::Path, process::Command};
 
-pub fn install() -> Result<()> {
+pub fn install<P>(config_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     // Get the config
-    let config = Config::from_default_file_or_new().context("retrieving config")?;
+    let config = Config::from_path_or_new(&config_path)?;
 
     // Get the repository from the config
     let repo = Repo::new(config, true).context("opening repository")?;

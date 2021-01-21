@@ -1,5 +1,6 @@
 use crate::public_clap_app;
 use anyhow::Result;
+use clap_generate::generators::{Bash, Fish, Zsh};
 use std::{env, io};
 
 pub fn init_main(shell_name: &str) -> Result<()> {
@@ -8,11 +9,11 @@ pub fn init_main(shell_name: &str) -> Result<()> {
         .into_string()
         .expect("Could not convert path to string");
 
-    let (setup_script, shell) = match shell_name {
-        "bash" => (BASH_INIT, Some(clap::Shell::Bash)),
-        "zsh" => (ZSH_INIT, Some(clap::Shell::Zsh)),
-        "fish" => (FISH_INIT, Some(clap::Shell::Fish)),
-        "nu" => (NU_INIT, None),
+    let setup_script = match shell_name {
+        "bash" => BASH_INIT,
+        "zsh" => ZSH_INIT,
+        "fish" => FISH_INIT,
+        "nu" => NU_INIT,
         _ => panic!("Shell \"{}\" is not supported at the moment", shell_name),
     };
 
@@ -22,9 +23,18 @@ pub fn init_main(shell_name: &str) -> Result<()> {
     );
 
     // Print the completions
-    if let Some(shell) = shell {
-        public_clap_app().gen_completions_to("emplace", shell, &mut io::stdout());
-    }
+    match shell_name {
+        "bash" => {
+            clap_generate::generate::<Bash, _>(&mut public_clap_app(), "emplace", &mut io::stdout())
+        }
+        "zsh" => {
+            clap_generate::generate::<Zsh, _>(&mut public_clap_app(), "emplace", &mut io::stdout())
+        }
+        "fish" => {
+            clap_generate::generate::<Fish, _>(&mut public_clap_app(), "emplace", &mut io::stdout())
+        }
+        _ => (),
+    };
 
     Ok(())
 }

@@ -51,7 +51,10 @@ pub struct Config {
 
 impl Config {
     /// Create a new config and save it on disk.
-    pub fn new() -> Result<Self> {
+    pub fn new<P>(path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         info!("No configuration file found.");
         let repo_url = dialoguer::Input::<String>::new()
             .with_prompt("The URL of the git repository you (want to) store the mirrors in")
@@ -63,17 +66,9 @@ impl Config {
         };
 
         // Save the config
-        config.save_to_default_path()?;
+        config.save(path)?;
 
         Ok(config)
-    }
-
-    /// Try to open the default config or create a new one.
-    pub fn from_default_file_or_new() -> Result<Self> {
-        match Config::from_default_file()? {
-            Some(config) => Ok(config),
-            None => Config::new(),
-        }
     }
 
     /// Ask the user if they want to change the repo path, clone it or create locally, or abort.
@@ -130,6 +125,14 @@ impl Config {
     /// Try to open the default.
     pub fn from_default_file() -> Result<Option<Self>> {
         Config::from_path(&Config::default_path())
+    }
+
+    /// Load the config from a file or create a new one.
+    pub fn from_path_or_new<P: AsRef<Path>>(file_path: P) -> Result<Self> {
+        match Config::from_default_file()? {
+            Some(config) => Ok(config),
+            None => Config::new(file_path),
+        }
     }
 
     /// Load the config from a file.

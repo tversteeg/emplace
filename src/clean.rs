@@ -4,11 +4,15 @@ use crate::{
     repo::Repo,
 };
 use anyhow::{Context, Result};
+use std::path::Path;
 
 /// Remove listed packages.
-pub fn clean() -> Result<()> {
+pub fn clean<P>(config_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     // Get the config
-    let config = Config::from_default_file_or_new()?;
+    let config = Config::from_path_or_new(&config_path)?;
 
     // Get the repository from the config
     let repo = Repo::new(config, true)?;

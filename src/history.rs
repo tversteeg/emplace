@@ -15,7 +15,11 @@ use std::{
 };
 
 /// Capture a history file.
-pub fn history(path: &Path) -> Result<()> {
+pub fn history<P1, P2>(config_path: P1, path: P2) -> Result<()>
+where
+    P1: AsRef<Path>,
+    P2: AsRef<Path>,
+{
     let hist_file = File::open(path)?;
     let reader = BufReader::new(hist_file);
 
@@ -29,7 +33,7 @@ pub fn history(path: &Path) -> Result<()> {
     };
 
     // Get the config
-    let config = Config::from_default_file_or_new()?;
+    let config = Config::from_path_or_new(&config_path)?;
 
     // Get the repository from the config
     let repo = Repo::new(config, true)?;

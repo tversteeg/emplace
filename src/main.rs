@@ -11,7 +11,8 @@ mod package_manager;
 mod package_manager_impl;
 mod repo;
 
-use anyhow::{Context, Result};
+use crate::config::Config;
+use anyhow::{anyhow, Context, Result};
 use bugreport::{
     bugreport,
     collector::{
@@ -20,12 +21,12 @@ use bugreport::{
     },
     format::Markdown,
 };
-use clap::{App, AppSettings, Arg, SubCommand};
+use clap::{App, AppSettings, Arg};
 use log::error;
 use simplelog::{LevelFilter, TermLogger, TerminalMode};
 use std::path::PathBuf;
 
-fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
+fn public_clap_app<'a>() -> App<'a> {
     App::new("emplace")
         .version(clap::crate_version!())
         .author(clap::crate_authors!())
@@ -37,15 +38,16 @@ fn public_clap_app<'a, 'b>() -> App<'a, 'b> {
         .global_setting(AppSettings::ColorAuto)
         .global_setting(AppSettings::ColoredHelp)
         .subcommand(
-            SubCommand::with_name("install")
+            App::new("install")
                 .about("Install the packages that have been mirrored from other machines"),
         )
-        .subcommand(SubCommand::with_name("clean").about("Remove package synching"))
+        .subcommand(App::new("clean").about("Remove package synching"))
         .arg(
-            Arg::with_name("config-path")
-                .short("c")
-                .help("The location of the configuration file")
+            Arg::new("config-path")
+                .short('c')
+                .about("The location of the configuration file")
                 .required(false)
+                .global(true)
                 .env("EMPLACE_CONFIG"),
         )
 }
@@ -60,105 +62,104 @@ fn safe_main() -> Result<()> {
 
     let matches = public_clap_app()
 		.subcommand(
-			SubCommand::with_name("init")
+			App::new("init")
 				.about("Prints the shell function used to execute emplace")
 				.arg(
-					Arg::with_name("shell")
+					Arg::new("shell")
 						.value_name("SHELL")
-						.help(
+						.about(
 							"The name of the currently running shell\nCurrently supported options: bash, nu, fish & zsh",
 						)
 						.required(true)
 				)
 		)
 		.subcommand(
-			SubCommand::with_name("catch")
+			App::new("catch")
 				.about("Capture a command entered in a terminal")
 				.arg(
-					Arg::with_name("line")
+					Arg::new("line")
 						.value_name("LINE")
-						.help("The command as entired in the terminal")
+						.about("The command as entired in the terminal")
 						.required(true),
 				),
 		)
 		.subcommand(
-			SubCommand::with_name("history")
+			App::new("history")
 				.about("Parses your history file and retrieves installations")
 				.arg(
-					Arg::with_name("history_file")
+					Arg::new("history_file")
                         .value_name("PATH")
-						.help("Path to shell history file")
+						.about("Path to shell history file")
 						.required(true)
 				),
 		)
         .subcommand(
-            SubCommand::with_name("config")
+            App::new("config")
             .about("Provides options for managing configuration")
             .arg(
-                Arg::with_name("new")
-                .short("n")
+                Arg::new("new")
+                .short('n')
                 .long("new")
-                .help("Create a new config")
-                .required_unless("path")
+                .about("Create a new config")
                 .takes_value(false)
             )
             .arg(
-                Arg::with_name("path")
-                .short("p")
+                Arg::new("path")
+                .short('p')
                 .long("path")
-                .help("Print out path to config")
-                .required_unless("new")
+                .about("Print out path to config")
                 .takes_value(false)
             ),
         )
         .subcommand(
-            SubCommand::with_name("bugreport")
+            App::new("bugreport")
             .about("Collect and print information that can be send along with a bug report")
         )
 		.get_matches();
 
+    let config_path = matches
+        .value_of_t("config-path")
+        .unwrap_or(Config::default_path());
+
     match matches.subcommand() {
-        ("init", Some(sub_m)) => {
+        Some(("init", sub_m)) => {
             let shell_name = sub_m.value_of("shell").context("shell name is missing")?;
 
             init::init_main(shell_name)
         }
-        ("catch", Some(sub_m)) => {
+        Some(("catch", sub_m)) => {
             let line = sub_m.value_of("line").context("line is missing")?;
 
-            catch::catch(line).context("catching a command")
+            catch::catch(config_path, line).context("catching a command")
         }
-        ("install", Some(_)) => install::install().context("installing packages"),
-        ("clean", Some(_)) => clean::clean().context("cleaning packages"),
-        ("history", Some(sub_m)) => {
+        Some(("install", _)) => install::install(config_path).context("installing packages"),
+        Some(("clean", _)) => clean::clean(config_path).context("cleaning packages"),
+        Some(("history", sub_m)) => {
             let hist_path = PathBuf::from(
                 &sub_m
                     .value_of("history_file")
                     .context("path to history file is not provided")?,
             );
 
-            history::history(&hist_path).context("capturing history")
+            history::history(config_path, &hist_path).context("capturing history")
         }
         // Config subcommand, if path is present and new is not
         // it will just print the default path for the config file,
         // otherwise it will create a new config and ask what to do about the repository
-        ("config", Some(subm)) => {
+        Some(("config", subm)) => {
             if subm.is_present("path") && !subm.is_present("new") {
-                println!(
-                    "Your config path is {}",
-                    config::Config::default_path().to_str().unwrap()
-                );
+                println!("Your config path is {}", config_path.to_str().unwrap());
 
                 Ok(())
             } else {
-                let mut config = config::Config::new()?;
+                let mut config = config::Config::new(config_path)?;
                 config.clone_repo_ask()?;
 
                 Ok(())
             }
         }
         // Print information that can be used in bug report tickets
-        ("bugreport", _) => {
+        Some(("bugreport", _)) => {
             bugreport!()
                 .info(SoftwareVersion::default())
                 .info(OperatingSystem::default())
@@ -170,7 +171,8 @@ fn safe_main() -> Result<()> {
 
             Ok(())
         }
-        (&_, _) => Ok(()),
+        Some((other, _)) => Err(anyhow!("Unrecognized subcommand \"{}\"", other)),
+        None => Ok(()),
     }
 }
 

@@ -2,8 +2,12 @@ use crate::{config::Config, package::Packages, package_manager::PackageManager, 
 use anyhow::Result;
 use colored::Colorize;
 use dialoguer::Confirm;
+use std::path::Path;
 
-pub fn catch(line: &str) -> Result<()> {
+pub fn catch<P>(config_path: P, line: &str) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     // Do a quick check so it won't stall the terminal
     if !PackageManager::detects_line(line) {
         return Ok(());
@@ -18,7 +22,7 @@ pub fn catch(line: &str) -> Result<()> {
     }
 
     // Get the config
-    let config = Config::from_default_file_or_new()?;
+    let config = Config::from_path_or_new(&config_path)?;
 
     // Get the repository from the config
     let repo = Repo::new(config, false)?;
