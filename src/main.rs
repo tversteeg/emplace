@@ -119,7 +119,7 @@ fn safe_main() -> Result<()> {
 
     let config_path = matches
         .value_of_t("config-path")
-        .unwrap_or(Config::default_path());
+        .unwrap_or_else(|_| Config::default_path());
 
     match matches.subcommand() {
         Some(("init", sub_m)) => {

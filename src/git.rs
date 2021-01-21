@@ -139,14 +139,14 @@ pub fn add_all_files<P: AsRef<Path>>(dir: &P) -> Result<bool> {
 
 /// Do a git status to verify if there are local changes.
 pub fn has_changes<P: AsRef<Path>>(dir: &P) -> Result<bool> {
-    Ok(call_on_path_has_output(
+    call_on_path_has_output(
         vec!["git", "ls-files", "--others", "--exclude-standard"],
         dir,
     )
-    .context("failed checking if there are git changes")?)
+    .context("failed checking if there are git changes")
 }
 
 /// Initialize an empty repository
 pub fn init_repo<P: AsRef<Path>>(dir: &P) -> Result<bool> {
-    Ok(call_on_path(vec!["git", "init"], dir).context("Failed initializing the repository")?)
+    call_on_path(vec!["git", "init"], dir).context("Failed initializing the repository")
 }
