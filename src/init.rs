@@ -22,21 +22,23 @@ where
 
     println!(
         "{}",
-        setup_script.replace(
-            "## EMPLACE ##",
-            &format!(
-                "\"{}\" -c \"{}\"",
-                exe_path,
+        // Replace command
+        setup_script
+            .replace("## EMPLACE ##", exe_path.as_str())
+            // Replace path
+            .replace(
+                "## EMPLACE_CONFIG_PATH ##",
                 config_path
                     .as_ref()
                     .canonicalize()?
                     .to_str()
-                    .ok_or_else(|| anyhow!(
-                        "Could not convert path {:?} to string",
-                        config_path.as_ref()
-                    ))?
+                    .ok_or_else(|| {
+                        anyhow!(
+                            "Could not convert path {:?} to string",
+                            config_path.as_ref()
+                        )
+                    })?,
             )
-        )
     );
 
     // Print the completions
@@ -56,7 +58,7 @@ where
     Ok(())
 }
 
-const BASH_INIT: &str = r##"
+const BASH_INIT: &str = r###"
 emplace_postexec_invoke_exec () {
     # quit when the previous command failed
     [ -z "$!" ] && exit $?
@@ -68,10 +70,10 @@ emplace_postexec_invoke_exec () {
 }
 PROMPT_COMMAND="emplace_postexec_invoke_exec;$PROMPT_COMMAND"
 
-alias emplace='## EMPLACE ##'
-"##;
+export EMPLACE_CONFIG="## EMPLACE_CONFIG_PATH ##"
+"###;
 
-const ZSH_INIT: &str = r##"
+const ZSH_INIT: &str = r###"
 emplace_precmd() {
     # quit when the previous command failed
     [ -z "$!" ] && exit
@@ -86,10 +88,10 @@ if [[ ${precmd_functions[(ie)emplace_precmd]} -gt ${#precmd_functions} ]]; then
     precmd_functions+=(emplace_precmd)
 fi
 
-alias emplace='## EMPLACE ##'
-"##;
+export EMPLACE_CONFIG="## EMPLACE_CONFIG_PATH ##"
+"###;
 
-const FISH_INIT: &str = r##"
+const FISH_INIT: &str = r###"
 function emplace_postcmd --on-event fish_postexec
     # quit when the previous command failed
     if test $status -gt 0
@@ -99,11 +101,9 @@ function emplace_postcmd --on-event fish_postexec
     ## EMPLACE ## catch "$argv"
 end
 
-alias emplace='## EMPLACE ##'
-"##;
+set -x EMPLACE_CONFIG "## EMPLACE_CONFIG_PATH ##"
+"###;
 
-const NU_INIT: &str = r##"
-alias emplace = ## EMPLACE ##
-
-## EMPLACE ## catch $(history | last); echo >
-"##;
+const NU_INIT: &str = r###"
+EMPLACE_CONFIG="## EMPLACE_CONFIG_PATH ##" ## EMPLACE ## catch $(history | last); echo >
+"###;

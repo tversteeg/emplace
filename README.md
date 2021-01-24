@@ -122,7 +122,7 @@
 
    When you want to use a different configuration file from the default one you can change `emplace init $SHELL` with `emplace init $SHELL -c path/to/my/config.toml`.
    
-   This will create an alias in the shell, so all further invocations of `emplace ..` will automatically be prepended with an expanded version of `-c path/to/my/config.toml`.
+   This will set the `EMPLACE_CONFIG="path/to/my/config.toml"` environment variable. This can be overwritten with `export EMPLACE_CONFIG="path/to/other/config.toml"` _after_ the init function, except in the Nu shell.
    
 ## Usage
 
