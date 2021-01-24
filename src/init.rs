@@ -67,6 +67,8 @@ emplace_postexec_invoke_exec () {
     ## EMPLACE ## catch "$this_command"
 }
 PROMPT_COMMAND="emplace_postexec_invoke_exec;$PROMPT_COMMAND"
+
+alias emplace='## EMPLACE ##'
 "##;
 
 const ZSH_INIT: &str = r##"
@@ -83,6 +85,8 @@ emplace_precmd() {
 if [[ ${precmd_functions[(ie)emplace_precmd]} -gt ${#precmd_functions} ]]; then
     precmd_functions+=(emplace_precmd)
 fi
+
+alias emplace='## EMPLACE ##'
 "##;
 
 const FISH_INIT: &str = r##"
@@ -94,8 +98,12 @@ function emplace_postcmd --on-event fish_postexec
 
     ## EMPLACE ## catch "$argv"
 end
+
+alias emplace='## EMPLACE ##'
 "##;
 
 const NU_INIT: &str = r##"
+alias emplace = ## EMPLACE ##
+
 ## EMPLACE ## catch $(history | last); echo >
 "##;

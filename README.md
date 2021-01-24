@@ -117,6 +117,12 @@
 	```sh
 	emplace init nu | config set_into prompt
 	```
+
+3. Change the configuration file (optional)
+
+   When you want to use a different configuration file from the default one you can change `emplace init $SHELL` with `emplace init $SHELL -c path/to/my/config.toml`.
+   
+   This will create an alias in the shell, so all further invocations of `emplace ..` will automatically be prepended with an expanded version of `-c path/to/my/config.toml`.
    
 ## Usage
 
