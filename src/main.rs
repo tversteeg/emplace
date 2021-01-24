@@ -125,7 +125,7 @@ fn safe_main() -> Result<()> {
         Some(("init", sub_m)) => {
             let shell_name = sub_m.value_of("shell").context("shell name is missing")?;
 
-            init::init_main(shell_name)
+            init::init_main(config_path, shell_name)
         }
         Some(("catch", sub_m)) => {
             let line = sub_m.value_of("line").context("line is missing")?;

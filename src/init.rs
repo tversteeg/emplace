@@ -1,9 +1,12 @@
 use crate::public_clap_app;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use clap_generate::generators::{Bash, Fish, Zsh};
-use std::{env, io};
+use std::{env, io, path::Path};
 
-pub fn init_main(shell_name: &str) -> Result<()> {
+pub fn init_main<P>(config_path: P, shell_name: &str) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     let exe_path = env::current_exe()?
         .into_os_string()
         .into_string()
@@ -19,7 +22,21 @@ pub fn init_main(shell_name: &str) -> Result<()> {
 
     println!(
         "{}",
-        setup_script.replace("## EMPLACE ##", &format!("\"{}\"", exe_path))
+        setup_script.replace(
+            "## EMPLACE ##",
+            &format!(
+                "\"{}\" -c \"{}\"",
+                exe_path,
+                config_path
+                    .as_ref()
+                    .canonicalize()?
+                    .to_str()
+                    .ok_or_else(|| anyhow!(
+                        "Could not convert path {:?} to string",
+                        config_path.as_ref()
+                    ))?
+            )
+        )
     );
 
     // Print the completions
