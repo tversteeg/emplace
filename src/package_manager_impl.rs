@@ -124,7 +124,7 @@ impl PackageManager {
 
                         // Loop over the arguments handling flags in a special way
                         while let Some(arg) = args_iter.next() {
-                            if arg.starts_with('-') {
+                            if arg.starts_with('-') || arg.starts_with('+') {
                                 self.handle_capture_flags(&arg, &mut args_iter, &mut catched_flags);
 
                                 // If it's a flag containing an extra arguments besides it skip one
