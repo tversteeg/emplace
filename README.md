@@ -70,13 +70,17 @@
    nix-env -iA nixos.emplace
    ```
    
-   ### Source
+   ### Linux, MacOS, Windows
 
    #### Rust
    
    ```sh
    cargo install emplace
    ```
+   
+   #### Binary
+   
+   Download the latest binary from [releases](https://github.com/tversteeg/emplace/releases) for your OS and put it somewhere in your PATH.
 
 2. Add the init script to your shell's config file:
 
