@@ -30,8 +30,32 @@ impl PackageManagerTrait for Pacman {
     }
 
     fn known_flags_with_values(self) -> Vec<&'static str> {
-        // TODO
-        vec![]
+        // Source: https://archlinux.org/pacman/pacman.8.html
+        vec![
+            "-b",
+            "--dbpath",
+            "-r",
+            "--root",
+            "--arch",
+            "--cachedir",
+            "--color",
+            "--config",
+            "--gpgdir",
+            "--hookdir",
+            "--logfile",
+            "--sysroot",
+            "--assume-installed",
+            "--print-format",
+            "--ignore",
+            "--ignoregroup",
+            "--overwrite",
+            "-o",
+            "--owns",
+            "-s",
+            "--search",
+            "--asdeps",
+            "--asexplicit",
+        ]
     }
 
     fn capture_flags(self) -> Vec<CaptureFlag> {
