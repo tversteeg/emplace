@@ -1,7 +1,7 @@
 [package]
 name = "emplace"
 version = "0.4.4-alpha.0"
-authors = ["Thomas Versteeg <thomasversteeg@gmx.com>"]
+authors = ["Thomas Versteeg <thomas@versteeg.email>"]
 description = "Command-line tool to mirror installed software on multiple machines."
 edition = "2018"
 repository = "https://github.com/tversteeg/emplace"
@@ -37,8 +37,8 @@ strum_macros = "0.20.1"
 toml = "0.5.8"
 
 [package.metadata.deb]
-maintainer = "Thomas Versteeg <thomasversteeg@gmx.com>"
-copyright = "2019, Thomas Versteeg <thomasversteeg@gmx.com>"
+maintainer = "Thomas Versteeg <thomas@versteeg.email>"
+copyright = "2019, Thomas Versteeg <thomas@versteeg.email>"
 license-file = ["LICENSE", "4"]
 extended-description = """\
 A command-line tool to mirror installed software on multiple machines. \
