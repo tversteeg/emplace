@@ -6,6 +6,7 @@ mod brew;
 mod cargo;
 mod chocolatey;
 mod dnf;
+mod guix;
 mod nix;
 mod npm;
 mod pacman;
@@ -22,6 +23,7 @@ pub use brew::Brew;
 pub use cargo::Cargo;
 pub use chocolatey::Chocolatey;
 pub use dnf::Dnf;
+pub use guix::Guix;
 pub use nix::Nix;
 pub use npm::Npm;
 pub use pacman::Pacman;
@@ -48,6 +50,7 @@ pub enum PackageManager {
     Cargo,
     Chocolatey,
     Dnf,
+    Guix,
     Nix,
     Npm,
     Pacman,
