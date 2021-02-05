@@ -44,12 +44,13 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
-          
-      - uses: actions-rs/clippy-check@v1
+
+      - name: cargo clippy
+        uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features
-        
+
   test:
     name: cargo test
     strategy:
@@ -75,7 +76,7 @@ jobs:
           profile: default
           toolchain: stable
           override: true
-          
+
       - name: cargo test
         uses: actions-rs/cargo@v1
         with:

@@ -1,0 +1,21 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+name: bloat
+
+jobs:
+  cargo_bloat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: cargo bloat
+        uses: orf/cargo-bloat-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
