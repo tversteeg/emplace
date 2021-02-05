@@ -44,12 +44,11 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
-
-      - name: cargo clippy
-        uses: actions-rs/cargo@v1
+          
+      - uses: actions-rs/clippy-check@v1
         with:
-          command: clippy
-          args: --all-targets --all-features -- -D clippy::all
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
         
   test:
     name: cargo test
