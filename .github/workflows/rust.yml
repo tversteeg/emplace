@@ -1,4 +1,4 @@
-name: CI
+name: rust
 on:
   push:
     branches:
@@ -70,6 +70,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+
       - name: install rust
         uses: actions-rs/toolchain@v1
         with:
@@ -85,7 +86,7 @@ jobs:
   # Build sources for every OS
   github_build:
     if: startsWith(github.ref, 'refs/tags/v')
-    name: Build release binaries
+    name: build release binaries
     strategy:
       fail-fast: false
       matrix:
@@ -107,7 +108,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Install Rust toolchain
+      - name: install rust
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -115,13 +116,13 @@ jobs:
           override: true
           target: ${{ matrix.target }}
 
-      - name: Build target
+      - name: cargo build
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --target ${{ matrix.target }}
 
-      - name: Prepare build artifacts [Windows]
+      - name: prepare windows build artifacts
         if: matrix.os == 'windows-latest'
         run: |
           cd target/${{ matrix.target }}/release
@@ -129,7 +130,7 @@ jobs:
           mv emplace.exe ../../../${{ matrix.name }}
           cd -
 
-      - name: Prepare build artifacts [-nix]
+      - name: prepare -nix build artifacts
         if: matrix.os != 'windows-latest'
         run: |
           cd target/${{ matrix.target }}/release
@@ -137,7 +138,7 @@ jobs:
           mv emplace ../../../${{ matrix.name }}
           cd -
 
-      - name: Upload build artifact
+      - name: upload build artifacts
         uses: actions/upload-artifact@v1
         with:
           name: ${{ matrix.name }}
@@ -146,33 +147,33 @@ jobs:
   # Create GitHub release with Rust build targets and release notes
   github_release:
     if: startsWith(github.ref, 'refs/tags/v')
-    name: Create GitHub Release
+    name: create github release
     needs: github_build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
 
       # These can be squashed when https://github.com/actions/download-artifact/issues/6 is closed
-      - name: Download releases from github_build
+      - name: download releases from github_build
         uses: actions/download-artifact@v1
         with:
           name: emplace-x86_64-unknown-linux-gnu
           path: .
-      - name: Download releases from github_build
+      - name: download releases from github_build
         uses: actions/download-artifact@v1
         with:
           name: emplace-x86_64-apple-darwin
           path: .
-      - name: Download releases from github_build
+      - name: download releases from github_build
         uses: actions/download-artifact@v1
         with:
           name: emplace-x86_64-pc-windows-msvc.exe
           path: .
 
-      - name: Generate checksums
+      - name: generate checksums
         run: for file in emplace-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
 
-      - name: Create GitHub release ${{ matrix.target }}
+      - name: create github release ${{ matrix.target }}
         uses: softprops/action-gh-release@v1
         with:
           files: |
