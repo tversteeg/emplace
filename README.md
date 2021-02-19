@@ -226,6 +226,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/l1a"><img src="https://avatars3.githubusercontent.com/u/634380?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ken Tobias</b></sub></a><br /><a href="#platform-l1a" title="Packaging/porting to new platform">📦</a></td>
     <td align="center"><a href="https://github.com/adamcstephens"><img src="https://avatars2.githubusercontent.com/u/2071575?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Adam Stephens</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/issues?q=author%3Aadamcstephens" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/ram02z"><img src="https://avatars2.githubusercontent.com/u/59267627?v=4?s=100" width="100px;" alt=""/><br /><sub><b>omar</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/issues?q=author%3Aram02z" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/5c0tt-b0t"><img src="https://avatars.githubusercontent.com/u/63571864?v=4?s=100" width="100px;" alt=""/><br /><sub><b>5c0tt-b0t</b></sub></a><br /><a href="#ideas-5c0tt-b0t" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
