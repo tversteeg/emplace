@@ -7,6 +7,7 @@ mod cargo;
 mod chocolatey;
 mod dnf;
 mod gem;
+mod go;
 mod guix;
 mod nix;
 mod npm;
@@ -25,6 +26,7 @@ pub use cargo::Cargo;
 pub use chocolatey::Chocolatey;
 pub use dnf::Dnf;
 pub use gem::Gem;
+pub use go::Go;
 pub use guix::Guix;
 pub use nix::Nix;
 pub use npm::Npm;
@@ -53,6 +55,7 @@ pub enum PackageManager {
     Chocolatey,
     Dnf,
     Gem,
+    Go,
     Guix,
     Nix,
     Npm,
