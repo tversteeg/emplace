@@ -14,6 +14,7 @@ mod npm;
 mod pacman;
 mod pip;
 mod pip3;
+mod pkg;
 mod rua;
 mod rustup;
 mod scoop;
@@ -33,6 +34,7 @@ pub use npm::Npm;
 pub use pacman::Pacman;
 pub use pip::Pip;
 pub use pip3::Pip3;
+pub use pkg::Pkg;
 pub use rua::Rua;
 pub use rustup::Rustup;
 pub use scoop::Scoop;
@@ -62,6 +64,7 @@ pub enum PackageManager {
     Pacman,
     Pip,
     Pip3,
+    Pkg,
     Rua,
     Rustup,
     Scoop,
