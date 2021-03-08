@@ -30,7 +30,7 @@ itertools = "0.10.0"
 log = "0.4.14"
 ron = "0.6.4"
 run_script = "0.6.4"
-serde = { version = "1.0.123", features = ["derive"] }
+serde = { version = "1.0.124", features = ["derive"] }
 simplelog = "0.9.0"
 strum = "0.20.0"
 strum_macros = "0.20.1"
