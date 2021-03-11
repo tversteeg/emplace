@@ -64,6 +64,7 @@ mod tests {
         // Ignore
         catch!(PackageManager::from(Apt), "sudo apt test test2" => ());
         catch!(PackageManager::from(Apt), "sudo apt install -f" => ());
+        catch!(PackageManager::from(Apt), "sudo bapt install test" => ());
     }
 
     #[test]

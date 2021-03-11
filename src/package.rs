@@ -134,11 +134,7 @@ impl Packages {
                 }
 
                 // Attempt to find a matching package manager with the line
-                match PackageManager::from_line(line) {
-                    // Pass the line along
-                    Some(manager) => Some((line, manager)),
-                    None => None,
-                }
+                PackageManager::from_line(line).map(|manager| (line, manager))
             })
             // Parse the packages in the line with the package manager supplied
             .map(|(line, package_manager)| package_manager.catch(line))

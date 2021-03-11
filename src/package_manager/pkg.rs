@@ -50,6 +50,8 @@ mod tests {
     fn test_package_manager() {
         let manager = PackageManager::from_line("pkg install test").unwrap();
         assert_eq!(manager, PackageManager::from(Pkg));
+
+        assert!(PackageManager::from_line("qpkg install test").is_none());
     }
 
     #[test]

@@ -48,6 +48,8 @@ impl PackageManagerTrait for Cargo {
             CaptureFlag::Single("+nightly"),
             CaptureFlag::Single("+stable"),
             CaptureFlag::Single("+beta"),
+            CaptureFlag::Single("--no-default-features"),
+            CaptureFlag::DynamicValue("--features"),
         ]
     }
 }
