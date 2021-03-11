@@ -24,7 +24,7 @@ impl PackageManager {
                 .into_iter()
                 // Find the command that's in the file, use an extra space to only match full
                 // package names
-                .any(|command| Self::line_contains_command(line, command))
+                .any(|command| Self::line_contains_command(line, &command))
         })
     }
 
@@ -228,8 +228,7 @@ impl PackageManager {
         let command_with_space = format!("{} ", command);
 
         // Only match `pkg` for example, but not `bpkg`
-        line.starts_with(&command_with_space)
-            || line.contains(&format!(" {}", command_with_space))
+        line.starts_with(&command_with_space) || line.contains(&format!(" {}", command_with_space))
     }
 }
 
