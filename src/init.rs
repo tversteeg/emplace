@@ -1,5 +1,5 @@
 use crate::public_clap_app;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use clap_generate::generators::{Bash, Fish, Zsh};
 use std::{env, io, path::Path};
 
@@ -7,7 +7,8 @@ pub fn init_main<P>(config_path: P, shell_name: &str) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    let exe_path = env::current_exe()?
+    let exe_path = env::current_exe()
+        .context("getting executable path for initial configuration")?
         .into_os_string()
         .into_string()
         .expect("Could not convert path to string");
@@ -30,7 +31,8 @@ where
                 "## EMPLACE_CONFIG_PATH ##",
                 config_path
                     .as_ref()
-                    .canonicalize()?
+                    .canonicalize()
+                    .context("canonicalizing configuration path")?
                     .to_str()
                     .ok_or_else(|| {
                         anyhow!(
