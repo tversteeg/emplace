@@ -1,4 +1,4 @@
-use crate::public_clap_app;
+use crate::{config::Config, public_clap_app};
 use anyhow::{anyhow, Context, Result};
 use clap_generate::generators::{Bash, Fish, Zsh};
 use std::{env, io, path::Path};
@@ -32,7 +32,8 @@ where
                 config_path
                     .as_ref()
                     .canonicalize()
-                    .context("canonicalizing configuration path")?
+                    // When canonicalizing path failed use the default path
+                    .unwrap_or(Config::default_path())
                     .to_str()
                     .ok_or_else(|| {
                         anyhow!(
