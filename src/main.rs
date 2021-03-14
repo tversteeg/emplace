@@ -163,8 +163,7 @@ fn safe_main() -> Result<()> {
             bugreport!()
                 .info(SoftwareVersion::default())
                 .info(OperatingSystem::default())
-                .info(CommandLine::default())
-                .info(EnvironmentVariables::list(&["SHELL"]))
+                .info(EnvironmentVariables::list(&["SHELL", "EMPLACE_CONFIG"]))
                 .info(CommandOutput::new("Git version", "git", &["--version"]))
                 .info(CompileTimeInformation::default())
                 .print::<Markdown>();
