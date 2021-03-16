@@ -35,6 +35,9 @@ strum = "0.20.0"
 strum_macros = "0.20.1"
 toml = "0.5.8"
 
+[dev-dependencies]
+indoc = "1.0.3"
+
 [package.metadata.deb]
 maintainer = "Thomas Versteeg <thomas@versteeg.email>"
 copyright = "2019, Thomas Versteeg <thomas@versteeg.email>"
