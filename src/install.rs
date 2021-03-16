@@ -4,7 +4,7 @@ use dialoguer::MultiSelect;
 use log::{debug, error};
 use std::{path::Path, process::Command};
 
-pub fn install<P>(config_path: P) -> Result<()>
+pub fn install<P>(config_path: P, install_all: bool) -> Result<()>
 where
     P: AsRef<Path>,
 {
@@ -44,12 +44,17 @@ where
     if package_names.is_empty() {
         println!("Nothing to install.");
     } else {
-        // Prompt the user for which package to install
-        let selections = MultiSelect::new()
-            .with_prompt("Select the packages you want to install (space to add)")
-            .items(&package_names[..])
-            .interact()
-            .context("failed constructing checkboxes")?;
+        let selections = if install_all {
+            // Select all packages
+            (0..package_names.len()).collect()
+        } else {
+            // Prompt the user for which package to install
+            MultiSelect::new()
+                .with_prompt("Select the packages you want to install (space to add)")
+                .items(&package_names[..])
+                .interact()
+                .context("failed constructing checkboxes")?
+        };
 
         // Install the selected packages
         for selection in selections {

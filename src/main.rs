@@ -16,7 +16,7 @@ use anyhow::{anyhow, Context, Result};
 use bugreport::{
     bugreport,
     collector::{
-        CommandLine, CommandOutput, CompileTimeInformation, EnvironmentVariables, OperatingSystem,
+        CommandOutput, CompileTimeInformation, EnvironmentVariables, OperatingSystem,
         SoftwareVersion,
     },
     format::Markdown,
@@ -39,7 +39,13 @@ fn public_clap_app<'a>() -> App<'a> {
         .global_setting(AppSettings::ColoredHelp)
         .subcommand(
             App::new("install")
-                .about("Install the packages that have been mirrored from other machines"),
+                .about("Install the packages that have been mirrored from other machines")
+                .arg(
+                    Arg::new("yes")
+                        .short('y')
+                        .long("yes")
+                        .about("Don't prompt the user and try to install everything"),
+                ),
         )
         .subcommand(App::new("clean").about("Remove package synching"))
         .arg(
@@ -132,7 +138,9 @@ fn safe_main() -> Result<()> {
 
             catch::catch(config_path, line).context("catching a command")
         }
-        Some(("install", _)) => install::install(config_path).context("installing packages"),
+        Some(("install", sub_m)) => {
+            install::install(config_path, sub_m.is_present("yes")).context("installing packages")
+        }
         Some(("clean", _)) => clean::clean(config_path).context("cleaning packages"),
         Some(("history", sub_m)) => {
             let hist_path = PathBuf::from(
