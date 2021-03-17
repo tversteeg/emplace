@@ -5,8 +5,7 @@ use crate::{
 };
 use anyhow::Result;
 use colored::Colorize;
-use console::Style;
-use dialoguer::{theme::ColorfulTheme, MultiSelect};
+use dialoguer::MultiSelect;
 use itertools::Itertools;
 use std::{
     fs::File,
@@ -48,9 +47,7 @@ where
 
     let colored_selection: Vec<String> = catches.iter().map(|x| x.color_full_name()).collect();
 
-    let mut select_style = ColorfulTheme::default();
-    select_style.active_item_style = Style::underlined(select_style.active_item_style);
-    let ms = MultiSelect::with_theme(&select_style)
+    let ms = MultiSelect::new()
         .items(&colored_selection)
         .with_prompt("Select packages to sync")
         .paged(true)
