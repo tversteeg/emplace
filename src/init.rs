@@ -64,7 +64,7 @@ where
 const BASH_INIT: &str = r###"
 emplace_postexec_invoke_exec () {
     # quit when the previous command failed
-    [ -z "$!" ] && exit $?
+    [ -z "$?" ] && exit $?
 
     local hist=`history 1`
 
@@ -79,7 +79,7 @@ export EMPLACE_CONFIG="## EMPLACE_CONFIG_PATH ##"
 const ZSH_INIT: &str = r###"
 emplace_precmd() {
     # quit when the previous command failed
-    [ -z "$!" ] && exit
+    [ -z "$?" ] && exit
 
     local hist=`history -1`
 
