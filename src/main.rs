@@ -97,7 +97,13 @@ fn safe_main() -> Result<()> {
                         .value_name("PATH")
 						.about("Path to shell history file")
 						.required(true)
-				),
+				)
+                .arg(
+                    Arg::new("yes")
+                        .short('y')
+                        .long("yes")
+                        .about("Don't prompt the user and select everything"),
+                ),
 		)
         .subcommand(
             App::new("config")
@@ -149,7 +155,8 @@ fn safe_main() -> Result<()> {
                     .context("path to history file is not provided")?,
             );
 
-            history::history(config_path, &hist_path).context("capturing history")
+            history::history(config_path, &hist_path, sub_m.is_present("yes"))
+                .context("capturing history")
         }
         // Config subcommand, if path is present and new is not
         // it will just print the default path for the config file,

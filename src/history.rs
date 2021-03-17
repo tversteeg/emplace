@@ -14,7 +14,7 @@ use std::{
 };
 
 /// Capture a history file.
-pub fn history<P1, P2>(config_path: P1, path: P2) -> Result<()>
+pub fn history<P1, P2>(config_path: P1, path: P2, select_all: bool) -> Result<()>
 where
     P1: AsRef<Path>,
     P2: AsRef<Path>,
@@ -45,17 +45,24 @@ where
         return Ok(());
     }
 
-    let colored_selection: Vec<String> = catches.iter().map(|x| x.color_full_name()).collect();
+    let selections = if select_all {
+        // Select everything from the history
+        (0..catches.len()).collect()
+    } else {
+        // Prompt the user for the packages to sync
+        let colored_selection: Vec<String> = catches.iter().map(|x| x.color_full_name()).collect();
 
-    let ms = MultiSelect::new()
-        .items(&colored_selection)
-        .with_prompt("Select packages to sync")
-        .paged(true)
-        .interact()?;
+        MultiSelect::new()
+            .items(&colored_selection)
+            .with_prompt("Select packages to sync")
+            .paged(true)
+            .interact()?
+    };
 
     let mut checked = vec![];
-
-    ms.iter().for_each(|x| checked.push(catches[*x].clone()));
+    selections
+        .iter()
+        .for_each(|x| checked.push(catches[*x].clone()));
 
     let len = checked.len();
     if len == 0 {
@@ -74,7 +81,7 @@ where
         println!("- {}", catch.color_full_name());
     }
 
-    if !dialoguer::Confirm::new().interact()? {
+    if !select_all && !dialoguer::Confirm::new().interact()? {
         // Exit, we don't need to do anything
         return Ok(());
     }
