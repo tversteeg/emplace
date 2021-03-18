@@ -129,7 +129,12 @@ impl PackageManager {
 
                         // Loop over the arguments handling flags in a special way
                         while let Some(arg) = args_iter.next() {
-                            if arg.starts_with('-') || arg.starts_with('+') {
+                            let first_char = arg
+                                .chars()
+                                .next()
+                                .expect("Arg string is suddenly zero bytes");
+
+                            if first_char == '-' || first_char == '+' {
                                 self.handle_capture_flags(&arg, &mut args_iter, &mut catched_flags);
 
                                 // If it's a flag containing an extra arguments besides it skip one
@@ -138,7 +143,8 @@ impl PackageManager {
                                     args_iter.next();
                                     continue;
                                 }
-                            } else {
+                            // Only match packages starting with no special characters
+                            } else if first_char.is_alphanumeric() {
                                 // We've found a package
                                 package_strings.push(arg.to_string());
                             }

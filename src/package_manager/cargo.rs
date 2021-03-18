@@ -76,6 +76,7 @@ mod tests {
 
         // Shouldn't match
         catch!(PackageManager::from(Cargo), "cargo uninstall test test2" => ());
+        catch!(PackageManager::from(Cargo), "cargo install ." => ());
 
         // Flags that should be captured
         catch!(PackageManager::from(Cargo), "cargo install --git https://test.com/test.git" => "https://test.com/test.git" ["--git"]);
