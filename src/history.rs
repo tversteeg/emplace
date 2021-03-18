@@ -39,6 +39,7 @@ where
 
     let mut catches = Packages::from(catches);
     catches.filter_saved_packages(&repo.read()?);
+    catches.dedup();
 
     if catches.is_empty() {
         // Nothing found after filtering

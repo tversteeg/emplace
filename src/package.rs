@@ -166,6 +166,11 @@ impl Packages {
             .collect();
     }
 
+    /// Remove all duplicate packages.
+    pub fn dedup(&mut self) {
+        self.0.dedup();
+    }
+
     /// Construct a commit message depending on the amount of packages that need to be committed.
     pub fn commit_message(&self) -> String {
         match self.0.len() {
