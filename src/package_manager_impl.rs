@@ -129,6 +129,11 @@ impl PackageManager {
 
                         // Loop over the arguments handling flags in a special way
                         while let Some(arg) = args_iter.next() {
+                            // Stop when a flag is found that invalidate the command
+                            if self.has_invalidating_flag(&arg) {
+                                return vec![];
+                            }
+
                             let first_char = arg
                                 .chars()
                                 .next()
@@ -184,6 +189,14 @@ impl PackageManager {
     #[cfg(not(target_os = "windows"))]
     fn os_commands(&self) -> Vec<&str> {
         self.commands()
+    }
+
+    /// Whether the command has an invalidating flag.
+    fn has_invalidating_flag(self, arg: &str) -> bool {
+        self.invalidating_flags()
+            .iter()
+            .find(|capture| *capture == &arg)
+            .is_some()
     }
 
     /// Handle the iterator's flags using the different options as defined in the package managers.

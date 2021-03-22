@@ -101,6 +101,9 @@ pub trait PackageManagerTrait {
     ///
     /// This usually stays empty.
     fn capture_flags(self) -> Vec<CaptureFlag>;
+
+    /// Flags that make a command with a subcommand that would be caught otherwise be ignored.
+    fn invalidating_flags(self) -> Vec<&'static str>;
 }
 
 /// Different ways in which a set of flags can be captured.

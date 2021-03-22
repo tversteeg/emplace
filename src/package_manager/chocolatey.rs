@@ -40,6 +40,10 @@ impl PackageManagerTrait for Chocolatey {
     fn capture_flags(self) -> Vec<CaptureFlag> {
         vec![]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec![]
+    }
 }
 
 #[cfg(test)]

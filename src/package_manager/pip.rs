@@ -37,6 +37,10 @@ impl PackageManagerTrait for Pip {
     fn capture_flags(self) -> Vec<CaptureFlag> {
         vec![CaptureFlag::Single("--user")]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec!["-r"]
+    }
 }
 
 #[cfg(test)]
@@ -62,5 +66,6 @@ mod tests {
         // Ignore
         catch!(PackageManager::from(Pip), "sudo pip3 install test test2" => ());
         catch!(PackageManager::from(Pip), "sudo pip test test2" => ());
+        catch!(PackageManager::from(Pip), "pip install -r requirements.txt" => ());
     }
 }

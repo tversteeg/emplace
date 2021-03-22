@@ -38,6 +38,10 @@ impl PackageManagerTrait for Dnf {
         // TODO
         vec![]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec![]
+    }
 }
 
 #[cfg(test)]

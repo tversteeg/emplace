@@ -52,6 +52,10 @@ impl PackageManagerTrait for Cargo {
             CaptureFlag::DynamicValue("--features"),
         ]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec!["--path"]
+    }
 }
 
 #[cfg(test)]
@@ -77,6 +81,7 @@ mod tests {
         // Shouldn't match
         catch!(PackageManager::from(Cargo), "cargo uninstall test test2" => ());
         catch!(PackageManager::from(Cargo), "cargo install ." => ());
+        catch!(PackageManager::from(Cargo), "cargo install --path test" => ());
 
         // Flags that should be captured
         catch!(PackageManager::from(Cargo), "cargo install --git https://test.com/test.git" => "https://test.com/test.git" ["--git"]);

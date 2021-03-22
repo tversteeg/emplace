@@ -39,6 +39,10 @@ impl PackageManagerTrait for Pkg {
             CaptureFlag::DynamicValue("-r"),
         ]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec![]
+    }
 }
 
 #[cfg(test)]

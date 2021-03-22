@@ -50,6 +50,10 @@ impl PackageManagerTrait for Guix {
             CaptureFlag::DynamicValue("--profile"),
         ]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec![]
+    }
 }
 
 #[cfg(test)]

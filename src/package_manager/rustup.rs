@@ -44,6 +44,10 @@ impl PackageManagerTrait for Rustup {
             CaptureFlag::DynamicValue("--toolchain"),
         ]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec![]
+    }
 }
 
 #[cfg(test)]

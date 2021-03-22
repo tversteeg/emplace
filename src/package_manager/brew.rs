@@ -41,6 +41,10 @@ impl PackageManagerTrait for Brew {
             CaptureFlag::Single("--fetch-HEAD"),
         ]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec![]
+    }
 }
 
 #[cfg(test)]

@@ -37,6 +37,10 @@ impl PackageManagerTrait for Nix {
     fn capture_flags(self) -> Vec<CaptureFlag> {
         vec![CaptureFlag::DynamicValue("-f")]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec![]
+    }
 }
 
 #[cfg(test)]

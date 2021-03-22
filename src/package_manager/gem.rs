@@ -59,6 +59,10 @@ impl PackageManagerTrait for Gem {
             CaptureFlag::DynamicValue("--version"),
         ]
     }
+
+    fn invalidating_flags(self) -> Vec<&'static str> {
+        vec![]
+    }
 }
 
 #[cfg(test)]
