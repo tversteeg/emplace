@@ -123,7 +123,7 @@ impl Packages {
     pub fn from_line(line: &str) -> Self {
         // First we split the line into separating characters
         let lines = line
-            .split(|c| c == ';' || c == '|' || c == '&')
+            .split(|c| c == ';' || c == '|' || c == '&' || c == '\r' || c == '\n')
             // Then try to find the proper package manager for each line, this also filters out
             // lines that are not related to the package manager
             .filter_map(|line| {

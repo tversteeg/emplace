@@ -244,10 +244,14 @@ impl PackageManager {
 
     /// Whether a line can be parsed with a command.
     fn line_contains_command(line: &str, command: &str) -> bool {
-        let command_with_space = format!("{} ", command);
+        line.lines().any(|line| {
+            let command_with_space = format!("{} ", command);
 
-        // Only match `pkg` for example, but not `bpkg`
-        line.starts_with(&command_with_space) || line.contains(&format!(" {}", command_with_space))
+            // Only match `pkg` for example, but not `bpkg`
+            line.starts_with(&command_with_space)
+                || line.contains(&format!(" {}", command_with_space))
+                || line.contains(&format!("\t{}", command_with_space))
+        })
     }
 }
 
@@ -270,6 +274,12 @@ mod tests {
     fn test_detect() {
         assert!(PackageManager::detects_line("apt install test"));
         assert!(!PackageManager::detects_line("something"));
+
+        assert!(PackageManager::detects_line("echo test\napt install test"));
+        assert!(PackageManager::detects_line(
+            "apt install test\n\tapt install test"
+        ));
+        assert!(PackageManager::detects_line("\n\tapt install test"));
     }
 
     #[cfg(target_os = "windows")]
