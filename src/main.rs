@@ -23,7 +23,7 @@ use bugreport::{
 };
 use clap::{App, AppSettings, Arg};
 use log::error;
-use simplelog::{LevelFilter, TermLogger, TerminalMode};
+use simplelog::{ColorChoice, LevelFilter, TermLogger, TerminalMode};
 use std::path::PathBuf;
 
 fn public_clap_app<'a>() -> App<'a> {
@@ -63,6 +63,7 @@ fn safe_main() -> Result<()> {
         LevelFilter::Info,
         simplelog::Config::default(),
         TerminalMode::Mixed,
+        ColorChoice::Auto,
     )
     .context("no interactive terminal")?;
 
