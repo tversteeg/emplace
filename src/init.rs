@@ -74,6 +74,9 @@ emplace_postexec_invoke_exec () {
 PROMPT_COMMAND="emplace_postexec_invoke_exec;$PROMPT_COMMAND"
 
 export EMPLACE_CONFIG="## EMPLACE_CONFIG_PATH ##"
+
+# Add an empty line so new shells won't display the last installable command
+echo "# emplace" >> $HISTFILE
 "###;
 
 const ZSH_INIT: &str = r###"
@@ -92,6 +95,9 @@ if [[ ${precmd_functions[(ie)emplace_precmd]} -gt ${#precmd_functions} ]]; then
 fi
 
 export EMPLACE_CONFIG="## EMPLACE_CONFIG_PATH ##"
+
+# Add an empty line so new shells won't display the last installable command
+echo "# emplace" >> $HISTFILE
 "###;
 
 const FISH_INIT: &str = r###"
