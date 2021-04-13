@@ -37,6 +37,7 @@ toml = "0.5.8"
 
 [dev-dependencies]
 indoc = "1.0.3"
+cargo-husky = { version = "1.5.0", features = ["precommit-hook", "run-cargo-check", "run-cargo-clippy", "run-cargo-fmt"] }
 
 [package.metadata.deb]
 maintainer = "Thomas Versteeg <thomas@versteeg.email>"
