@@ -155,17 +155,17 @@ jobs:
 
       # These can be squashed when https://github.com/actions/download-artifact/issues/6 is closed
       - name: download releases from github_build
-        uses: actions/download-artifact@v2.0.8
+        uses: actions/download-artifact@v2.0.9
         with:
           name: emplace-x86_64-unknown-linux-gnu
           path: .
       - name: download releases from github_build
-        uses: actions/download-artifact@v2.0.8
+        uses: actions/download-artifact@v2.0.9
         with:
           name: emplace-x86_64-apple-darwin
           path: .
       - name: download releases from github_build
-        uses: actions/download-artifact@v2.0.8
+        uses: actions/download-artifact@v2.0.9
         with:
           name: emplace-x86_64-pc-windows-msvc.exe
           path: .
