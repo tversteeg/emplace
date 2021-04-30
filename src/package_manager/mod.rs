@@ -20,6 +20,7 @@ mod rustup;
 mod scoop;
 mod snap;
 mod yay;
+mod zypper;
 
 pub use apt::Apt;
 pub use brew::Brew;
@@ -40,6 +41,7 @@ pub use rustup::Rustup;
 pub use scoop::Scoop;
 pub use snap::Snap;
 pub use yay::Yay;
+pub use zypper::Zypper;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -70,6 +72,7 @@ pub enum PackageManager {
     Scoop,
     Snap,
     Yay,
+    Zypper,
 }
 
 /// Trait that needs to be implemented for a new package manager.
