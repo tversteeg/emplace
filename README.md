@@ -233,6 +233,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/5c0tt-b0t"><img src="https://avatars.githubusercontent.com/u/63571864?v=4?s=100" width="100px;" alt=""/><br /><sub><b>5c0tt-b0t</b></sub></a><br /><a href="#ideas-5c0tt-b0t" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/tversteeg/emplace/issues?q=author%3A5c0tt-b0t" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/ModdedGamers"><img src="https://avatars.githubusercontent.com/u/35778371?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Modded Gamers</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/issues?q=author%3AModdedGamers" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://www.openhub.net/accounts/jayvdb"><img src="https://avatars.githubusercontent.com/u/15092?v=4?s=100" width="100px;" alt=""/><br /><sub><b>John Vandenberg</b></sub></a><br /><a href="https://github.com/tversteeg/emplace/issues?q=author%3Ajayvdb" title="Bug reports">🐛</a> <a href="#ideas-jayvdb" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/cryolithic"><img src="https://avatars.githubusercontent.com/u/11305845?v=4?s=100" width="100px;" alt=""/><br /><sub><b>cryolithic</b></sub></a><br /><a href="#platform-cryolithic" title="Packaging/porting to new platform">📦</a></td>
   </tr>
 </table>
 
