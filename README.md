@@ -30,6 +30,7 @@
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | Pacman |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | RUA |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | Yay |
+    | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/suse.svg" width="18" height="18" /> | Zypper |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/linux.svg" width="18" height="18" /> | Snap |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/fedora.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/redhat.svg" width="18" height="18" /> | DNF/YUM |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/linux.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/apple.svg" width="18" height="18" /> | Homebrew |
