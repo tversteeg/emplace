@@ -10,11 +10,11 @@ impl PackageManagerTrait for Zypper {
     }
 
     fn commands(self) -> Vec<&'static str> {
-        vec!["zypper"]
+        vec!["zypper", "zin", "zinr"]
     }
 
     fn sub_commands(self) -> Vec<&'static str> {
-        vec!["install"]
+        vec!["install", "in", "inr"]
     }
 
     fn install_command(self) -> &'static str {
