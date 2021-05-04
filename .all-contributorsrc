@@ -131,6 +131,15 @@
         "bug",
         "ideas"
       ]
+    },
+    {
+      "login": "cryolithic",
+      "name": "cryolithic",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11305845?v=4",
+      "profile": "https://github.com/cryolithic",
+      "contributions": [
+        "platform"
+      ]
     }
   ],
   "contributorsPerLine": 7,
