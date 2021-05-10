@@ -17,7 +17,7 @@ is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
 
 [dependencies]
 anyhow = { version = "1.0.40", features = ["backtrace"] }
-bugreport = { git = "https://github.com/sharkdp/bugreport.git" }
+bugreport = "0.4.0"
 clap = { version = "3.0.0-beta.2", features = ["suggestions", "color", "wrap_help"] }
 clap_generate = "3.0.0-beta.2"
 colored = "2.0.0"
