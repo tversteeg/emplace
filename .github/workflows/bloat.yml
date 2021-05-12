@@ -16,6 +16,6 @@ jobs:
         with:
           toolchain: stable
       - name: cargo bloat
-        uses: orf/cargo-bloat-action@v1
+        uses: orf/cargo-bloat-action@v1.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
