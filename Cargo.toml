@@ -32,7 +32,7 @@ run_script = "0.8.0"
 serde = { version = "1.0.126", features = ["derive"] }
 simplelog = "0.10.0"
 strum = "0.21.0"
-strum_macros = "0.20.1"
+strum_macros = "0.21.0"
 toml = "0.5.8"
 
 [dev-dependencies]
