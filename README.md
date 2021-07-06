@@ -209,6 +209,10 @@ Run `emplace clean` and select the packages you want to be cleaned, they won't b
 
 Run `emplace config --new` to create a new config and configure the repository or `emplace config --path` to retrieve the path to the configuration file.
 
+## Development Status
+
+This software isn't actively developed on by me anymore, I do however review and accept pull requests.
+
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
