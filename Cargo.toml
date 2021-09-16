@@ -18,7 +18,7 @@ is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
 [dependencies]
 anyhow = { version = "1.0.44", features = ["backtrace"] }
 bugreport = "0.4.1"
-clap = { version = "3.0.0-beta.2", features = ["suggestions", "color", "wrap_help"] }
+clap = { version = "3.0.0-beta.4", features = ["suggestions", "color", "wrap_help"] }
 clap_generate = "3.0.0-beta.2"
 colored = "2.0.0"
 console = "0.14.1"
