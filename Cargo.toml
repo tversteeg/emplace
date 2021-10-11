@@ -31,7 +31,7 @@ ron = "0.6.5"
 run_script = "0.9.0"
 serde = { version = "1.0.130", features = ["derive"] }
 simplelog = "0.10.2"
-strum = "0.21.0"
+strum = "0.22.0"
 strum_macros = "0.21.1"
 toml = "0.5.8"
 
