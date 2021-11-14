@@ -56,7 +56,6 @@ where
         MultiSelect::new()
             .items(&colored_selection)
             .with_prompt("Select packages to sync")
-            .paged(true)
             .interact()?
     };
 

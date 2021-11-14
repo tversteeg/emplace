@@ -89,7 +89,7 @@ impl Package {
 
     /// Check if this package is already installed.
     pub fn is_installed(&self) -> Result<bool> {
-        self.source.package_is_installed(&self)
+        self.source.package_is_installed(self)
     }
 
     /// Check if the package manager can be found.

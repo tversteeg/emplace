@@ -33,7 +33,7 @@ where
                     .as_ref()
                     .canonicalize()
                     // When canonicalizing path failed use the default path
-                    .unwrap_or(Config::default_path())
+                    .unwrap_or_else(|_| Config::default_path())
                     .to_str()
                     .ok_or_else(|| {
                         anyhow!(
@@ -47,13 +47,11 @@ where
     // Print the completions
     match shell_name {
         "bash" => {
-            clap_generate::generate::<Bash, _>(&mut public_clap_app(), "emplace", &mut io::stdout())
+            clap_generate::generate(Bash, &mut public_clap_app(), "emplace", &mut io::stdout())
         }
-        "zsh" => {
-            clap_generate::generate::<Zsh, _>(&mut public_clap_app(), "emplace", &mut io::stdout())
-        }
+        "zsh" => clap_generate::generate(Zsh, &mut public_clap_app(), "emplace", &mut io::stdout()),
         "fish" => {
-            clap_generate::generate::<Fish, _>(&mut public_clap_app(), "emplace", &mut io::stdout())
+            clap_generate::generate(Fish, &mut public_clap_app(), "emplace", &mut io::stdout())
         }
         _ => (),
     };

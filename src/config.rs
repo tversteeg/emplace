@@ -106,7 +106,6 @@ impl Config {
             let chosen_in = dialoguer::Select::with_theme(&*theme)
                 .with_prompt(prompt)
                 .items(choices_in)
-                .paged(true)
                 .clear(true)
                 .interact_on(&term)?;
             if chosen_in == 0 {

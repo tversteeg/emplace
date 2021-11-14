@@ -21,9 +21,9 @@ use bugreport::{
     },
     format::Markdown,
 };
-use clap::{App, AppSettings, Arg};
+use clap::{App, AppSettings, Arg, ColorChoice};
 use log::error;
-use simplelog::{ColorChoice, LevelFilter, TermLogger, TerminalMode};
+use simplelog::{ColorChoice as LogColorChoice, LevelFilter, TermLogger, TerminalMode};
 use std::path::PathBuf;
 
 fn public_clap_app<'a>() -> App<'a> {
@@ -35,8 +35,7 @@ fn public_clap_app<'a>() -> App<'a> {
         .setting(AppSettings::DeriveDisplayOrder)
         .setting(AppSettings::SubcommandRequiredElseHelp)
         // Print the help in colors if the terminal allows it
-        .global_setting(AppSettings::ColorAuto)
-        .global_setting(AppSettings::ColoredHelp)
+        .color(ColorChoice::Auto)
         .subcommand(
             App::new("install")
                 .about("Install the packages that have been mirrored from other machines")
@@ -63,7 +62,7 @@ fn safe_main() -> Result<()> {
         LevelFilter::Info,
         simplelog::Config::default(),
         TerminalMode::Mixed,
-        ColorChoice::Auto,
+        LogColorChoice::Auto,
     )
     .context("no interactive terminal")?;
 

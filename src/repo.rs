@@ -160,8 +160,6 @@ impl Repo {
     }
 
     fn pretty_config() -> PrettyConfig {
-        PrettyConfig::new()
-            .with_depth_limit(2)
-            .with_indentor("".into())
+        PrettyConfig::new().depth_limit(2).indentor("".into())
     }
 }
