@@ -43,14 +43,14 @@ fn public_clap_app<'a>() -> App<'a> {
                     Arg::new("yes")
                         .short('y')
                         .long("yes")
-                        .about("Don't prompt the user and try to install everything"),
+                        .help("Don't prompt the user and try to install everything"),
                 ),
         )
         .subcommand(App::new("clean").about("Remove package synching"))
         .arg(
             Arg::new("config-path")
                 .short('c')
-                .about("The location of the configuration file")
+                .help("The location of the configuration file")
                 .required(false)
                 .global(true)
                 .env("EMPLACE_CONFIG"),
@@ -73,7 +73,7 @@ fn safe_main() -> Result<()> {
 				.arg(
 					Arg::new("shell")
 						.value_name("SHELL")
-						.about(
+						.help(
 							"The name of the currently running shell\nCurrently supported options: bash, nu, fish & zsh",
 						)
 						.required(true)
@@ -85,7 +85,7 @@ fn safe_main() -> Result<()> {
 				.arg(
 					Arg::new("line")
 						.value_name("LINE")
-						.about("The command as entired in the terminal")
+						.help("The command as entired in the terminal")
 						.required(true),
 				),
 		)
@@ -95,14 +95,14 @@ fn safe_main() -> Result<()> {
 				.arg(
 					Arg::new("history_file")
                         .value_name("PATH")
-						.about("Path to shell history file")
+						.help("Path to shell history file")
 						.required(true)
 				)
                 .arg(
                     Arg::new("yes")
                         .short('y')
                         .long("yes")
-                        .about("Don't prompt the user and select everything"),
+                        .help("Don't prompt the user and select everything"),
                 ),
 		)
         .subcommand(
@@ -112,14 +112,14 @@ fn safe_main() -> Result<()> {
                 Arg::new("new")
                 .short('n')
                 .long("new")
-                .about("Create a new config")
+                .help("Create a new config")
                 .takes_value(false)
             )
             .arg(
                 Arg::new("path")
                 .short('p')
                 .long("path")
-                .about("Print out path to config")
+                .help("Print out path to config")
                 .takes_value(false)
             ),
         )

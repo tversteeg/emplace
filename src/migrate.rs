@@ -33,8 +33,6 @@ pub mod zero_two {
     struct OldPackage {
         source: OldPackageManager,
         name: String,
-        #[serde(skip)]
-        pub(crate) package_name: Option<String>,
     }
 
     #[derive(Debug, Serialize, Deserialize)]
