@@ -26,7 +26,7 @@ dialoguer = "0.10.0"
 dirs = "4.0.0"
 enum_dispatch = "0.3.8"
 itertools = "0.10.3"
-log = "0.4.14"
+log = "0.4.16"
 ron = "0.7.0"
 run_script = "0.9.0"
 serde = { version = "1.0.136", features = ["derive"] }
