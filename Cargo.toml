@@ -33,7 +33,7 @@ serde = { version = "1.0.136", features = ["derive"] }
 simplelog = "0.11.2"
 strum = "0.23.0"
 strum_macros = "0.24.0"
-toml = "0.5.8"
+toml = "0.5.9"
 
 [dev-dependencies]
 indoc = "1.0.4"
