@@ -22,7 +22,7 @@ clap = { version = "3.1.15", features = ["env", "cargo"] }
 clap_generate = "3.0.3"
 colored = "2.0.0"
 console = "0.15.0"
-dialoguer = "0.10.0"
+dialoguer = "0.10.1"
 dirs = "4.0.0"
 enum_dispatch = "0.3.8"
 itertools = "0.10.3"
