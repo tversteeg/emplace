@@ -137,9 +137,7 @@ impl Packages {
                 PackageManager::from_line(line).map(|manager| (line, manager))
             })
             // Parse the packages in the line with the package manager supplied
-            .map(|(line, package_manager)| package_manager.catch(line))
-            // Create a long list of the list of lists
-            .flatten()
+            .flat_map(|(line, package_manager)| package_manager.catch(line))
             .collect();
 
         Self(lines)

@@ -94,6 +94,7 @@ pub trait PackageManagerTrait {
     fn needs_root(self) -> bool;
 
     /// Check whether a package is already installed.
+    #[allow(clippy::wrong_self_convention)]
     fn is_installed(self, package: &str) -> PackageInstalledMethod;
 
     /// A list of known command line flags that accept an extra argument which could be the name of

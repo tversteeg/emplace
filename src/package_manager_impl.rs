@@ -24,7 +24,7 @@ impl PackageManager {
                 .into_iter()
                 // Find the command that's in the file, use an extra space to only match full
                 // package names
-                .any(|command| Self::line_contains_command(line, &command))
+                .any(|command| Self::line_contains_command(line, command))
         })
     }
 
@@ -67,7 +67,7 @@ impl PackageManager {
         // Try all different commands
         self.os_commands()
             .iter()
-            .map(|command| {
+            .flat_map(|command| {
                 // If the command can't be found in this line just continue
                 if !Self::line_contains_command(line, command) {
                     return vec![];
@@ -165,7 +165,6 @@ impl PackageManager {
                     None => vec![],
                 }
             })
-            .flatten()
             .collect()
     }
 

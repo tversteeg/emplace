@@ -16,27 +16,27 @@ is-it-maintained-issue-resolution = { repository = "tversteeg/emplace" }
 is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
 
 [dependencies]
-anyhow = { version = "1.0.57", features = ["backtrace"] }
+anyhow = { version = "1.0.60", features = ["backtrace"] }
 bugreport = "0.5.0"
-clap = { version = "3.1.18", features = ["env", "cargo"] }
-clap_generate = "3.0.3"
+clap = { version = "3.2.16", features = ["env", "cargo"] }
+clap_complete = "3.2.3"
 colored = "2.0.0"
-console = "0.15.0"
-dialoguer = "0.10.1"
+console = "0.15.1"
+dialoguer = "0.10.2"
 dirs = "4.0.0"
 enum_dispatch = "0.3.8"
 itertools = "0.10.3"
 log = "0.4.17"
-ron = "0.7.0"
-run_script = "0.9.0"
-serde = { version = "1.0.137", features = ["derive"] }
+ron = "0.7.1"
+run_script = "0.10.0"
+serde = { version = "1.0.143", features = ["derive"] }
 simplelog = "0.12.0"
-strum = "0.24.0"
-strum_macros = "0.24.0"
+strum = "0.24.1"
+strum_macros = "0.24.3"
 toml = "0.5.9"
 
 [dev-dependencies]
-indoc = "1.0.6"
+indoc = "1.0.7"
 cargo-husky = { version = "1.5.0", features = ["precommit-hook", "run-cargo-check", "run-cargo-clippy", "run-cargo-fmt"] }
 
 [package.metadata.deb]

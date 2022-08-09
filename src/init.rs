@@ -1,6 +1,6 @@
 use crate::{config::Config, public_clap_app};
 use anyhow::{anyhow, Context, Result};
-use clap_generate::generators::{Bash, Fish, Zsh};
+use clap_complete::shells::{Bash, Fish, Zsh};
 use std::{env, io, path::Path};
 
 pub fn init_main<P>(config_path: P, shell_name: &str) -> Result<()>
@@ -47,11 +47,11 @@ where
     // Print the completions
     match shell_name {
         "bash" => {
-            clap_generate::generate(Bash, &mut public_clap_app(), "emplace", &mut io::stdout())
+            clap_complete::generate(Bash, &mut public_clap_app(), "emplace", &mut io::stdout())
         }
-        "zsh" => clap_generate::generate(Zsh, &mut public_clap_app(), "emplace", &mut io::stdout()),
+        "zsh" => clap_complete::generate(Zsh, &mut public_clap_app(), "emplace", &mut io::stdout()),
         "fish" => {
-            clap_generate::generate(Fish, &mut public_clap_app(), "emplace", &mut io::stdout())
+            clap_complete::generate(Fish, &mut public_clap_app(), "emplace", &mut io::stdout())
         }
         _ => (),
     };
