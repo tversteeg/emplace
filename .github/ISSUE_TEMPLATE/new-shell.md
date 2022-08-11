@@ -3,7 +3,6 @@ name: New shell
 about: Request support for a new shell
 title: "[FEATURE] Support for shell  "
 labels: enhancement
-assignees: tversteeg
 
 ---
 

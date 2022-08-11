@@ -3,7 +3,6 @@ name: New package manager
 about: Request support for a new package manager
 title: "[FEATURE] Support for package manager "
 labels: enhancement
-assignees: tversteeg
 
 ---
 
