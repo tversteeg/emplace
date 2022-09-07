@@ -10,7 +10,7 @@ jobs:
   cargo_bloat:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: install rust
         uses: actions-rs/toolchain@v1.0.7
         with:
