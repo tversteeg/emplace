@@ -27,7 +27,7 @@ dirs = "4.0.0"
 enum_dispatch = "0.3.8"
 itertools = "0.10.3"
 log = "0.4.17"
-ron = "0.7.1"
+ron = "0.8.1"
 run_script = "0.10.0"
 serde = { version = "1.0.143", features = ["derive"] }
 simplelog = "0.12.0"
