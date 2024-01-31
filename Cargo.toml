@@ -16,27 +16,27 @@ is-it-maintained-issue-resolution = { repository = "tversteeg/emplace" }
 is-it-maintained-open-issues = { repository = "tversteeg/emplace" }
 
 [dependencies]
-anyhow = { version = "1.0.61", features = ["backtrace"] }
+anyhow = { version = "1.0.79", features = ["backtrace"] }
 bugreport = "0.5.0"
-clap = { version = "3.2.17", features = ["env", "cargo"] }
-clap_complete = "3.2.4"
-colored = "2.0.0"
-console = "0.15.1"
-dialoguer = "0.10.2"
-dirs = "4.0.0"
-enum_dispatch = "0.3.8"
-itertools = "0.10.3"
-log = "0.4.17"
-ron = "0.7.1"
-run_script = "0.10.0"
-serde = { version = "1.0.143", features = ["derive"] }
-simplelog = "0.12.0"
-strum = "0.24.1"
-strum_macros = "0.24.3"
-toml = "0.5.9"
+clap = { version = "4.4.18", features = ["env", "cargo"] }
+clap_complete = "4.4.9"
+colored = "2.1.0"
+console = "0.15.8"
+dialoguer = "0.11.0"
+dirs = "5.0.1"
+enum_dispatch = "0.3.12"
+itertools = "0.12.1"
+log = "0.4.20"
+ron = "0.8.1"
+run_script = "0.10.1"
+serde = { version = "1.0.196", features = ["derive"] }
+simplelog = "0.12.1"
+strum = "0.26.1"
+strum_macros = "0.26.1"
+toml = "0.8.9"
 
 [dev-dependencies]
-indoc = "1.0.7"
+indoc = "2.0.4"
 cargo-husky = { version = "1.5.0", features = ["precommit-hook", "run-cargo-check", "run-cargo-clippy", "run-cargo-fmt"] }
 
 [package.metadata.deb]

@@ -156,12 +156,8 @@ impl Packages {
 
     /// Remove all packages that have been saved already.
     pub fn filter_saved_packages(&mut self, old: &Packages) {
-        self.0 = self
-            .0
-            .iter()
-            .filter(|package| !old.iter().any(|old_package| *package == old_package))
-            .cloned()
-            .collect();
+        self.0
+            .retain(|package| !old.iter().any(|old_package| package == old_package));
     }
 
     /// Remove all duplicate packages.

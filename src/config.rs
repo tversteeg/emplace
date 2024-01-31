@@ -75,7 +75,7 @@ impl Config {
     pub fn clone_repo_ask(&mut self) -> Result<bool> {
         let term = console::Term::stdout();
         let theme: Box<dyn dialoguer::theme::Theme> = if term.features().colors_supported() {
-            Box::new(dialoguer::theme::ColorfulTheme::default())
+            Box::<dialoguer::theme::ColorfulTheme>::default()
         } else {
             Box::new(dialoguer::theme::SimpleTheme)
         };

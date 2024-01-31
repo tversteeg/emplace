@@ -100,7 +100,7 @@ where
 {
     // Filter actual lines
     lines
-        .filter_map(|x| x.ok())
+        .map_while(Result::ok)
         .map(|x| x.split_whitespace().join(" "))
         // Remove duplicates
         .sorted()

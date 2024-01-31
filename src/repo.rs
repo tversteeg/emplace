@@ -44,8 +44,7 @@ impl Repo {
             println!("Cloning Emplace repo \"{}\" to \"{}\".", repo_url, path_str);
 
             fs::create_dir_all(path).context("creating new directory for repo")?;
-            git::clone_single_branch(&path, &*repo_url, &*repo_branch)
-                .context("cloning new repo")?;
+            git::clone_single_branch(&path, &repo_url, &repo_branch).context("cloning new repo")?;
 
             // Create the emplace file if it doesn't exist
             let emplace_file = config.full_file_path();
@@ -81,7 +80,7 @@ impl Repo {
 
     pub fn read(&self) -> Result<Packages> {
         // Open the file
-        let mut file = File::open(&self.config.full_file_path())
+        let mut file = File::open(self.config.full_file_path())
             .context("failed opening Emplace mirrors file")?;
 
         // Read the contents
@@ -124,7 +123,7 @@ impl Repo {
         fs::write(&full_path, toml_string)?;
 
         // Add the file to git
-        git::add_file(&self.path, &*self.config.repo.file)?;
+        git::add_file(&self.path, &self.config.repo.file)?;
 
         // Check if there are other changes
         if git::has_changes(&self.path)? {
@@ -133,7 +132,7 @@ impl Repo {
         }
 
         println!("Committing with message \"{}\".", commit_msg);
-        git::commit_all(&self.path, &*commit_msg, false)?;
+        git::commit_all(&self.path, &commit_msg, false)?;
 
         println!("Pushing to remote.");
         git::push(&self.path)?;
@@ -146,12 +145,12 @@ impl Repo {
         let toml_string = to_string_pretty(&commands, Repo::pretty_config())?;
 
         let full_path = self.config.full_file_path();
-        fs::write(&full_path, toml_string)?;
+        fs::write(full_path, toml_string)?;
 
         let commit_msg = "Emplace - clean packages";
         println!("Committing with message \"{}\".", commit_msg);
-        git::add_file(&self.path, &*self.config.repo.file)?;
-        git::commit_all(&self.path, &*commit_msg, false)?;
+        git::add_file(&self.path, &self.config.repo.file)?;
+        git::commit_all(&self.path, commit_msg, false)?;
 
         println!("Pushing to remote.");
         git::push(&self.path)?;
