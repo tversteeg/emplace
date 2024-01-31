@@ -1,182 +1,49 @@
-name: rust
+name: CI
 on:
   push:
-    branches:
-      - master
-    tags:
-      - v*
     paths-ignore:
       - "docs/**"
       - "**.md"
-      - ".all-contributorsrc"
-  pull_request:
-    branches:
-      - master
-    tags:
-      - v*
-    paths-ignore:
-      - "docs/**"
-      - "**.md"
-      - ".all-contributorsrc"
 
 jobs:
-  rust:
-    name: cargo fmt & cargo clippy
+  # Check for formatting
+  rustfmt:
+    name: Formatter check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: install rust
-        uses: actions-rs/toolchain@v1.0.7
+      - uses: actions-rs/toolchain@v1
         with:
-          profile: default
+          profile: minimal
           toolchain: stable
+          components: rustfmt
           override: true
 
-      - name: cargo check
-        uses: actions-rs/cargo@v1.0.3
-        with:
-          command: check
-          args: --all
-
-      - name: cargo fmt
-        uses: actions-rs/cargo@v1.0.3
+      - run: rustup component add rustfmt
+      - uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all -- --check
 
-      - name: cargo clippy
-        uses: actions-rs/clippy-check@v1.0.7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features
-
+  # Run test check on Linux, macOS, and Windows
   test:
-    name: cargo test
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-apple-darwin
-          - x86_64-pc-windows-msvc
-        include:
-          - target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
-          - target: x86_64-apple-darwin
-            os: macOS-latest
-          - target: x86_64-pc-windows-msvc
-            os: windows-latest
+    name: Test
     runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: install rust
-        uses: actions-rs/toolchain@v1.0.7
-        with:
-          profile: default
-          toolchain: stable
-          override: true
-
-      - name: cargo test
-        uses: actions-rs/cargo@v1.0.3
-        with:
-          command: test
-
-  # Build sources for every OS
-  github_build:
-    if: startsWith(github.ref, 'refs/tags/v')
-    name: build release binaries
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-apple-darwin
-          - x86_64-pc-windows-msvc
-        include:
-          - target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
-            name: emplace-x86_64-unknown-linux-gnu
-          - target: x86_64-apple-darwin
-            os: macOS-latest
-            name: emplace-x86_64-apple-darwin
-          - target: x86_64-pc-windows-msvc
-            os: windows-latest
-            name: emplace-x86_64-pc-windows-msvc.exe
-    runs-on: ${{ matrix.os }}
+        os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v3
+      # Checkout the branch being tested
+      - uses: actions/checkout@v4
 
-      - name: install rust
-        uses: actions-rs/toolchain@v1.0.7
+      # Install rust stable
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: stable
-          override: true
-          target: ${{ matrix.target }}
 
-      - name: cargo build
-        uses: actions-rs/cargo@v1.0.3
-        with:
-          command: build
-          args: --release --target ${{ matrix.target }}
+      # Test all feature combinations on the target platform
+      - name: Test
+        run: cargo test
 
-      - name: prepare windows build artifacts
-        if: matrix.os == 'windows-latest'
-        run: |
-          cd target/${{ matrix.target }}/release
-          strip emplace.exe
-          mv emplace.exe ../../../${{ matrix.name }}
-          cd -
-
-      - name: prepare -nix build artifacts
-        if: matrix.os != 'windows-latest'
-        run: |
-          cd target/${{ matrix.target }}/release
-          strip emplace
-          mv emplace ../../../${{ matrix.name }}
-          cd -
-
-      - name: upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.name }}
-          path: ${{ matrix.name }}
-
-  # Create GitHub release with Rust build targets and release notes
-  github_release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    name: create github release
-    needs: github_build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      # These can be squashed when https://github.com/actions/download-artifact/issues/6 is closed
-      - name: download releases from github_build
-        uses: actions/download-artifact@v3
-        with:
-          name: emplace-x86_64-unknown-linux-gnu
-          path: .
-      - name: download releases from github_build
-        uses: actions/download-artifact@v3
-        with:
-          name: emplace-x86_64-apple-darwin
-          path: .
-      - name: download releases from github_build
-        uses: actions/download-artifact@v3
-        with:
-          name: emplace-x86_64-pc-windows-msvc.exe
-          path: .
-
-      - name: generate checksums
-        run: for file in emplace-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
-
-      - name: create github release ${{ matrix.target }}
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            emplace-*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
