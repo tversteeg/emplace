@@ -24,7 +24,7 @@ impl PackageManager {
                 .into_iter()
                 // Find the command that's in the file, use an extra space to only match full
                 // package names
-                .any(|command| Self::line_contains_command(line, command))
+                .any(|command| Self::line_contains_command(line, &command))
         })
     }
 
@@ -186,8 +186,8 @@ impl PackageManager {
 
     /// Get OS specific commands.
     #[cfg(not(target_os = "windows"))]
-    fn os_commands(&self) -> Vec<&str> {
-        self.commands()
+    fn os_commands(&self) -> Vec<String> {
+        self.commands().into_iter().map(|s| s.to_string()).collect()
     }
 
     /// Whether the command has an invalidating flag.
