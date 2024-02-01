@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0](https://github.com/tversteeg/emplace/compare/v1.4.3...v1.5.0) - 2024-02-01
+
+### Added
+- *(cargo-binstall)* implement cargo-binstall detection
+
 ## [1.4.3](https://github.com/tversteeg/emplace/compare/v1.4.2...v1.4.3) - 2024-01-31
 
 ### Other
