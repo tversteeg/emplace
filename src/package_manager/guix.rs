@@ -63,7 +63,7 @@ mod tests {
 
     #[test]
     fn test_package_manager() {
-        let manager = PackageManager::from_line("guix install emplace").unwrap();
+        let manager = PackageManager::single_from_line("guix install emplace").unwrap();
         assert_eq!(manager, PackageManager::from(Guix));
     }
 

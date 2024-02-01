@@ -11,13 +11,27 @@ use strum::IntoEnumIterator;
 impl PackageManager {
     /// Whether the line contains a package manager.
     pub fn detects_line(line: &str) -> bool {
-        Self::from_line(line).is_some()
+        Self::single_from_line(line).is_some()
     }
 
-    /// Try to find the proper package manager corresponding to a line.
-    pub fn from_line(line: &str) -> Option<Self> {
+    /// Try to find the best matching package manager corresponding to a line.
+    pub fn single_from_line(line: &str) -> Option<Self> {
         // Iterate over all enum variations
         Self::iter().find(|manager| {
+            // Iterate over all commands
+            manager
+                .os_commands()
+                .into_iter()
+                // Find the command that's in the file, use an extra space to only match full
+                // package names
+                .any(|command| Self::line_contains_command(line, &command))
+        })
+    }
+
+    /// Get all possible package manager corresponding to a line.
+    pub fn from_line_iter(line: &str) -> impl Iterator<Item = Self> + '_ {
+        // Iterate over all enum variations
+        Self::iter().filter(move |manager| {
             // Iterate over all commands
             manager
                 .os_commands()

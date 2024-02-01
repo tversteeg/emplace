@@ -50,7 +50,7 @@ mod tests {
 
     #[test]
     fn test_package_manager() {
-        let manager = PackageManager::from_line("yay -S test").unwrap();
+        let manager = PackageManager::single_from_line("yay -S test").unwrap();
         assert_eq!(manager, PackageManager::from(Yay));
     }
 

@@ -52,10 +52,10 @@ mod tests {
 
     #[test]
     fn test_package_manager() {
-        let manager = PackageManager::from_line("pkg install test").unwrap();
+        let manager = PackageManager::single_from_line("pkg install test").unwrap();
         assert_eq!(manager, PackageManager::from(Pkg));
 
-        assert!(PackageManager::from_line("qpkg install test").is_none());
+        assert!(PackageManager::single_from_line("qpkg install test").is_none());
     }
 
     #[test]

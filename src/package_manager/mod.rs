@@ -4,6 +4,7 @@ pub mod test_macro;
 mod apt;
 mod brew;
 mod cargo;
+mod cargo_binstall;
 mod chocolatey;
 mod dnf;
 mod gem;
@@ -25,6 +26,7 @@ mod zypper;
 pub use apt::Apt;
 pub use brew::Brew;
 pub use cargo::Cargo;
+pub use cargo_binstall::CargoBinstall;
 pub use chocolatey::Chocolatey;
 pub use dnf::Dnf;
 pub use gem::Gem;
@@ -56,6 +58,7 @@ pub enum PackageManager {
     Apt,
     Brew,
     Cargo,
+    CargoBinstall,
     Chocolatey,
     Dnf,
     Gem,

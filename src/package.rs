@@ -126,15 +126,9 @@ impl Packages {
             .split(|c| c == ';' || c == '|' || c == '&' || c == '\r' || c == '\n')
             // Then try to find the proper package manager for each line, this also filters out
             // lines that are not related to the package manager
-            .filter_map(|line| {
-                // Filter out matches with less than 4 characters, it's impossible to install a
-                // package that we can catch like that
-                if line.len() < 4 {
-                    return None;
-                }
-
-                // Attempt to find a matching package manager with the line
-                PackageManager::from_line(line).map(|manager| (line, manager))
+            .flat_map(|line| {
+                // Attempt to find a matching package managers with the line
+                PackageManager::from_line_iter(line).map(move |manager| (line, manager))
             })
             // Parse the packages in the line with the package manager supplied
             .flat_map(|(line, package_manager)| package_manager.catch(line))

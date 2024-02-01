@@ -65,8 +65,8 @@ mod tests {
 
     #[test]
     fn test_package_manager() {
-        let manager = PackageManager::from_line("cargo install test").unwrap();
-        assert_eq!(manager, PackageManager::from(Cargo));
+        assert!(PackageManager::from_line_iter("cargo binstall test")
+            .any(|manager| manager == PackageManager::from(Cargo)));
     }
 
     #[test]
@@ -82,6 +82,7 @@ mod tests {
         catch!(PackageManager::from(Cargo), "cargo uninstall test test2" => ());
         catch!(PackageManager::from(Cargo), "cargo install ." => ());
         catch!(PackageManager::from(Cargo), "cargo install --path test" => ());
+        catch!(PackageManager::from(Cargo), "cargo binstall test" => ());
 
         // Flags that should be captured
         catch!(PackageManager::from(Cargo), "cargo install --git https://test.com/test.git" => "https://test.com/test.git" ["--git"]);

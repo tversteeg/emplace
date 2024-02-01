@@ -50,7 +50,7 @@ mod tests {
 
     #[test]
     fn test_package_manager() {
-        let manager = PackageManager::from_line("snap install test").unwrap();
+        let manager = PackageManager::single_from_line("snap install test").unwrap();
         assert_eq!(manager, PackageManager::from(Snap));
     }
 
