@@ -50,6 +50,7 @@ fn public_clap_app() -> Command {
                 .required(false)
                 .global(true)
                 .action(ArgAction::Set)
+                .value_parser(clap::value_parser!(PathBuf))
                 .env("EMPLACE_CONFIG"),
         )
 }
@@ -74,7 +75,7 @@ fn safe_main() -> Result<()> {
 							"The name of the currently running shell\nCurrently supported options: bash, nu, fish & zsh",
 						)
 						.required(true)
-                .action(ArgAction::Set)
+                        .action(ArgAction::Set)
 				)
 		)
 		.subcommand(
@@ -85,7 +86,7 @@ fn safe_main() -> Result<()> {
 						.value_name("LINE")
 						.help("The command as entired in the terminal")
 						.required(true)
-                .action(ArgAction::Set)
+                        .action(ArgAction::Set)
 				),
 		)
 		.subcommand(
@@ -96,14 +97,15 @@ fn safe_main() -> Result<()> {
                         .value_name("PATH")
 						.help("Path to shell history file")
 						.required(true)
-                .action(ArgAction::Set)
+						.value_parser(clap::value_parser!(PathBuf))
+                        .action(ArgAction::Set)
 				)
                 .arg(
                     Arg::new("yes")
                         .short('y')
                         .long("yes")
                         .help("Don't prompt the user and select everything")
-                .action(ArgAction::SetTrue)
+                        .action(ArgAction::SetTrue)
                 ),
 		)
         .subcommand(
@@ -114,12 +116,14 @@ fn safe_main() -> Result<()> {
                 .short('n')
                 .long("new")
                 .help("Create a new config")
+                .action(ArgAction::SetTrue)
             )
             .arg(
                 Arg::new("path")
                 .short('p')
                 .long("path")
                 .help("Print out path to config")
+                .action(ArgAction::SetTrue)
             ),
         )
         .subcommand(
