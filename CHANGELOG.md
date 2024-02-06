@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.2](https://github.com/tversteeg/emplace/compare/v1.5.1...v1.5.2) - 2024-02-06
+
+### Fixed
+- *(config)* set config path in init even if it can't be canonicalized
+- *(deps)* update rust crate toml to 0.8.10
+- *(deps)* update rust crate clap_complete to 4.4.10
+
+### Other
+- *(ci)* set renovate to automerge
+
 ## [1.5.1](https://github.com/tversteeg/emplace/compare/v1.5.0...v1.5.1) - 2024-02-01
 
 ### Fixed
