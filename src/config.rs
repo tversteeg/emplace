@@ -1,5 +1,6 @@
 use crate::git;
 use anyhow::Result;
+use camino::Utf8PathBuf;
 use log::info;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -188,22 +189,25 @@ impl Config {
     }
 
     /// Get the default path where the 'emplace.toml' file lives.
-    pub fn default_path() -> PathBuf {
-        dirs::config_dir()
-            .expect("Could not find config dir")
-            .join("emplace.toml")
+    pub fn default_path() -> Utf8PathBuf {
+        Utf8PathBuf::from_path_buf(
+            dirs::config_dir()
+                .expect("Could not find config dir")
+                .join("emplace.toml"),
+        )
+        .expect("Path is not valid UTF-8")
     }
 
-    fn default_mirror_dir() -> PathBuf {
-        dirs::data_local_dir()
-            .expect("Could not find local data dir")
-            .join("emplace")
+    fn default_mirror_dir() -> Utf8PathBuf {
+        Utf8PathBuf::from_path_buf(
+            dirs::data_local_dir()
+                .expect("Could not find local data dir")
+                .join("emplace"),
+        )
+        .expect("Path is not valid UTF-8")
     }
 
     fn default_mirror_dir_string() -> String {
-        Config::default_mirror_dir()
-            .to_str()
-            .expect("Could not get directory")
-            .to_string()
+        Config::default_mirror_dir().to_string()
     }
 }

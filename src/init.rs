@@ -1,12 +1,10 @@
-use crate::{config::Config, public_clap_app};
-use anyhow::{anyhow, Context, Result};
+use crate::public_clap_app;
+use anyhow::{Context, Result};
+use camino::Utf8Path;
 use clap_complete::shells::{Bash, Fish, Zsh};
-use std::{env, io, path::Path};
+use std::{env, io};
 
-pub fn init_main<P>(config_path: P, shell_name: &str) -> Result<()>
-where
-    P: AsRef<Path>,
-{
+pub fn init_main(config_path: &Utf8Path, shell_name: &str) -> Result<()> {
     let exe_path = env::current_exe()
         .context("getting executable path for initial configuration")?
         .into_os_string()
@@ -30,17 +28,10 @@ where
             .replace(
                 "## EMPLACE_CONFIG_PATH ##",
                 config_path
-                    .as_ref()
-                    .canonicalize()
-                    // When canonicalizing path failed use the default path
-                    .unwrap_or_else(|_| Config::default_path())
-                    .to_str()
-                    .ok_or_else(|| {
-                        anyhow!(
-                            "Could not convert path {:?} to string",
-                            config_path.as_ref()
-                        )
-                    })?,
+                    .canonicalize_utf8()
+                    // Use the un-canonicalized form if it fails
+                    .unwrap_or_else(|_| config_path.to_path_buf())
+                    .as_str()
             )
     );
 

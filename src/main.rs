@@ -21,6 +21,7 @@ use bugreport::{
     },
     format::Markdown,
 };
+use camino::Utf8PathBuf;
 use clap::{Arg, ArgAction, ColorChoice, Command};
 use log::error;
 use simplelog::{ColorChoice as LogColorChoice, LevelFilter, TermLogger, TerminalMode};
@@ -50,7 +51,7 @@ fn public_clap_app() -> Command {
                 .required(false)
                 .global(true)
                 .action(ArgAction::Set)
-                .value_parser(clap::value_parser!(PathBuf))
+                .value_parser(clap::value_parser!(Utf8PathBuf))
                 .env("EMPLACE_CONFIG"),
         )
 }
@@ -97,7 +98,7 @@ fn safe_main() -> Result<()> {
                         .value_name("PATH")
 						.help("Path to shell history file")
 						.required(true)
-						.value_parser(clap::value_parser!(PathBuf))
+						.value_parser(clap::value_parser!(Utf8PathBuf))
                         .action(ArgAction::Set)
 				)
                 .arg(
@@ -132,7 +133,7 @@ fn safe_main() -> Result<()> {
         )
 		.get_matches();
 
-    let config_path: PathBuf = matches
+    let config_path: Utf8PathBuf = matches
         .get_one("config-path")
         .cloned()
         .unwrap_or_else(Config::default_path);
@@ -141,7 +142,7 @@ fn safe_main() -> Result<()> {
         Some(("init", sub_m)) => {
             let shell_name: &String = sub_m.get_one("shell").context("shell name is missing")?;
 
-            init::init_main(config_path, shell_name)
+            init::init_main(&config_path, shell_name)
         }
         Some(("catch", sub_m)) => {
             let line: &String = sub_m.get_one("line").context("line is missing")?;
@@ -165,7 +166,7 @@ fn safe_main() -> Result<()> {
         // otherwise it will create a new config and ask what to do about the repository
         Some(("config", subm)) => {
             if subm.get_flag("path") && !subm.get_flag("new") {
-                println!("Your config path is {}", config_path.to_str().unwrap());
+                println!("Your config path is {config_path}");
 
                 Ok(())
             } else {
