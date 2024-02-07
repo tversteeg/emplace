@@ -15,10 +15,7 @@ use crate::config::Config;
 use anyhow::{anyhow, Context, Result};
 use bugreport::{
     bugreport,
-    collector::{
-        CommandOutput, CompileTimeInformation, EnvironmentVariables, OperatingSystem,
-        SoftwareVersion,
-    },
+    collector::{CommandOutput, CompileTimeInformation, EnvironmentVariables, SoftwareVersion},
     format::Markdown,
 };
 use camino::Utf8PathBuf;
@@ -180,7 +177,6 @@ fn safe_main() -> Result<()> {
         Some(("bugreport", _)) => {
             bugreport!()
                 .info(SoftwareVersion::default())
-                .info(OperatingSystem::default())
                 .info(EnvironmentVariables::list(&["SHELL", "EMPLACE_CONFIG"]))
                 .info(CommandOutput::new("Git version", "git", &["--version"]))
                 .info(CompileTimeInformation::default())
