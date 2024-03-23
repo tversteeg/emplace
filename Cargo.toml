@@ -37,7 +37,7 @@ strum_macros = "0.26.2"
 toml = "0.8.12"
 
 [dev-dependencies]
-indoc = "2.0.4"
+indoc = "2.0.5"
 cargo-husky = { version = "1.5.0", features = ["precommit-hook", "run-cargo-check", "run-cargo-clippy", "run-cargo-fmt"] }
 
 [package.metadata.deb]
