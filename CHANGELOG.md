@@ -6,6 +6,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.4](https://github.com/tversteeg/emplace/compare/v1.5.3...v1.5.4) - 2024-03-26
+
+### Fixed
+- *(deps)* update rust crate clap to 4.5.4
+- *(deps)* update rust crate toml to 0.8.12
+- *(deps)* update rust crate clap to 4.5.3
+- *(deps)* update rust crate anyhow to 1.0.81
+- *(deps)* update rust crate toml to 0.8.11
+- *(deps)* update rust crate strum_macros to 0.26.2
+- *(deps)* update rust crate strum to 0.26.2
+- *(deps)* update rust crate clap to 4.5.2
+- *(deps)* update rust crate simplelog to 0.12.2
+- *(deps)* update rust crate log to 0.4.21
+- *(deps)* update rust crate serde to 1.0.197
+- *(deps)* update rust crate anyhow to 1.0.80
+- *(deps)* update rust crate clap_complete to 4.5.1
+- *(deps)* update rust crate clap to 4.5.1
+- *(deps)* update rust crate clap_complete to 4.5.0
+- *(deps)* update rust crate clap to 4.5.0
+
+### Other
+- *(deps)* update rust crate indoc to 2.0.5
+
 ## [1.5.3](https://github.com/tversteeg/emplace/compare/v1.5.2...v1.5.3) - 2024-02-07
 
 ### Fixed
