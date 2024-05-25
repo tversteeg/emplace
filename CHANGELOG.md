@@ -6,6 +6,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0](https://github.com/tversteeg/emplace/compare/v1.5.3...v1.6.0) - 2024-05-25
+
+### Added
+- *(paru)* support paru ([#387](https://github.com/tversteeg/emplace/pull/387))
+
+### Fixed
+- *(deps)* update rust crate anyhow to v1.0.86
+- *(deps)* update rust crate anyhow to v1.0.85
+- *(deps)* update rust crate itertools to 0.13.0
+- *(deps)* update rust crate toml to v0.8.13
+- *(deps)* update rust crate serde to v1.0.202
+- *(deps)* update rust crate camino to v1.1.7
+- *(deps)* update rust crate serde to v1.0.201
+- *(deps)* update rust crate anyhow to v1.0.83
+- *(deps)* update rust crate serde to 1.0.200
+- *(deps)* update rust crate serde to 1.0.199
+- *(deps)* update rust crate serde to 1.0.198
+- *(deps)* update rust crate anyhow to 1.0.82
+- *(deps)* update rust crate clap_complete to 4.5.2
+- *(deps)* update rust crate enum_dispatch to 0.3.13
+- *(deps)* update rust crate clap to 4.5.4
+- *(deps)* update rust crate toml to 0.8.12
+- *(deps)* update rust crate clap to 4.5.3
+- *(deps)* update rust crate anyhow to 1.0.81
+- *(deps)* update rust crate toml to 0.8.11
+- *(deps)* update rust crate strum_macros to 0.26.2
+- *(deps)* update rust crate strum to 0.26.2
+- *(deps)* update rust crate clap to 4.5.2
+- *(deps)* update rust crate simplelog to 0.12.2
+- *(deps)* update rust crate log to 0.4.21
+- *(deps)* update rust crate serde to 1.0.197
+- *(deps)* update rust crate anyhow to 1.0.80
+- *(deps)* update rust crate clap_complete to 4.5.1
+- *(deps)* update rust crate clap to 4.5.1
+- *(deps)* update rust crate clap_complete to 4.5.0
+- *(deps)* update rust crate clap to 4.5.0
+
+### Other
+- *(deps)* update rust crate indoc to 2.0.5
+
 ## [1.5.3](https://github.com/tversteeg/emplace/compare/v1.5.2...v1.5.3) - 2024-02-07
 
 ### Fixed
