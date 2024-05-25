@@ -28,6 +28,7 @@
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/linux.svg" width="18" height="18" /> | GNU Guix |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/nixos.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/linux.svg" width="18" height="18" /><img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/apple.svg" width="18" height="18" /> | Nix |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | Pacman |
+    | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | Paru |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | RUA |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/archlinux.svg" width="18" height="18" /> | Yay |
     | <img src="https://cdn.rawgit.com/simple-icons/simple-icons/develop/icons/suse.svg" width="18" height="18" /> | Zypper |
@@ -150,6 +151,8 @@ rustup component add rustfmt
 sudo apt install meld
 # -- or --
 pacman -S zsh
+# -- or --
+paru -S ventoy
 # -- or --
 rua install peek
 # -- or --
