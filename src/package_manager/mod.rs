@@ -13,6 +13,7 @@ mod guix;
 mod nix;
 mod npm;
 mod pacman;
+mod paru;
 mod pip;
 mod pip3;
 mod pkg;
@@ -35,6 +36,7 @@ pub use guix::Guix;
 pub use nix::Nix;
 pub use npm::Npm;
 pub use pacman::Pacman;
+pub use paru::Paru;
 pub use pip::Pip;
 pub use pip3::Pip3;
 pub use pkg::Pkg;
@@ -67,6 +69,7 @@ pub enum PackageManager {
     Nix,
     Npm,
     Pacman,
+    Paru,
     Pip,
     Pip3,
     Pkg,
