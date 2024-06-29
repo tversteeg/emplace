@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1](https://github.com/tversteeg/emplace/compare/v1.6.0...v1.6.1) - 2024-06-29
+
+### Fixed
+- *(deps)* update rust crate clap_complete to v4.5.7
+- *(deps)* update rust crate clap to v4.5.8
+- *(deps)* update rust crate log to v0.4.22
+- *(deps)* update rust crate strum to v0.26.3
+- *(deps)* update rust crate clap_complete to v4.5.6
+- *(deps)* update rust crate clap to v4.5.7
+- *(deps)* update rust crate clap_complete to v4.5.5
+- *(deps)* update rust crate clap to v4.5.6
+- *(deps)* update rust crate strum_macros to v0.26.4
+- *(deps)* update rust crate strum_macros to v0.26.3
+- *(deps)* update rust crate toml to v0.8.14
+- *(deps)* update rust crate serde to v1.0.203
+
+### Other
+- add Qelxiros as a contributor for platform ([#388](https://github.com/tversteeg/emplace/pull/388))
+
 ## [1.6.0](https://github.com/tversteeg/emplace/compare/v1.5.3...v1.6.0) - 2024-05-25
 
 ### Added
