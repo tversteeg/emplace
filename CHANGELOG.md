@@ -6,6 +6,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1](https://github.com/tversteeg/emplace/compare/v1.6.0...v1.6.1) - 2024-10-09
+
+### Fixed
+
+- *(deps)* update rust crate clap_complete to v4.5.33
+- *(deps)* update rust crate clap to v4.5.20
+- *(deps)* update rust crate run_script to 0.11.0
+- *(deps)* update rust crate clap_complete to v4.5.32
+- *(deps)* update rust crate clap to v4.5.19
+- *(deps)* update rust crate camino to v1.1.9 ([#395](https://github.com/tversteeg/emplace/pull/395))
+- *(deps)* update rust crate clap_complete to v4.5.29 ([#392](https://github.com/tversteeg/emplace/pull/392))
+- *(deps)* update rust crate serde to v1.0.210 ([#394](https://github.com/tversteeg/emplace/pull/394))
+- *(deps)* update rust crate toml to v0.8.19 ([#393](https://github.com/tversteeg/emplace/pull/393))
+- *(deps)* update rust crate anyhow to v1.0.89
+- *(deps)* update time to 0.3.36; fix build for rust 1.80 ([#397](https://github.com/tversteeg/emplace/pull/397))
+- *(deps)* update rust crate clap_complete to v4.5.9
+- *(deps)* update rust crate toml to v0.8.15
+- *(deps)* update rust crate clap_complete to v4.5.8
+- *(deps)* update rust crate serde to v1.0.204
+- *(deps)* update rust crate clap to v4.5.9
+- *(deps)* update rust crate clap_complete to v4.5.7
+- *(deps)* update rust crate clap to v4.5.8
+- *(deps)* update rust crate log to v0.4.22
+- *(deps)* update rust crate strum to v0.26.3
+- *(deps)* update rust crate clap_complete to v4.5.6
+- *(deps)* update rust crate clap to v4.5.7
+- *(deps)* update rust crate clap_complete to v4.5.5
+- *(deps)* update rust crate clap to v4.5.6
+- *(deps)* update rust crate strum_macros to v0.26.4
+- *(deps)* update rust crate strum_macros to v0.26.3
+- *(deps)* update rust crate toml to v0.8.14
+- *(deps)* update rust crate serde to v1.0.203
+
+### Other
+
+- add Qelxiros as a contributor for platform ([#388](https://github.com/tversteeg/emplace/pull/388))
+
 ## [1.6.0](https://github.com/tversteeg/emplace/compare/v1.5.3...v1.6.0) - 2024-05-25
 
 ### Added
