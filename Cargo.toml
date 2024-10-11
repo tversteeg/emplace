@@ -56,3 +56,6 @@ assets = [
 	["target/release/emplace", "usr/bin/", "755"],
 	["README.md", "usr/share/doc/emplace/README", "644"],
 ]
+
+[profile.release]
+lto = true
