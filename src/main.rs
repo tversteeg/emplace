@@ -151,7 +151,7 @@ fn safe_main() -> Result<()> {
         }
         Some(("clean", _)) => clean::clean(config_path).context("cleaning packages"),
         Some(("history", sub_m)) => {
-            let hist_path: &PathBuf = sub_m
+            let hist_path: &Utf8PathBuf = sub_m
                 .get_one("history_file")
                 .context("path to history file is not provided")?;
 
