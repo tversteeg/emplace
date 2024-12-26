@@ -149,6 +149,15 @@
       "contributions": [
         "platform"
       ]
+    },
+    {
+      "login": "chenrui333",
+      "name": "Rui Chen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1580956?v=4",
+      "profile": "http://chenrui.dev",
+      "contributions": [
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7,
