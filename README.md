@@ -249,6 +249,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Qelxiros"><img src="https://avatars.githubusercontent.com/u/48220588?v=4?s=100" width="100px;" alt="Jeremy Smart"/><br /><sub><b>Jeremy Smart</b></sub></a><br /><a href="#platform-Qelxiros" title="Packaging/porting to new platform">📦</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://chenrui.dev"><img src="https://avatars.githubusercontent.com/u/1580956?v=4?s=100" width="100px;" alt="Rui Chen"/><br /><sub><b>Rui Chen</b></sub></a><br /><a href="#maintenance-chenrui333" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://zamazan4ik.github.io"><img src="https://avatars.githubusercontent.com/u/7355383?v=4?s=100" width="100px;" alt="Alexander Zaitsev"/><br /><sub><b>Alexander Zaitsev</b></sub></a><br /><a href="#maintenance-zamazan4ik" title="Maintenance">🚧</a></td>
     </tr>
   </tbody>
 </table>
