@@ -21,7 +21,7 @@ bugreport = { version = "0.5.0", default-features = false, features = ["git_hash
 camino = "1.1.6"
 clap = { version = "4.5.4", features = ["env", "cargo"] }
 clap_complete = "4.5.2"
-colored = "2.1.0"
+colored = "3.0.0"
 console = "0.15.8"
 dialoguer = "0.11.0"
 dirs = "5.0.1"
