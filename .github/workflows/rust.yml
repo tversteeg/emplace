@@ -11,7 +11,7 @@ jobs:
     name: Formatter check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -36,7 +36,7 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
       # Checkout the branch being tested
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Install rust stable
       - uses: dtolnay/rust-toolchain@master
