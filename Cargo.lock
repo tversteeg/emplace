@@ -581,9 +581,9 @@ dependencies = [
 
 [[package]]
 name = "run_script"
-version = "0.11.0"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f20d7c40e6d6fc2ff69ad8e8bac4d39a5fc1874402647ac92b620954d56d5c3e"
+checksum = "e8f982753d06bafa2d1e5c1bd5be496bcb3cd02919a89f07e7f21c7a6ecb4e1a"
 dependencies = [
  "fsio",
 ]
