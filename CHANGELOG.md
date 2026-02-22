@@ -6,6 +6,191 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1](https://github.com/tversteeg/emplace/compare/v1.6.0...v1.6.1) - 2026-02-22
+
+### Fixed
+
+- *(deps)* update strum monorepo to 0.28.0
+- *(deps)* update rust crate toml to v1
+- *(deps)* update rust crate serde to v1.0.226
+- *(deps)* update rust crate clap to v4.5.48
+- *(deps)* update rust crate anyhow to v1.0.100
+- *(deps)* update rust crate toml to v0.9.7
+- *(deps)* update rust crate serde to v1.0.225
+- *(deps)* update rust crate clap_complete to v4.5.58
+- *(deps)* update rust crate toml to v0.9.6
+- *(deps)* update rust crate camino to v1.2.0
+- *(deps)* update rust crate serde to v1.0.223
+- *(deps)* update rust crate serde to v1.0.221
+- *(deps)* update rust crate log to v0.4.28
+- *(deps)* update rust crate clap to v4.5.47
+- *(deps)* update rust crate camino to v1.1.12
+- *(deps)* update rust crate clap to v4.5.46
+- *(deps)* update rust crate clap to v4.5.45
+- *(deps)* update rust crate clap_complete to v4.5.57
+- *(deps)* update rust crate anyhow to v1.0.99
+- *(deps)* update rust crate clap to v4.5.44
+- *(deps)* update rust crate clap_complete to v4.5.56
+- *(deps)* update rust crate camino to v1.1.11
+- *(deps)* update rust crate clap to v4.5.43
+- *(deps)* update rust crate toml to v0.9.5
+- *(deps)* update rust crate toml to v0.9.4
+- *(deps)* update rust crate clap to v4.5.42
+- *(deps)* update rust crate toml to v0.9.3
+- *(deps)* update strum monorepo to v0.27.2
+- *(deps)* update rust crate toml to v0.9.2
+- *(deps)* update rust crate toml to v0.9.1
+- *(deps)* update rust crate clap_complete to v4.5.55
+- *(deps)* update rust crate clap to v4.5.41
+- *(deps)* update rust crate toml to 0.9.0
+- *(deps)* update rust crate clap_complete to v4.5.54
+- *(deps)* update rust crate clap to v4.5.40
+- *(deps)* update rust crate toml to v0.8.23
+- *(deps)* update rust crate camino to v1.1.10
+- *(deps)* update rust crate clap_complete to v4.5.52
+- *(deps)* update rust crate clap to v4.5.39
+- *(deps)* update rust crate clap_complete to v4.5.51
+- *(deps)* update rust crate clap to v4.5.38
+- *(deps)* update rust crate clap_complete to v4.5.50
+- *(deps)* update rust crate clap_complete to v4.5.49
+- *(deps)* update rust crate toml to v0.8.22
+- *(deps)* update rust crate clap_complete to v4.5.48
+- *(deps)* update rust crate toml to v0.8.21
+- *(deps)* update rust crate clap to v4.5.37
+- *(deps)* update rust crate anyhow to v1.0.98
+- *(deps)* update rust crate clap to v4.5.36
+- *(deps)* update rust crate clap to v4.5.35
+- *(deps)* update rust crate clap to v4.5.34
+- *(deps)* update rust crate clap to v4.5.33
+- *(deps)* update rust crate log to v0.4.27
+- *(deps)* update rust crate clap_complete to v4.5.47
+- *(deps)* update rust crate clap to v4.5.32
+- *(deps)* update rust crate serde to v1.0.219
+- *(deps)* update rust crate anyhow to v1.0.97
+- *(deps)* update rust crate console to v0.15.11
+- *(deps)* update rust crate clap_complete to v4.5.46
+- *(deps)* update rust crate clap to v4.5.31
+- *(deps)* update rust crate log to v0.4.26
+- *(deps)* update rust crate serde to v1.0.218
+- *(deps)* update rust crate anyhow to v1.0.96
+- *(deps)* update rust crate clap_complete to v4.5.45
+- *(deps)* update rust crate clap to v4.5.30
+- *(deps)* update strum monorepo to v0.27.1
+- *(deps)* update rust crate clap to v4.5.29
+- *(deps)* update strum monorepo to 0.27.0
+- *(deps)* update rust crate toml to v0.8.20
+- *(deps)* update rust crate clap to v4.5.28
+- *(deps)* update rust crate clap_complete to v4.5.44
+- *(deps)* update rust crate clap_complete to v4.5.43
+- *(deps)* update rust crate clap to v4.5.27
+- *(deps)* update rust crate log to v0.4.25
+- *(deps)* update rust crate dirs to v6
+- *(deps)* update rust crate log to v0.4.24
+- *(deps)* update rust crate clap_complete to v4.5.42
+- *(deps)* update rust crate clap to v4.5.26
+- *(deps)* update rust crate colored to v3
+- *(deps)* update rust crate clap_complete to v4.5.41
+- *(deps)* update rust crate clap to v4.5.24
+- *(deps)* update rust crate bugreport to v0.5.1
+- *(deps)* update rust crate itertools to 0.14.0
+- *(deps)* update rust crate serde to v1.0.217
+- *(deps)* update rust crate anyhow to v1.0.95
+- *(deps)* update rust crate clap_complete to v4.5.40
+- *(deps)* update rust crate clap_complete to v4.5.39
+- *(deps)* update rust crate console to v0.15.10
+- *(deps)* update rust crate colored to v2.2.0
+- *(deps)* update rust crate serde to v1.0.216
+- *(deps)* update rust crate clap to v4.5.23
+- *(deps)* update rust crate clap to v4.5.22
+- *(deps)* update rust crate anyhow to v1.0.94
+- *(deps)* update rust crate clap_complete to v4.5.38
+- *(deps)* update rust crate clap to v4.5.21
+- *(deps)* update rust crate serde to v1.0.215
+- *(deps)* update rust crate anyhow to v1.0.93
+- *(deps)* update rust crate clap_complete to v4.5.37
+- *(deps)* update rust crate anyhow to v1.0.92
+- *(deps)* update rust crate clap_complete to v4.5.36
+- *(deps)* update rust crate serde to v1.0.214
+- *(deps)* update rust crate clap_complete to v4.5.35
+- *(deps)* update rust crate serde to v1.0.213
+- *(deps)* update rust crate anyhow to v1.0.91
+- *(deps)* update rust crate serde to v1.0.211
+- *(deps)* update rust crate anyhow to v1.0.90
+- *(deps)* update rust crate clap_complete to v4.5.33
+- *(deps)* update rust crate clap to v4.5.20
+- *(deps)* update rust crate run_script to 0.11.0
+- *(deps)* update rust crate clap_complete to v4.5.32
+- *(deps)* update rust crate clap to v4.5.19
+- *(deps)* update rust crate camino to v1.1.9 ([#395](https://github.com/tversteeg/emplace/pull/395))
+- *(deps)* update rust crate clap_complete to v4.5.29 ([#392](https://github.com/tversteeg/emplace/pull/392))
+- *(deps)* update rust crate serde to v1.0.210 ([#394](https://github.com/tversteeg/emplace/pull/394))
+- *(deps)* update rust crate toml to v0.8.19 ([#393](https://github.com/tversteeg/emplace/pull/393))
+- *(deps)* update rust crate anyhow to v1.0.89
+- *(deps)* update time to 0.3.36; fix build for rust 1.80 ([#397](https://github.com/tversteeg/emplace/pull/397))
+- *(deps)* update rust crate clap_complete to v4.5.9
+- *(deps)* update rust crate toml to v0.8.15
+- *(deps)* update rust crate clap_complete to v4.5.8
+- *(deps)* update rust crate serde to v1.0.204
+- *(deps)* update rust crate clap to v4.5.9
+- *(deps)* update rust crate clap_complete to v4.5.7
+- *(deps)* update rust crate clap to v4.5.8
+- *(deps)* update rust crate log to v0.4.22
+- *(deps)* update rust crate strum to v0.26.3
+- *(deps)* update rust crate clap_complete to v4.5.6
+- *(deps)* update rust crate clap to v4.5.7
+- *(deps)* update rust crate clap_complete to v4.5.5
+- *(deps)* update rust crate clap to v4.5.6
+- *(deps)* update rust crate strum_macros to v0.26.4
+- *(deps)* update rust crate strum_macros to v0.26.3
+- *(deps)* update rust crate toml to v0.8.14
+- *(deps)* update rust crate serde to v1.0.203
+
+### Other
+
+- *(deps)* update rust crate anyhow to v1.0.102
+- *(deps)* update rust crate clap to v4.5.60
+- *(deps)* update rust crate toml to v1.0.3
+- *(deps)* update rust crate clap to v4.5.59
+- *(deps)* update rust crate toml to v1.0.2
+- *(deps)* update rust crate toml to v1.0.1
+- *(deps)* update rust crate clap_complete to v4.5.66
+- *(deps)* update rust crate clap to v4.5.58
+- *(deps)* update rust crate toml to v0.9.12
+- *(deps)* update rust crate anyhow to v1.0.101
+- *(deps)* update rust crate clap to v4.5.57
+- *(deps)* update rust crate clap to v4.5.56
+- *(deps)* update rust crate clap to v4.5.55
+- *(deps)* update rust crate colored to v3.1.1
+- *(deps)* update rust crate toml to v0.9.11
+- *(deps)* update rust crate clap_complete to v4.5.65
+- *(deps)* update rust crate clap to v4.5.54
+- *(deps)* update rust crate clap_complete to v4.5.64
+- *(deps)* update rust crate clap_complete to v4.5.63
+- *(deps)* update rust crate toml to v0.9.10
+- *(deps)* update rust crate clap_complete to v4.5.62
+- *(deps)* update rust crate toml to v0.9.9
+- *(deps)* update rust crate camino to v1.2.2
+- *(deps)* update rust crate log to v0.4.29
+- *(deps)* update rust crate clap_complete to v4.5.61
+- *(deps)* update rust crate clap to v4.5.53
+- *(deps)* update rust crate clap to v4.5.52
+- *(deps)* update rust crate clap_complete to v4.5.60
+- *(deps)* update rust crate clap to v4.5.51
+- *(deps)* update rust crate indoc to v2.0.7
+- *(deps)* update rust crate clap to v4.5.50
+- *(deps)* update rust crate run_script to v0.11.2
+- *(deps)* update rust crate clap_complete to v4.5.59
+- *(deps)* update rust crate clap to v4.5.49
+- *(deps)* update rust crate toml to v0.9.8
+- *(deps)* update rust crate serde to v1.0.228
+- *(deps)* update rust crate camino to v1.2.1
+- *(deps)* update rust crate indoc to v2.0.6
+- add zamazan4ik as a contributor for maintenance ([#402](https://github.com/tversteeg/emplace/pull/402))
+- add chenrui333 as a contributor for maintenance ([#401](https://github.com/tversteeg/emplace/pull/401))
+- bump time crate to build with rust 1.80+ ([#400](https://github.com/tversteeg/emplace/pull/400))
+- *(binary)* enable LTO ([#399](https://github.com/tversteeg/emplace/pull/399))
+- add Qelxiros as a contributor for platform ([#388](https://github.com/tversteeg/emplace/pull/388))
+
 ## [1.6.0](https://github.com/tversteeg/emplace/compare/v1.5.3...v1.6.0) - 2024-05-25
 
 ### Added
