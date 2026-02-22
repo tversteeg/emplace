@@ -32,8 +32,8 @@ ron = "0.8.1"
 run_script = "0.11.0"
 serde = { version = "1.0.200", features = ["derive"] }
 simplelog = "0.12.2"
-strum = "0.27.0"
-strum_macros = "0.27.0"
+strum = "0.28.0"
+strum_macros = "0.28.0"
 toml = "1.0.0"
 
 [dev-dependencies]
